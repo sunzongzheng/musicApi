@@ -1,4 +1,4 @@
-#music-api
+# music-api [![Build Status](https://travis-ci.org/sunzongzheng/musicApi.svg?branch=master)](https://travis-ci.org/sunzongzheng/musicApi)
 - 聚合各大音乐Api
 - 参考[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
 - axios es6 mocha

@@ -6,3 +6,6 @@ install:
 
 script:
   - npm run test
+
+notifications:
+    email: false
