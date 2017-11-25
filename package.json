@@ -1,0 +1,23 @@
+{
+  "name": "music-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon --inspect --debug-brk src/app.js --exec babel-node",
+    "test": "mocha -t 20000 --require babel-register"
+  },
+  "author": "sunzongzhengwy@163.com",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "big-integer": "^1.6.26"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "mocha": "^4.0.1",
+    "nodemon": "^1.12.1"
+  }
+}
