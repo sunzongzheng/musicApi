@@ -2,10 +2,11 @@
   "name": "music-api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon --inspect --debug-brk src/app.js --exec babel-node",
-    "test": "mocha -t 20000 --require babel-register"
+    "test": "mocha -t 20000 --require babel-register",
+    "build": "babel src -d dist"
   },
   "author": "sunzongzhengwy@163.com",
   "license": "ISC",
