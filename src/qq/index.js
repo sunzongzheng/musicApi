@@ -26,6 +26,7 @@ export default {
             return {
                 status: true,
                 data: {
+                    keyword: data.data.keyword,
                     total: data.data.song.totalnum,
                     songs: data.data.song.list.map(item => {
                         return {

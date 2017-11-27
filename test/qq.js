@@ -9,10 +9,10 @@ describe('QQ音乐', () => {
         offset: 0,
         type: 1
     }
-    it('搜索歌曲 & 有30首歌', async () => {
+    it('搜索歌曲 & keyword=周杰伦', async () => {
         const data = await qq.searchSong(params)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.songs.length === 30)
+        assert.equal(true, data.data.keyword === '周杰伦')
     })
     it('获取歌曲地址 & 歌曲地址可连通', async () => {
         const songs = await qq.searchSong(params)
