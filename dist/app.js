@@ -74,6 +74,17 @@ const app = {
         }
         return api[vendor]['getLyric'](id);
     },
+    // 获取排行榜
+    getTopList(id) {
+        // id不能为空
+        if (!id || id.toString().trim().length < 1) {
+            return {
+                status: false,
+                msg: 'id不能为空'
+            };
+        }
+        return _index2.default.getTopList(id);
+    },
     // 获取数据
     getData(api, params) {
         return _asyncToGenerator(function* () {
