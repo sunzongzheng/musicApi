@@ -27,4 +27,20 @@ describe('网易云', () => {
         assert.equal(true, data.status)
         assert.equal(true, data.data.length > 0)
     })
+    it('获取新歌榜', async () => {
+        const {data} = await netease.getTopList("0")
+        assert.equal(true, data.list.length >= 30)
+    })
+    it('获取热歌榜', async () => {
+        const {data} = await netease.getTopList("1")
+        assert.equal(true, data.list.length >= 30)
+    })
+    it('获取网易原创歌曲榜', async () => {
+        const {data} = await netease.getTopList("2")
+        assert.equal(true, data.list.length >= 30)
+    })
+    it('获取飙升榜', async () => {
+        const {data} = await netease.getTopList("3")
+        assert.equal(true, data.list.length >= 30)
+    })
 })
