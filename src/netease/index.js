@@ -51,6 +51,7 @@ export default {
                             artists: item.ar,
                             name: item.name,
                             id: item.id,
+                            commentId: item.id,
                             cp: !item.privilege.cp
                         }
                     })
@@ -60,6 +61,37 @@ export default {
             return {
                 status: false,
                 msg: '获取失败',
+                log: e
+            }
+        }
+    },
+    async getSongDetail(id) {
+        try {
+            let data = await instace.post('/weapi/v3/song/detail', {
+                c: JSON.stringify([{id: id}]),
+                ids: '[' + id + ']',
+                csrf_token: ''
+            })
+            const info = data.songs[0]
+            return {
+                status: true,
+                data: {
+                    album: {
+                        id: info.al.id,
+                        name: info.al.name,
+                        cover: info.al.picUrl
+                    },
+                    artists: info.ar,
+                    name: info.name,
+                    id: info.id,
+                    commentId: info.id,
+                    cp: !data.privileges[0].cp
+                }
+            }
+        } catch (e) {
+            return {
+                status: false,
+                msg: '请求失败',
                 log: e
             }
         }
@@ -79,7 +111,11 @@ export default {
         try {
             let {data} = await instace.post('/weapi/song/enhance/player/url', params)
         } catch (e) {
-            return e
+            return {
+                status: false,
+                msg: '获取失败',
+                log: e
+            }
         }
     },
     async getLyric(id) {
@@ -103,7 +139,6 @@ export default {
                 log: e
             }
         }
-
     },
     async getTopList(id) {
         try {
@@ -132,6 +167,7 @@ export default {
                             artists: item.ar,
                             name: item.name,
                             id: item.id,
+                            commentId: item.id,
                             cp: !privileges[i].cp
                         }
                     })
@@ -141,6 +177,30 @@ export default {
             return {
                 status: false,
                 msg: '获取失败',
+                log: e
+            }
+        }
+    },
+    async getComment(rid, offset = 0, limit = 20) {
+        try {
+            let {hotComments, comments, total} = await instace.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
+                offset,
+                rid,
+                limit,
+                csrf_token: ""
+            })
+            return {
+                status: true,
+                data: {
+                    hotComments,
+                    comments,
+                    total
+                }
+            }
+        } catch (e) {
+            return {
+                status: false,
+                msg: '请求失败',
                 log: e
             }
         }

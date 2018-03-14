@@ -7,8 +7,41 @@ const api = {
     qq,
     xiami
 }
+const vendors = ['netease', 'qq', 'xiami']
 const app = {
     vendors: ['netease', 'qq', 'xiami'],
+    paramsVerify: (vendor, id) => {
+        // 参数校验
+        if (!vendors.includes(vendor)) {
+            return {
+                status: false,
+                msg: 'vendor错误'
+            }
+        }
+        if (id.toString().trim().length < 1) {
+            return {
+                status: false,
+                msg: 'id不能为空'
+            }
+        }
+    },
+    // 获取歌曲详情
+    getSongDetail(vendor, id){
+        // 参数校验
+        if (!this.vendors.includes(vendor)) {
+            return {
+                status: false,
+                msg: 'vendor错误'
+            }
+        }
+        if (id.toString().trim().length < 1) {
+            return {
+                status: false,
+                msg: 'id不能为空'
+            }
+        }
+        return api[vendor]['getSongDetail'](id)
+    },
     // 搜索歌曲
     searchSong(keyword) {
         // 关键字不能为空
@@ -67,6 +100,11 @@ const app = {
         }
         return netease.getTopList(id)
     },
+    // 获取歌曲评论
+    getComment(vendor, id, offset = 0, limit = 20) {
+        this.paramsVerify(vendor, id)
+        return api[vendor]['getComment'](id, offset, limit)
+    },
     // 获取数据
     async getData(api, params) {
         let netease_rs = await netease[api](params)
@@ -85,4 +123,5 @@ const app = {
         }
     }
 }
+
 export default app

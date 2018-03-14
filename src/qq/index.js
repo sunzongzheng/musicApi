@@ -38,13 +38,60 @@ export default {
                             artists: item.singer,
                             name: item.name,
                             id: item.mid,
+                            commentId: item.id,
                             cp: !item.action.alert,
                         }
                     })
                 }
             }
         } catch (e) {
-            return Promise.reject(e)
+            return {
+                status: false,
+                msg: '获取失败',
+                log: e
+            }
+        }
+    },
+    async getSongDetail(songmid) {
+        try {
+            const data = await instace.get('https://c.y.qq.com/v8/fcg-bin/fcg_play_single_song.fcg', {
+                params: {
+                    songmid,
+                    tpl: 'yqq_song_detail',
+                    format: 'jsonp',
+                    callback: 'callback',
+                    jsonpCallback: 'callback',
+                    loginUin: 0,
+                    hostUin: 0,
+                    inCharset: 'utf8',
+                    outCharset: 'utf-8',
+                    notice: 0,
+                    platform: 'yqq',
+                    needNewCode: 0
+                }
+            })
+            const info = data.data[0]
+            return {
+                status: true,
+                data: {
+                    album: {
+                        id: info.album.id,
+                        name: info.album.name,
+                        cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`,
+                    },
+                    artists: info.singer,
+                    name: info.name,
+                    id: info.mid,
+                    commentId: info.id,
+                    cp: !info.action.alert,
+                }
+            }
+        } catch (e) {
+            return {
+                status: false,
+                msg: '请求失败',
+                log: e
+            }
         }
     },
     async getSongUrl(id, level = 'normal') {
@@ -96,11 +143,11 @@ export default {
         try {
             let data = await instace.get('http://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg', {
                 params: {
-                    'callback': 'MusicJsonCallback_lrc',
+                    'callback': 'callback',
                     'pcachetime': Date.parse(new Date()),
                     'songmid': id,
                     'g_tk': 5381,
-                    'jsonpCallback': 'MusicJsonCallback_lrc',
+                    'jsonpCallback': 'callback',
                     'loginUin': 0,
                     'hostUin': 0,
                     'format': 'jsonp',
@@ -130,5 +177,48 @@ export default {
             }
         }
 
+    },
+    async getComment(topid, pagenum = 0, pagesize = 20) {
+        try {
+            const {comment, hot_comment} = await instace.get('https://c.y.qq.com/base/fcgi-bin/fcg_global_comment_h5.fcg', {
+                params: {
+                    jsonpCallback: 'callback',
+                    loginUin: 0,
+                    hostUin: 0,
+                    format: 'jsonp',
+                    inCharset: 'utf8',
+                    outCharset: 'utf8',
+                    notice: 0,
+                    platform: 'yqq',
+                    needNewCode: 0,
+                    reqtype: 2,
+                    biztype: 1,
+                    topid,
+                    cmd: 8,
+                    needmusiccrit: 0,
+                    pagenum,
+                    pagesize,
+                    lasthotcommentid: '',
+                    callback: 'callback',
+                    domain: 'qq.com',
+                }
+            })
+            debugger
+            return {
+                status: true,
+                data: {
+                    hotComments: hot_comment ? hot_comment.commentlist : [],
+                    comments: comment.commentlist,
+                    total: comment.commenttotal
+                }
+            }
+        } catch (e) {
+            console.warn(e)
+            return {
+                status: false,
+                msg: '请求失败',
+                log: e
+            }
+        }
     }
 }

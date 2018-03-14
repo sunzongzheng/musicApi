@@ -5,7 +5,7 @@ import axios from 'axios'
 describe('QQ音乐', () => {
     const params = {
         keyword: '周杰伦',
-        limit: 30,
+        limit: 1,
         offset: 0,
         type: 1
     }
@@ -26,5 +26,11 @@ describe('QQ音乐', () => {
         const data = await qq.getLyric(songs.data.songs[0].id)
         assert.equal(true, data.status)
         assert.equal(true, data.data.length > 0)
+    })
+    it('获取歌词评论 & 评论不为空', async () => {
+        const songs = await qq.searchSong(params)
+        const data = await qq.getComment(songs.data.songs[0].commentId, 0, 1)
+        assert.equal(true, data.status)
+        assert.equal(true, data.data.comments.length > 0)
     })
 })

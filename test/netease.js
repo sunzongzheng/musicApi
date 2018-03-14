@@ -43,4 +43,10 @@ describe('网易云', () => {
         const {data} = await netease.getTopList("3")
         assert.equal(true, data.list.length >= 30)
     })
+    it('获取歌词评论', async () => {
+        const songs = await netease.searchSong(params)
+        const data = await netease.getComment(songs.data.songs[0].commentId, 0, 1)
+        assert.equal(true, data.status)
+        assert.equal(true, data.data.comments.length > 0)
+    })
 })

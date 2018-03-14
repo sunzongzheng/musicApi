@@ -34,9 +34,11 @@ const instance = axios.create({
         'referer': 'https://y.qq.com/portal/player.html',
     }
 })
+
 instance.interceptors.request.use(config => {
     return config
 }, e => Promise.reject(e))
+
 instance.interceptors.response.use(res => {
     if (!res.data) {
         return Promise.reject({
@@ -44,23 +46,31 @@ instance.interceptors.response.use(res => {
             msg: '请求无结果'
         })
     }
-    const match = res.data.match(/^(callback|jsonCallback|MusicJsonCallback|MusicJsonCallback_lrc)\((.*)\);?$/)
-    if (!match || !match[2]) {
+    // 是否有回调
+    let hasCallback = false
+    const callbackArr = ['callback', 'jsonCallback', 'MusicJsonCallback']
+    callbackArr.forEach(item => {
+        if (res.data.toString().startsWith(item)) {
+            res.data = eval(`function ${item}(val){return val} ${res.data}`)
+            hasCallback = true
+        }
+    })
+    if (!hasCallback) {
         return Promise.reject({
             status: false,
             msg: '请求结果错误',
             log: res.data
         })
     }
-    const data = JSON.parse(match[2])
-    if (data.code !== 0) {
+    // code是否正确
+    if (res.data.code !== 0) {
         return Promise.reject({
             status: false,
             msg: '请求结果报错',
-            log: data
+            log: res.data
         })
     }
-    return data
+    return res.data
 }, e => Promise.reject(e))
 export default instance
 

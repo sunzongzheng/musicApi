@@ -31,7 +31,7 @@ const instance = axios.create({
     baseURL: 'http://api.xiami.com',
     timeout: 5000,
     headers: {
-        cookie: 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=cb8bfadfe130abdbf5e2282c30f0b39a;',
+        Cookie: 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=cb8bfadfe130abdbf5e2282c30f0b39a;',
         referer: 'http://h.xiami.com/',
         'User-Agent': randomUserAgent()
     }
