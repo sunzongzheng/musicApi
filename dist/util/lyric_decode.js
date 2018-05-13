@@ -1,5 +1,7 @@
+"use strict";
+
 const decode = function (str) {
-  let list = str.split('\n');
+  let list = str.replace(/\<\d+\>/g, '').split('\n');
   let lyric_arr = [];
   list.forEach(item => {
     const matchs = item.match(/((\[\d+:\d+\.\d+\])+)(.*)/);

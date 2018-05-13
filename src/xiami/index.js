@@ -62,7 +62,7 @@ export default {
             return Promise.reject(e)
         }
     },
-    async getSongDetail(id) {
+    async getSongDetail(id, getRaw = false) {
         try {
             const api = 'mtop.alimusic.music.songservice.getsongs'
             const {token, signedToken} = await this.getXiamiToken(api)
@@ -107,6 +107,12 @@ export default {
             })
             if (data.ret[0].startsWith('SUCCESS')) {
                 const info = data.data.data.songs[0]
+                if(getRaw) {
+                    return {
+                        status: true,
+                        data: info
+                    }
+                }
                 return {
                     status: true,
                     data: {
@@ -162,8 +168,16 @@ export default {
     async getLyric(id) {
         let lyric_url
         try {
-            let data = await instance.get(`http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`)
-            lyric_url = data.trackList[0].lyric_url
+            let data = await this.getSongDetail(id, true)
+            if (data.status) {
+                lyric_url = data.data.lyricInfo.lyricFile
+            } else {
+                return {
+                    status: false,
+                    data: [],
+                    log: data.log
+                }
+            }
         } catch (e) {
             return {
                 status: true,

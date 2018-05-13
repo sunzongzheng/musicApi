@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon --inspect --debug-brk controllers/app.js --exec babel-node",
+    "dev": "nodemon --inspect-brk controllers/app.js --exec babel-node",
     "devtool": "devtool -r @babel/register controllers/app.js -w",
     "test": "mocha -t 30000 --require @babel/register",
     "build": "babel src -d dist"
