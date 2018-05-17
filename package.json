@@ -1,34 +1,33 @@
 {
   "name": "music-api",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "music api colletion",
   "main": "dist/app.js",
+  "browser": "dist/app.native.js",
   "scripts": {
     "dev": "nodemon --inspect-brk controllers/app.js --exec babel-node",
-    "devtool": "devtool -r @babel/register controllers/app.js -w",
     "test": "mocha -t 30000 --require @babel/register",
-    "build": "babel src -d dist"
+    "build": "npm run build:node && npm run build:native",
+    "build:node": "babel src -d dist",
+    "build:native": "webpack-cli --mode=production src/app.native.js -o dist/app.native.js"
   },
   "author": "sunzongzhengwy@163.com",
   "license": "ISC",
   "dependencies": {
+    "big-integer": "^1.6.26",
+    "dsbridge": "^3.1.3",
+    "flyio": "^0.5.7"
+  },
+  "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",
     "@babel/node": "^7.0.0-beta.40",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
     "@babel/preset-env": "^7.0.0-beta.40",
     "@babel/register": "^7.0.0-beta.40",
-    "axios": "^0.17.1",
-    "axios-jsonp-pro": "^1.0.1",
-    "big-integer": "^1.6.26",
-    "isomorphic-fetch": "^2.2.1",
-    "jsonp": "^0.2.1",
-    "node-fetch": "^2.0.0",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2"
-  },
-  "devDependencies": {
     "mocha": "^4.0.1",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3"
   }
 }

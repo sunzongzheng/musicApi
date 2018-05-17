@@ -3,153 +3,35 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.xiami = exports.qq = exports.netease = void 0;
 
-var _index = _interopRequireDefault(require("./netease/index"));
+var _musicApi = _interopRequireDefault(require("./music-api"));
 
-var _index2 = _interopRequireDefault(require("./qq/index"));
+var _netease = _interopRequireDefault(require("./netease"));
 
-var _index3 = _interopRequireDefault(require("./xiami/index"));
+var _qq = _interopRequireDefault(require("./qq"));
+
+var _xiami = _interopRequireDefault(require("./xiami"));
+
+var _node = _interopRequireDefault(require("./netease/instance/node"));
+
+var _node2 = _interopRequireDefault(require("./qq/instance/node"));
+
+var _node3 = _interopRequireDefault(require("./xiami/instance/node"));
+
+var _node4 = _interopRequireDefault(require("./xiami/instance/node.new"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const api = {
-  netease: _index.default,
-  qq: _index2.default,
-  xiami: _index3.default
-};
-const vendors = ['netease', 'qq', 'xiami'];
-const app = {
-  vendors: ['netease', 'qq', 'xiami'],
-  paramsVerify: (vendor, id) => {
-    // 参数校验
-    if (!vendors.includes(vendor)) {
-      return {
-        status: false,
-        msg: 'vendor错误'
-      };
-    }
-
-    if (id.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: 'id不能为空'
-      };
-    }
-  },
-
-  // 获取歌曲详情
-  getSongDetail(vendor, id) {
-    // 参数校验
-    if (!this.vendors.includes(vendor)) {
-      return {
-        status: false,
-        msg: 'vendor错误'
-      };
-    }
-
-    if (id.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: 'id不能为空'
-      };
-    }
-
-    return api[vendor]['getSongDetail'](id);
-  },
-
-  // 搜索歌曲
-  searchSong(keyword) {
-    // 关键字不能为空
-    if (!keyword || keyword.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: '查询参数不能为空'
-      };
-    }
-
-    return this.getData('searchSong', {
-      keyword
-    });
-  },
-
-  // 获取歌曲url
-  getSongUrl(vendor, id) {
-    // 参数校验
-    if (!this.vendors.includes(vendor)) {
-      return {
-        status: false,
-        msg: 'vendor错误'
-      };
-    }
-
-    if (id.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: 'id不能为空'
-      };
-    }
-
-    return api[vendor]['getSongUrl'](id);
-  },
-
-  // 获取歌词
-  getLyric(vendor, id) {
-    // 参数校验
-    if (!this.vendors.includes(vendor)) {
-      return {
-        status: false,
-        msg: 'vendor错误'
-      };
-    }
-
-    if (id.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: 'id不能为空'
-      };
-    }
-
-    return api[vendor]['getLyric'](id);
-  },
-
-  // 获取排行榜
-  getTopList(id) {
-    // id不能为空
-    if (!id || id.toString().trim().length < 1) {
-      return {
-        status: false,
-        msg: 'id不能为空'
-      };
-    }
-
-    return _index.default.getTopList(id);
-  },
-
-  // 获取歌曲评论
-  getComment(vendor, id, offset = 0, limit = 20) {
-    this.paramsVerify(vendor, id);
-    return api[vendor]['getComment'](id, offset, limit);
-  },
-
-  // 获取数据
-  async getData(api, params) {
-    let netease_rs = await _index.default[api](params);
-    netease_rs = netease_rs.status ? netease_rs.data : [];
-    let qq_rs = await _index2.default[api](params);
-    qq_rs = qq_rs.status ? qq_rs.data : [];
-    let xiami_rs = await _index3.default[api](params);
-    xiami_rs = xiami_rs.status ? xiami_rs.data : [];
-    return {
-      status: true,
-      data: {
-        netease: netease_rs,
-        qq: qq_rs,
-        xiami: xiami_rs
-      }
-    };
-  }
-
-};
+const netease = (0, _netease.default)(_node.default);
+exports.netease = netease;
+const qq = (0, _qq.default)(_node2.default);
+exports.qq = qq;
+const xiami = (0, _xiami.default)(_node3.default, _node4.default);
+exports.xiami = xiami;
+const app = (0, _musicApi.default)(netease, qq, xiami);
+app.netease = netease;
+app.qq = qq;
+app.xiami = xiami;
 var _default = app;
 exports.default = _default;

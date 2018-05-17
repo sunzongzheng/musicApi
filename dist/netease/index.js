@@ -3,13 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = _default;
 
-var _instace = _interopRequireDefault(require("./instace"));
+var _util = require("../util");
 
-var _lyric_decode = _interopRequireDefault(require("../util/lyric_decode"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
 const top_list_all = {
   "0": ["云音乐新歌榜", "3779629"],
@@ -35,212 +33,225 @@ const top_list_all = {
   "20": ["台湾Hito排行榜", "112463"],
   "21": ["Beatport全球电子舞曲榜", "3812895"]
 };
-var _default = {
-  async searchSong({
-    keyword,
-    limit = 30,
-    offset = 0,
-    type = 1
-  }) {
-    // *(type)* 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002)
-    const params = {
-      csrf_token: '',
-      limit,
-      type,
-      s: keyword,
-      offset
-    };
 
-    try {
-      let {
-        result
-      } = await _instace.default.post('/weapi/cloudsearch/get/web', params);
-      return {
-        status: true,
-        data: {
-          total: result.songCount,
-          songs: result.songs.map(item => {
-            return {
+function _default(instance) {
+  return {
+    searchSong({
+      keyword,
+      limit = 30,
+      offset = 0,
+      type = 1
+    }) {
+      return _asyncToGenerator(function* () {
+        // *(type)* 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002)
+        const params = {
+          csrf_token: '',
+          limit,
+          type,
+          s: keyword,
+          offset
+        };
+
+        try {
+          let _ref = yield instance.post('/weapi/cloudsearch/get/web', params),
+              result = _ref.result;
+
+          return {
+            status: true,
+            data: {
+              total: result.songCount,
+              songs: result.songs.map(item => {
+                return {
+                  album: {
+                    id: item.al.id,
+                    name: item.al.name,
+                    cover: item.al.picUrl
+                  },
+                  artists: item.ar,
+                  name: item.name,
+                  id: item.id,
+                  commentId: item.id,
+                  cp: !item.privilege.cp
+                };
+              })
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getSongDetail(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          let data = yield instance.post('/weapi/v3/song/detail', {
+            c: JSON.stringify([{
+              id: id
+            }]),
+            ids: '[' + id + ']',
+            csrf_token: ''
+          });
+          const info = data.songs[0];
+          return {
+            status: true,
+            data: {
               album: {
-                id: item.al.id,
-                name: item.al.name,
-                cover: item.al.picUrl
+                id: info.al.id,
+                name: info.al.name,
+                cover: info.al.picUrl
               },
-              artists: item.ar,
-              name: item.name,
-              id: item.id,
-              commentId: item.id,
-              cp: !item.privilege.cp
-            };
-          })
+              artists: info.ar,
+              name: info.name,
+              id: info.id,
+              commentId: info.id,
+              cp: !data.privileges[0].cp
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
         }
-      };
-    } catch (e) {
-      return {
-        status: false,
-        msg: '获取失败',
-        log: e
-      };
-    }
-  },
+      })();
+    },
 
-  async getSongDetail(id) {
-    try {
-      let data = await _instace.default.post('/weapi/v3/song/detail', {
-        c: JSON.stringify([{
-          id: id
-        }]),
-        ids: '[' + id + ']',
-        csrf_token: ''
-      });
-      const info = data.songs[0];
-      return {
-        status: true,
-        data: {
-          album: {
-            id: info.al.id,
-            name: info.al.name,
-            cover: info.al.picUrl
-          },
-          artists: info.ar,
-          name: info.name,
-          id: info.id,
-          commentId: info.id,
-          cp: !data.privileges[0].cp
-        }
-      };
-    } catch (e) {
-      return {
-        status: false,
-        msg: '请求失败',
-        log: e
-      };
-    }
-  },
-
-  async getSongUrl(id) {
-    return {
-      status: true,
-      data: {
-        url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
-      }
-    };
-    const params = {
-      ids: [id],
-      br: 999000,
-      csrf_token: ''
-    };
-
-    try {
-      let {
-        data
-      } = await _instace.default.post('/weapi/song/enhance/player/url', params);
-    } catch (e) {
-      return {
-        status: false,
-        msg: '获取失败',
-        log: e
-      };
-    }
-  },
-
-  async getLyric(id) {
-    try {
-      let data = await _instace.default.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {});
-
-      if (data.lrc && data.lrc.lyric) {
+    getSongUrl(id) {
+      return _asyncToGenerator(function* () {
         return {
           status: true,
-          data: (0, _lyric_decode.default)(data.lrc.lyric)
+          data: {
+            url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
+          }
         };
-      } else {
-        return {
-          status: true,
-          data: []
+        const params = {
+          ids: [id],
+          br: 999000,
+          csrf_token: ''
         };
-      }
-    } catch (e) {
-      return {
-        status: false,
-        msg: '请求失败',
-        log: e
-      };
-    }
-  },
 
-  async getTopList(id) {
-    try {
-      const {
-        playlist,
-        privileges
-      } = await _instace.default.post('/weapi/v3/playlist/detail', {
-        id: top_list_all[id][1],
-        limit: 30,
-        offset: 0,
-        total: true,
-        n: 1000,
-        csrf_token: ""
-      });
-      return {
-        status: true,
-        data: {
-          name: playlist.name,
-          description: playlist.description,
-          cover: playlist.coverImgUrl,
-          playCount: playlist.playCount,
-          list: playlist.tracks.map((item, i) => {
+        try {
+          let _ref2 = yield instance.post('/weapi/song/enhance/player/url', params),
+              data = _ref2.data;
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getLyric(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          let data = yield instance.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {});
+
+          if (data.lrc && data.lrc.lyric) {
             return {
-              album: {
-                id: item.al.id,
-                name: item.al.name,
-                cover: item.al.picUrl
-              },
-              artists: item.ar,
-              name: item.name,
-              id: item.id,
-              commentId: item.id,
-              cp: !privileges[i].cp
+              status: true,
+              data: (0, _util.lyric_decode)(data.lrc.lyric)
             };
-          })
+          } else {
+            return {
+              status: true,
+              data: []
+            };
+          }
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
         }
-      };
-    } catch (e) {
-      return {
-        status: false,
-        msg: '获取失败',
-        log: e
-      };
-    }
-  },
+      })();
+    },
 
-  async getComment(rid, offset = 0, limit = 20) {
-    try {
-      let {
-        hotComments,
-        comments,
-        total
-      } = await _instace.default.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
-        offset,
-        rid,
-        limit,
-        csrf_token: ""
-      });
-      return {
-        status: true,
-        data: {
-          hotComments,
-          comments,
-          total
+    getTopList(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref3 = yield instance.post('/weapi/v3/playlist/detail', {
+            id: top_list_all[id][1],
+            limit: 30,
+            offset: 0,
+            total: true,
+            n: 1000,
+            csrf_token: ""
+          }),
+                playlist = _ref3.playlist,
+                privileges = _ref3.privileges;
+
+          return {
+            status: true,
+            data: {
+              name: playlist.name,
+              description: playlist.description,
+              cover: playlist.coverImgUrl,
+              playCount: playlist.playCount,
+              list: playlist.tracks.map((item, i) => {
+                return {
+                  album: {
+                    id: item.al.id,
+                    name: item.al.name,
+                    cover: item.al.picUrl
+                  },
+                  artists: item.ar,
+                  name: item.name,
+                  id: item.id,
+                  commentId: item.id,
+                  cp: !privileges[i].cp
+                };
+              })
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
         }
-      };
-    } catch (e) {
-      return {
-        status: false,
-        msg: '请求失败',
-        log: e
-      };
-    }
-  }
+      })();
+    },
 
-};
-exports.default = _default;
+    getComment(rid, offset = 0, limit = 20) {
+      return _asyncToGenerator(function* () {
+        try {
+          let _ref4 = yield instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
+            offset,
+            rid,
+            limit,
+            csrf_token: ""
+          }),
+              hotComments = _ref4.hotComments,
+              comments = _ref4.comments,
+              total = _ref4.total;
+
+          return {
+            status: true,
+            data: {
+              hotComments,
+              comments,
+              total
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    }
+
+  };
+}

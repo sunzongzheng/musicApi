@@ -1,17 +1,13 @@
 # music-api
-- 聚合各大音乐Api
+- 对网易云、虾米音乐、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
-- axios mocha
+- Node >= 6
+- 支持[安卓/ios](https://github.com/sunzongzheng/musicApi/blob/master/dist/app.native.js)通过Fly调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
 
-# 岂不是你啥都没做，就拷贝了两个仓库？:smirk:
-- 获取 QQ音乐、虾米音乐的 歌词api
-- 获取 QQ音乐、虾米音乐的 歌曲评论api
-- 获取 QQ音乐、虾米音乐的 歌曲详情
-
-# 已完成
+# Api列表
 - 歌曲搜索
 ````js
-function searchSong( { keyword='关键字' } ) {
+function searchSong( { keyword='关键字',offset='偏移页数' } ) {
     return {
         status:Boolean, // 请求是否成功
         data:{
@@ -53,6 +49,27 @@ function getComment( { vendor='歌曲来源',id='歌曲id',offset='偏移页数'
             hotComments: Array, // 热评
             comments: Array, // 所有评论
             total: Number, //评论总数
+        }
+    }
+}
+````
+- 歌曲详情
+
+````js
+function getSongDetail( { vendor='歌曲来源',id='歌曲id' } ) {
+    return {
+        status: Boolean, // 请求是否成功
+        data: {
+            album: {
+                id: Number | String,
+                name: String,
+                cover: String
+            },
+            artists: Array,
+            name: String,
+            id: Number | String,
+            commentId: Number | String,
+            cp: Boolean
         }
     }
 }

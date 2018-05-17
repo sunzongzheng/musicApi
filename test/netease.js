@@ -1,6 +1,6 @@
 import assert from 'assert'
-import netease from '../src/netease'
-import axios from 'axios'
+import {netease} from '../src/app'
+import fly from 'flyio'
 
 describe('网易云', () => {
     const params = {
@@ -17,7 +17,7 @@ describe('网易云', () => {
     it('获取歌曲地址 & 歌曲地址可连通', async () => {
         const songs = await netease.searchSong(params)
         const data = await netease.getSongUrl(songs.data.songs[0].id)
-        const {status} = await axios(data.data.url)
+        const {status} = await fly.get(data.data.url)
         assert.equal(true, data.status)
         assert.equal(true, status === 200 || status === 201)
     })

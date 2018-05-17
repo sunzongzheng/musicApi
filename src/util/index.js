@@ -1,8 +1,4 @@
-import Encrypt from './crypto.js'
-import axios from 'axios'
-import querystring from 'querystring'
-
-function randomUserAgent() {
+export function randomUserAgent() {
     const userAgentList = [
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
         'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
@@ -28,43 +24,20 @@ function randomUserAgent() {
     return userAgentList[num]
 }
 
-const instance = axios.create({
-    baseURL: 'http://music.163.com',
-    timeout: 5000,
-    headers: {
-        Accept: '*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
-        Connection: 'keep-alive',
-        'X-Real-IP': '223.74.158.213', // 此处加上可以解决海外请求的问题
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Referer: 'http://music.163.com',
-        Host: 'music.163.com',
-        'User-Agent': randomUserAgent()
-    }
-})
-instance.interceptors.request.use(config => {
-    const cryptoreq = Encrypt(config.data)
-    config.data = querystring.stringify({
-        params: cryptoreq.params,
-        encSecKey: cryptoreq.encSecKey
+export function lyric_decode(str) {
+    let list = str.replace(/\<\d+\>/g, '').split('\n')
+    let lyric_arr = []
+    list.forEach(item => {
+        const matchs = item.match(/((\[\d+:\d+\.\d+\])+)(.*)/)
+        if (matchs && matchs[1]) {
+            const t_array = matchs[1].match(/\[\d+:\d+\.\d+\]/g)
+            t_array.forEach(item => {
+                lyric_arr.push([
+                    item.substring(1, item.length - 1),
+                    matchs[3]
+                ])
+            })
+        }
     })
-    return config
-}, e => Promise.reject(e))
-instance.interceptors.response.use(res => {
-    if (!res.data) {
-        return Promise.reject({
-            status: false,
-            msg: '请求无结果'
-        })
-    }
-    if (res.data.code !== 200) {
-        return Promise.reject({
-            status: false,
-            msg: '请求失败',
-            log: res.data
-        })
-    }
-    return res.data
-}, e => Promise.reject(e))
-export default instance
-
+    return lyric_arr.sort()
+}

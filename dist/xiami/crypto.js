@@ -55,10 +55,10 @@ var modulus = '00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b7251
 var nonce = '0CoJUm6Qyw8W8jud';
 var pubKey = '010001';
 var Crypto = {
-  MD5: function (text) {
+  MD5: function MD5(text) {
     return crypto.createHash('md5').update(text).digest('hex');
   },
-  aesRsaEncrypt: function (text) {
+  aesRsaEncrypt: function aesRsaEncrypt(text) {
     var secKey = createSecretKey(16);
     return {
       params: aesEncrypt(aesEncrypt(text, nonce), secKey),

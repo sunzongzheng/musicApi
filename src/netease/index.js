@@ -1,5 +1,4 @@
-import instace from './instace'
-import lyric_encode from '../util/lyric_decode'
+import {lyric_decode} from '../util'
 
 const top_list_all = {
     "0": ["云音乐新歌榜", "3779629"],
@@ -25,183 +24,186 @@ const top_list_all = {
     "20": ["台湾Hito排行榜", "112463"],
     "21": ["Beatport全球电子舞曲榜", "3812895"]
 }
-export default {
-    async searchSong({keyword, limit = 30, offset = 0, type = 1}) {
-        // *(type)* 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002)
-        const params = {
-            csrf_token: '',
-            limit,
-            type,
-            s: keyword,
-            offset,
-        }
-        try {
-            let {result} = await instace.post('/weapi/cloudsearch/get/web', params)
-            return {
-                status: true,
-                data: {
-                    total: result.songCount,
-                    songs: result.songs.map(item => {
-                        return {
-                            album: {
-                                id: item.al.id,
-                                name: item.al.name,
-                                cover: item.al.picUrl
-                            },
-                            artists: item.ar,
-                            name: item.name,
-                            id: item.id,
-                            commentId: item.id,
-                            cp: !item.privilege.cp
-                        }
-                    })
-                }
-            }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '获取失败',
-                log: e
-            }
-        }
-    },
-    async getSongDetail(id) {
-        try {
-            let data = await instace.post('/weapi/v3/song/detail', {
-                c: JSON.stringify([{id: id}]),
-                ids: '[' + id + ']',
-                csrf_token: ''
-            })
-            const info = data.songs[0]
-            return {
-                status: true,
-                data: {
-                    album: {
-                        id: info.al.id,
-                        name: info.al.name,
-                        cover: info.al.picUrl
-                    },
-                    artists: info.ar,
-                    name: info.name,
-                    id: info.id,
-                    commentId: info.id,
-                    cp: !data.privileges[0].cp
-                }
-            }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
-            }
-        }
-    },
-    async getSongUrl(id) {
-        return {
-            status: true,
-            data: {
-                url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
-            }
-        }
-        const params = {
-            ids: [id],
-            br: 999000,
-            csrf_token: ''
-        }
-        try {
-            let {data} = await instace.post('/weapi/song/enhance/player/url', params)
-        } catch (e) {
-            return {
-                status: false,
-                msg: '获取失败',
-                log: e
-            }
-        }
-    },
-    async getLyric(id) {
-        try {
-            let data = await instace.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {})
-            if (data.lrc && data.lrc.lyric) {
-                return {
-                    status: true,
-                    data: lyric_encode(data.lrc.lyric)
-                }
-            } else {
-                return {
-                    status: true,
-                    data: []
-                }
-            }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
-            }
-        }
-    },
-    async getTopList(id) {
-        try {
-            const {playlist, privileges} = await instace.post('/weapi/v3/playlist/detail', {
-                id: top_list_all[id][1],
-                limit: 30,
-                offset: 0,
-                total: true,
-                n: 1000,
-                csrf_token: ""
-            })
-            return {
-                status: true,
-                data: {
-                    name: playlist.name,
-                    description: playlist.description,
-                    cover: playlist.coverImgUrl,
-                    playCount: playlist.playCount,
-                    list: playlist.tracks.map((item, i) => {
-                        return {
-                            album: {
-                                id: item.al.id,
-                                name: item.al.name,
-                                cover: item.al.picUrl
-                            },
-                            artists: item.ar,
-                            name: item.name,
-                            id: item.id,
-                            commentId: item.id,
-                            cp: !privileges[i].cp
-                        }
-                    })
-                }
-            }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '获取失败',
-                log: e
-            }
-        }
-    },
-    async getComment(rid, offset = 0, limit = 20) {
-        try {
-            let {hotComments, comments, total} = await instace.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
-                offset,
-                rid,
+
+export default function (instance) {
+    return {
+        async searchSong({keyword, limit = 30, offset = 0, type = 1}) {
+            // *(type)* 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002)
+            const params = {
+                csrf_token: '',
                 limit,
-                csrf_token: ""
-            })
+                type,
+                s: keyword,
+                offset,
+            }
+            try {
+                let {result} = await instance.post('/weapi/cloudsearch/get/web', params)
+                return {
+                    status: true,
+                    data: {
+                        total: result.songCount,
+                        songs: result.songs.map(item => {
+                            return {
+                                album: {
+                                    id: item.al.id,
+                                    name: item.al.name,
+                                    cover: item.al.picUrl
+                                },
+                                artists: item.ar,
+                                name: item.name,
+                                id: item.id,
+                                commentId: item.id,
+                                cp: !item.privilege.cp
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
+        },
+        async getSongDetail(id) {
+            try {
+                let data = await instance.post('/weapi/v3/song/detail', {
+                    c: JSON.stringify([{id: id}]),
+                    ids: '[' + id + ']',
+                    csrf_token: ''
+                })
+                const info = data.songs[0]
+                return {
+                    status: true,
+                    data: {
+                        album: {
+                            id: info.al.id,
+                            name: info.al.name,
+                            cover: info.al.picUrl
+                        },
+                        artists: info.ar,
+                        name: info.name,
+                        id: info.id,
+                        commentId: info.id,
+                        cp: !data.privileges[0].cp
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
+        async getSongUrl(id) {
             return {
                 status: true,
                 data: {
-                    hotComments,
-                    comments,
-                    total
+                    url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
                 }
             }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
+            const params = {
+                ids: [id],
+                br: 999000,
+                csrf_token: ''
+            }
+            try {
+                let {data} = await instance.post('/weapi/song/enhance/player/url', params)
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
+        },
+        async getLyric(id) {
+            try {
+                let data = await instance.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {})
+                if (data.lrc && data.lrc.lyric) {
+                    return {
+                        status: true,
+                        data: lyric_decode(data.lrc.lyric)
+                    }
+                } else {
+                    return {
+                        status: true,
+                        data: []
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
+        async getTopList(id) {
+            try {
+                const {playlist, privileges} = await instance.post('/weapi/v3/playlist/detail', {
+                    id: top_list_all[id][1],
+                    limit: 30,
+                    offset: 0,
+                    total: true,
+                    n: 1000,
+                    csrf_token: ""
+                })
+                return {
+                    status: true,
+                    data: {
+                        name: playlist.name,
+                        description: playlist.description,
+                        cover: playlist.coverImgUrl,
+                        playCount: playlist.playCount,
+                        list: playlist.tracks.map((item, i) => {
+                            return {
+                                album: {
+                                    id: item.al.id,
+                                    name: item.al.name,
+                                    cover: item.al.picUrl
+                                },
+                                artists: item.ar,
+                                name: item.name,
+                                id: item.id,
+                                commentId: item.id,
+                                cp: !privileges[i].cp
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
+        },
+        async getComment(rid, offset = 0, limit = 20) {
+            try {
+                let {hotComments, comments, total} = await instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
+                    offset,
+                    rid,
+                    limit,
+                    csrf_token: ""
+                })
+                return {
+                    status: true,
+                    data: {
+                        hotComments,
+                        comments,
+                        total
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
             }
         }
     }

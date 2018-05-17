@@ -1,6 +1,6 @@
 import assert from 'assert'
-import qq from '../src/qq'
-import axios from 'axios'
+import {qq} from '../src/app'
+import fly from 'flyio'
 
 describe('QQ音乐', () => {
     const params = {
@@ -17,7 +17,7 @@ describe('QQ音乐', () => {
     it('获取歌曲地址 & 歌曲地址可连通', async () => {
         const songs = await qq.searchSong(params)
         const data = await qq.getSongUrl(songs.data.songs[0].id)
-        const {status} = await axios(data.data.url)
+        const {status} = await fly.get(data.data.url)
         assert.equal(true, data.status)
         assert.equal(true, status === 200 || status === 201)
     })

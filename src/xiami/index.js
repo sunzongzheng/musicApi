@@ -1,95 +1,95 @@
-import axios from 'axios'
-import instance from './instace'
-import lyric_encode from '../util/lyric_decode'
-import 'isomorphic-fetch'
+import fly from "flyio"
+import {lyric_decode} from '../util'
 import Crypto from './crypto'
 
-const NEW_API_URL = 'http://acs.m.xiami.com/h5/'
-
-export default {
-    // 根据api获取虾米token
-    async getXiamiToken(api) {
-        try {
-            const res = await fetch(`${NEW_API_URL}${api}/1.0/`)
-            let token = Array.from(res.headers._headers['set-cookie'])
-            token = token.map(i => i.split(';')[0].trim())
-            const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
-
-            return {
-                token,
-                signedToken: myToken,
-            }
-        } catch (e) {
-            console.warn(e)
-        }
-    },
-    async searchSong({keyword, limit = 30, offset = 0}) {
-        const params = {
-            v: '2.0',
-            key: keyword,
-            limit: limit,
-            page: offset,
-            r: 'search/songs',
-            app_key: 1
-        }
-        try {
-            let data = await instance.post('/web?', params)
-            return {
-                status: true,
-                data: {
-                    total: data.total,
-                    songs: data.songs.map(item => {
-                        return {
-                            album: {
-                                id: item.album_id,
-                                name: item.album_name,
-                                cover: item.album_logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
-                            },
-                            artists: [{
-                                id: item.artist_id,
-                                name: item.artist_name,
-                                avatar: item.artist_logo,
-                            }],
-                            name: item.song_name,
-                            id: item.song_id,
-                            commentId: item.song_id,
-                            cp: !item.listen_file,
-                        }
+export default function (instance, newApiInstance) {
+    return {
+        // 根据api获取虾米token
+        async getXiamiToken(api) {
+            try {
+                await newApiInstance.get(`/${api}/1.0/`)
+            } catch (res) {
+                if (res.status === 200) {
+                    let token = res.headers['set-cookie'].split('Path=/,')
+                    token = token.map(i => i.split(';')[0].trim())
+                    const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
+                    return {
+                        token,
+                        signedToken: myToken,
+                    }
+                } else {
+                    return Promise.reject({
+                        msg: '获取token失败'
                     })
                 }
+
             }
-        } catch (e) {
-            return Promise.reject(e)
-        }
-    },
-    async getSongDetail(id, getRaw = false) {
-        try {
-            const api = 'mtop.alimusic.music.songservice.getsongs'
-            const {token, signedToken} = await this.getXiamiToken(api)
-            const appKey = 12574478
-            const queryStr = JSON.stringify({
-                requestStr: JSON.stringify({
-                    header: {
-                        appId: 200,
-                        appVersion: 1000000,
-                        callId: new Date().getTime(),
-                        network: 1,
-                        platformId: 'mac',
-                        remoteIp: '192.168.1.101',
-                        resolution: '1178*778',
-                    },
-                    model: {
-                        songIds: [id]
+        },
+        async searchSong({keyword, limit = 30, offset = 0}) {
+            const params = {
+                v: '2.0',
+                key: keyword,
+                limit: limit,
+                page: offset + 1,
+                r: 'search/songs',
+                app_key: 1
+            }
+            try {
+                let data = await instance.post('/web?', params)
+                return {
+                    status: true,
+                    data: {
+                        total: data.total,
+                        songs: data.songs.map(item => {
+                            return {
+                                album: {
+                                    id: item.album_id,
+                                    name: item.album_name,
+                                    cover: item.album_logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                                },
+                                artists: [{
+                                    id: item.artist_id,
+                                    name: item.artist_name,
+                                    avatar: item.artist_logo,
+                                }],
+                                name: item.song_name,
+                                id: item.song_id,
+                                commentId: item.song_id,
+                                cp: !item.listen_file,
+                            }
+                        })
                     }
+                }
+            } catch (e) {
+                return Promise.reject(e)
+            }
+        },
+        async getSongDetail(id, getRaw = false) {
+            try {
+                const api = 'mtop.alimusic.music.songservice.getsongs'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            songIds: [id]
+                        }
+                    })
                 })
-            })
-            const t = new Date().getTime()
-            const sign = Crypto.MD5(
-                `${signedToken}&${t}&${appKey}&${queryStr}`
-            )
-            const {data} = await axios(`${NEW_API_URL}/${api}/1.0/`, {
-                // resolveWithFullResponse: true,
-                params: {
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const data = await newApiInstance.get(`/${api}/1.0/`, {
                     appKey, // 会变化
                     t, // 会变化
                     sign, // 会变化
@@ -98,16 +98,13 @@ export default {
                     type: 'originaljson',
                     dataType: 'json', // 会变化
                     data: queryStr
-                },
-                headers: {
-                    'host': 'acs.m.xiami.com',
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'cookie': token.join(';'), // 会变化
-                },
-            })
-            if (data.ret[0].startsWith('SUCCESS')) {
-                const info = data.data.data.songs[0]
-                if(getRaw) {
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
+                const info = data.songs[0]
+                if (getRaw) {
                     return {
                         status: true,
                         data: info
@@ -132,65 +129,52 @@ export default {
                         cp: !info.listenFiles.length,
                     }
                 }
-            } else {
-                return {
-                    status: false,
-                    msg: data.ret[0].slice('::')[1],
-                    e: data
+            } catch (e) {
+                console.warn(e)
+                if (e.status === 200) {
+                    return {
+                        status: false,
+                        msg: e.ret[0].slice('::')[1],
+                        log: e
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: '请求失败',
+                        log: e
+                    }
                 }
             }
-        } catch (e) {
-            console.warn(e)
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
-            }
-        }
-    },
-    async getSongUrl(id) {
-        try {
-            let data = await instance.get(`http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`)
-            return {
-                status: true,
-                data: {
-                    url: this.parseLocation(data.trackList[0].location)
-                }
-            }
-        } catch (e) {
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
-            }
-        }
-    },
-    async getLyric(id) {
-        let lyric_url
-        try {
-            let data = await this.getSongDetail(id, true)
-            if (data.status) {
-                lyric_url = data.data.lyricInfo.lyricFile
-            } else {
-                return {
-                    status: false,
-                    data: [],
-                    log: data.log
-                }
-            }
-        } catch (e) {
-            return {
-                status: true,
-                data: [],
-                log: e
-            }
-        }
-        if (lyric_url) {
+        },
+        async getSongUrl(id) {
             try {
-                let {data} = await axios(lyric_url)
+                let data = await instance.get(`http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`)
                 return {
                     status: true,
-                    data: lyric_encode(data)
+                    data: {
+                        url: this.parseLocation(data.trackList[0].location)
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
+        async getLyric(id) {
+            let lyric_url
+            try {
+                let data = await this.getSongDetail(id, true)
+                if (data.status) {
+                    lyric_url = data.data.lyricInfo.lyricFile
+                } else {
+                    return {
+                        status: false,
+                        data: [],
+                        log: data.log
+                    }
                 }
             } catch (e) {
                 return {
@@ -199,48 +183,60 @@ export default {
                     log: e
                 }
             }
-        } else {
-            return {
-                status: true,
-                data: [],
-                log: '未获取到歌曲url'
-            }
-        }
-
-    },
-    async getComment(objectId, offset, pageSize) {
-        try {
-            const api = 'mtop.alimusic.social.commentservice.getcommentlist'
-            const {token, signedToken} = await this.getXiamiToken(api)
-            const appKey = 12574478
-            const queryStr = JSON.stringify({
-                requestStr: JSON.stringify({
-                    header: {
-                        appId: 200,
-                        appVersion: 1000000,
-                        callId: new Date().getTime(),
-                        network: 1,
-                        platformId: 'mac',
-                        remoteIp: '192.168.1.101',
-                        resolution: '1178*778',
-                    },
-                    model: {
-                        objectId, // 会变化
-                        objectType: 'song',
-                        pagingVO: {
-                            page: offset + 1,
-                            pageSize
-                        }
+            if (lyric_url) {
+                try {
+                    let {data} = await fly.get(lyric_url)
+                    return {
+                        status: true,
+                        data: lyric_decode(data)
                     }
+                } catch (e) {
+                    return {
+                        status: true,
+                        data: [],
+                        log: e
+                    }
+                }
+            } else {
+                return {
+                    status: true,
+                    data: [],
+                    log: '未获取到歌曲url'
+                }
+            }
+
+        },
+        async getComment(objectId, offset, pageSize) {
+            try {
+                const api = 'mtop.alimusic.social.commentservice.getcommentlist'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            objectId, // 会变化
+                            objectType: 'song',
+                            pagingVO: {
+                                page: offset + 1,
+                                pageSize
+                            }
+                        }
+                    })
                 })
-            })
-            const t = new Date().getTime()
-            const sign = Crypto.MD5(
-                `${signedToken}&${t}&${appKey}&${queryStr}`
-            )
-            const {data} = await axios(`${NEW_API_URL}/${api}/1.0/`, {
-                // resolveWithFullResponse: true,
-                params: {
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const data = await newApiInstance.get(`/${api}/1.0/`, {
                     appKey, // 会变化
                     t, // 会变化
                     sign, // 会变化
@@ -249,64 +245,63 @@ export default {
                     type: 'originaljson',
                     dataType: 'json', // 会变化
                     data: queryStr
-                },
-                headers: {
-                    'host': 'acs.m.xiami.com',
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'cookie': token.join(';'), // 会变化
-                },
-            })
-            if (data.ret[0].startsWith('SUCCESS')) {
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
                 return {
                     status: true,
                     data: {
                         hotComments: [],
-                        comments: data.data.data.commentVOList,
-                        total: data.data.data.pagingVO.count
+                        comments: data.commentVOList,
+                        total: data.pagingVO.count
                     }
                 }
-            } else {
-                return {
-                    status: false,
-                    msg: data.ret[0].slice('::')[1],
-                    e: data
-                }
-            }
-        } catch (e) {
-            console.warn(e)
-            return {
-                status: false,
-                msg: '请求失败',
-                log: e
-            }
-        }
-    },
-    parseLocation(location) {
-        let head = parseInt(location.substr(0, 1))
-        let _str = location.substr(1)
-        let rows = head
-        let cols = parseInt(_str.length / rows) + 1
-        let output = ''
-        let full_row
-        for (let i = 0; i < head; i++) {
-            if ((_str.length - i) / head === parseInt(_str.length / head)) {
-                full_row = i
-            }
-        }
-        for (let c = 0; c < cols; c++) {
-            for (let r = 0; r < head; r++) {
-                if (c === (cols - 1) && r >= full_row) {
-                    continue
-                }
-                let char
-                if (r < full_row) {
-                    char = _str[r * cols + c]
+            } catch (e) {
+                console.warn(e)
+                if (e.status === 200) {
+                    return {
+                        status: false,
+                        msg: e.ret[0].slice('::')[1],
+                        log: e
+                    }
                 } else {
-                    char = _str[cols * full_row + (r - full_row) * (cols - 1) + c]
+                    return {
+                        status: false,
+                        msg: '请求失败',
+                        log: e
+                    }
                 }
-                output += char
             }
+        },
+        parseLocation(location) {
+            let head = parseInt(location.substr(0, 1))
+            let _str = location.substr(1)
+            let rows = head
+            let cols = parseInt(_str.length / rows) + 1
+            let output = ''
+            let full_row
+            for (let i = 0; i < head; i++) {
+                if ((_str.length - i) / head === parseInt(_str.length / head)) {
+                    full_row = i
+                }
+            }
+            for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < head; r++) {
+                    if (c === (cols - 1) && r >= full_row) {
+                        continue
+                    }
+                    let char
+                    if (r < full_row) {
+                        char = _str[r * cols + c]
+                    } else {
+                        char = _str[cols * full_row + (r - full_row) * (cols - 1) + c]
+                    }
+                    output += char
+                }
+            }
+            return decodeURIComponent(output).replace(/\^/g, '0')
         }
-        return decodeURIComponent(output).replace(/\^/g, '0')
     }
 }
