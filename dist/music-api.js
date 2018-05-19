@@ -58,14 +58,6 @@ function _default(netease, qq, xiami) {
   }();
 
   return {
-    // 获取歌曲详情
-    getSongDetail(vendor, id) {
-      return _asyncToGenerator(function* () {
-        yield paramsVerify(vendor, id);
-        return yield api[vendor]['getSongDetail'](id);
-      })();
-    },
-
     // 搜索歌曲
     searchSong(keyword, offset = 0) {
       // 关键字不能为空
@@ -76,10 +68,18 @@ function _default(netease, qq, xiami) {
         };
       }
 
-      return this.getData('searchSong', {
+      return getData('searchSong', {
         keyword,
         offset
       });
+    },
+
+    // 获取歌曲详情
+    getSongDetail(vendor, id) {
+      return _asyncToGenerator(function* () {
+        yield paramsVerify(vendor, id);
+        return yield api[vendor]['getSongDetail'](id);
+      })();
     },
 
     // 获取歌曲url

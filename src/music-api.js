@@ -37,11 +37,6 @@ export default function (netease, qq, xiami) {
         }
     }
     return {
-        // 获取歌曲详情
-        async getSongDetail(vendor, id) {
-            await paramsVerify(vendor, id)
-            return await api[vendor]['getSongDetail'](id)
-        },
         // 搜索歌曲
         searchSong(keyword, offset = 0) {
             // 关键字不能为空
@@ -51,10 +46,15 @@ export default function (netease, qq, xiami) {
                     msg: '查询参数不能为空'
                 }
             }
-            return this.getData('searchSong', {
+            return getData('searchSong', {
                 keyword,
                 offset
             })
+        },
+        // 获取歌曲详情
+        async getSongDetail(vendor, id) {
+            await paramsVerify(vendor, id)
+            return await api[vendor]['getSongDetail'](id)
         },
         // 获取歌曲url
         async getSongUrl(vendor, id) {

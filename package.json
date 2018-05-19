@@ -6,7 +6,7 @@
   "browser": "dist/app.native.js",
   "scripts": {
     "dev": "nodemon --inspect-brk controllers/app.js --exec babel-node",
-    "test": "mocha -t 30000 --require @babel/register",
+    "test": "mocha -t 30000 --require @babel/register 'test/*.test.js' --exit",
     "build": "npm run build:node && npm run build:native",
     "build:node": "babel src -d dist",
     "build:native": "webpack-cli --mode=production src/app.native.js -o dist/app.native.js"
