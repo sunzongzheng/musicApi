@@ -7,6 +7,6 @@ export const qqMusic = {
     commentId: 5106429
 }
 export const xiamiMusic = {
-    id: 376035,
-    commentId: 376035
+    id: 74204,
+    commentId: 74204
 }

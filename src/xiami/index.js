@@ -2,10 +2,17 @@ import fly from "flyio"
 import {lyric_decode} from '../util'
 import Crypto from './crypto'
 
+let cache = {
+    token: null,
+    signedToken: null
+}
 export default function (instance, newApiInstance) {
     return {
         // 根据api获取虾米token
         async getXiamiToken(api) {
+            if(cache.token && cache.signedToken) {
+                return cache
+            }
             try {
                 await newApiInstance.get(`/${api}/1.0/`)
             } catch (res) {
@@ -13,10 +20,11 @@ export default function (instance, newApiInstance) {
                     let token = res.headers['set-cookie'].split('Path=/,')
                     token = token.map(i => i.split(';')[0].trim())
                     const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
-                    return {
+                    cache = {
                         token,
-                        signedToken: myToken,
+                        signedToken: myToken
                     }
+                    return cache
                 } else {
                     return Promise.reject({
                         msg: '获取token失败'

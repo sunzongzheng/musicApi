@@ -15,11 +15,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
+let cache = {
+  token: null,
+  signedToken: null
+};
+
 function _default(instance, newApiInstance) {
   return {
     // 根据api获取虾米token
     getXiamiToken(api) {
       return _asyncToGenerator(function* () {
+        if (cache.token && cache.signedToken) {
+          return cache;
+        }
+
         try {
           yield newApiInstance.get(`/${api}/1.0/`);
         } catch (res) {
@@ -27,10 +36,11 @@ function _default(instance, newApiInstance) {
             let token = res.headers['set-cookie'].split('Path=/,');
             token = token.map(i => i.split(';')[0].trim());
             const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
-            return {
+            cache = {
               token,
               signedToken: myToken
             };
+            return cache;
           } else {
             return Promise.reject({
               msg: '获取token失败'
