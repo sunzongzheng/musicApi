@@ -1,17 +1,17 @@
 declare module 'music-api' {
 
-    export interface album {
+    interface album {
         id: number | string
         name: string
         cover: string
     }
 
-    export interface artist {
+    interface artist {
         id: number | string
         name: string
     }
 
-    export interface musicInfo {
+    interface musicInfo {
         id: number | string
         name: string
         album: album
@@ -20,25 +20,25 @@ declare module 'music-api' {
         cp: boolean
     }
 
-    export interface errorResult {
+    interface errorResult {
         status: false
         msg: string
         log: any
     }
 
-    export interface searchSongResult {
+    interface searchSongResult {
         total: number
         songs: Array<musicInfo>
     }
 
-    export interface searchSongOptions {
+    interface searchSongOptions {
         keyword: string
         limit: number
         offset: number
         type?: number
     }
 
-    export interface getSongDetailResult {
+    interface getSongDetailResult {
         status: true,
         data: musicInfo
     }
@@ -49,25 +49,25 @@ declare module 'music-api' {
         low
     }
 
-    export interface getSongUrlResult {
+    interface getSongUrlResult {
         status: true
         data: {
             url: string
         }
     }
 
-    export interface getLyricResult {
+    interface getLyricResult {
         status: true
         data: Array<string>[]
     }
 
-    export interface qqCommentInfo {
+    interface qqCommentInfo {
         avatarurl: string
         nick: string
         rootcommentcontent: string
     }
 
-    export interface getCommentResult {
+    interface getCommentResult {
         status: true
         data: {
             hotComments: Array<qqCommentInfo>
@@ -97,7 +97,7 @@ declare module 'music-api' {
         parseLocation(location: string): string
     }
 
-    export interface getTopListResult {
+    interface getTopListResult {
         status: true
         data: {
             name: string,
@@ -113,7 +113,7 @@ declare module 'music-api' {
     }
 
 
-    export interface musicApiSearchSongResult {
+    interface musicApiSearchSongResult {
         status: true,
         data: {
             netease: searchSongResult,
@@ -124,10 +124,10 @@ declare module 'music-api' {
 
     export function searchSong(keyword: string, offset?: number): Promise<musicApiSearchSongResult | errorResult>
 
-    export enum vendor {
-        netease,
-        qq,
-        xiami
+    enum vendor {
+        netease = 'netease',
+        qq = 'qq',
+        xiami = 'xiami'
     }
 
     export function getSongDetail(vendor: vendor, id: number | string): Promise<getSongDetailResult | errorResult>
