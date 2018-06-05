@@ -13,7 +13,7 @@ export default function (netease, qq, xiami) {
                 msg: 'vendor错误'
             })
         }
-        if (!id) {
+        if (!id || Array.isArray(id) && !id.length) {
             return Promise.reject({
                 status: false,
                 msg: 'id不能为空'
@@ -55,6 +55,11 @@ export default function (netease, qq, xiami) {
         async getSongDetail(vendor, id) {
             await paramsVerify(vendor, id)
             return await api[vendor]['getSongDetail'](id)
+        },
+        // 批量获取歌曲详情
+        async getBatchSongDetail(vendor, ids) {
+            await paramsVerify(vendor, ids)
+            return await api[vendor]['getBatchSongDetail'](ids)
         },
         // 获取歌曲url
         async getSongUrl(vendor, id) {

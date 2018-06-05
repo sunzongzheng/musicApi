@@ -24,7 +24,7 @@ function _default(netease, qq, xiami) {
       });
     }
 
-    if (!id) {
+    if (!id || Array.isArray(id) && !id.length) {
       return Promise.reject({
         status: false,
         msg: 'id不能为空'
@@ -79,6 +79,14 @@ function _default(netease, qq, xiami) {
       return _asyncToGenerator(function* () {
         yield paramsVerify(vendor, id);
         return yield api[vendor]['getSongDetail'](id);
+      })();
+    },
+
+    // 批量获取歌曲详情
+    getBatchSongDetail(vendor, ids) {
+      return _asyncToGenerator(function* () {
+        yield paramsVerify(vendor, ids);
+        return yield api[vendor]['getBatchSongDetail'](ids);
       })();
     },
 

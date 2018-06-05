@@ -122,6 +122,45 @@ function _default(instance) {
       })();
     },
 
+    getBatchSongDetail(ids) {
+      return _asyncToGenerator(function* () {
+        ids = ids.map(item => parseInt(item));
+
+        try {
+          let data = yield instance.post('/weapi/v3/song/detail', {
+            c: JSON.stringify(ids.map(item => ({
+              id: item
+            }))),
+            ids: JSON.stringify(ids),
+            csrf_token: ''
+          });
+          return {
+            status: true,
+            data: data.songs.map(info => {
+              return {
+                album: {
+                  id: info.al.id,
+                  name: info.al.name,
+                  cover: info.al.picUrl
+                },
+                artists: info.ar,
+                name: info.name,
+                id: info.id,
+                commentId: info.id,
+                cp: !data.privileges[0].cp
+              };
+            })
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
     getSongUrl(id) {
       return _asyncToGenerator(function* () {
         return {
