@@ -10,7 +10,7 @@ export default function (instance, newApiInstance) {
     return {
         // 根据api获取虾米token
         async getXiamiToken(api) {
-            if(cache.token && cache.signedToken) {
+            if (cache.token && cache.signedToken) {
                 return cache
             }
             try {
@@ -136,6 +136,83 @@ export default function (instance, newApiInstance) {
                         commentId: info.songId,
                         cp: !info.listenFiles.length,
                     }
+                }
+            } catch (e) {
+                console.warn(e)
+                if (e.status === 200) {
+                    return {
+                        status: false,
+                        msg: e.ret[0].slice('::')[1],
+                        log: e
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: '请求失败',
+                        log: e
+                    }
+                }
+            }
+        },
+        async getBatchSongDetail(ids) {
+            try {
+                const api = 'mtop.alimusic.music.songservice.getsongs'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            songIds: ids
+                        }
+                    })
+                })
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const data = await newApiInstance.get(`/${api}/1.0/`, {
+                    appKey, // 会变化
+                    t, // 会变化
+                    sign, // 会变化
+                    api: 'mtop.alimusic.social.commentservice.getcommentlist',
+                    v: '1.0',
+                    type: 'originaljson',
+                    dataType: 'json', // 会变化
+                    data: queryStr
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
+                return {
+                    status: true,
+                    data: data.songs.map(info => {
+                        return {
+                            album: {
+                                id: info.albumId,
+                                name: info.albumName,
+                                cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                            },
+                            artists: [{
+                                id: info.artistId,
+                                name: info.artistName,
+                                avatar: info.artistLogo,
+                            }],
+                            name: info.songName,
+                            id: info.songId,
+                            commentId: info.songId,
+                            cp: !info.listenFiles.length,
+                        }
+                    })
                 }
             } catch (e) {
                 console.warn(e)
