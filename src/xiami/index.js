@@ -4,13 +4,14 @@ import Crypto from './crypto'
 
 let cache = {
     token: null,
-    signedToken: null
+    signedToken: null,
+    expire: null
 }
 export default function (instance, newApiInstance) {
     return {
         // 根据api获取虾米token
         async getXiamiToken(api) {
-            if (cache.token && cache.signedToken) {
+            if (cache.token && cache.signedToken && cache.expire <= Date.parse(new Date())) {
                 return cache
             }
             try {
@@ -22,7 +23,8 @@ export default function (instance, newApiInstance) {
                     const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
                     cache = {
                         token,
-                        signedToken: myToken
+                        signedToken: myToken,
+                        expire: Date.parse(new Date()) + 5 * 60 * 1000
                     }
                     return cache
                 } else {

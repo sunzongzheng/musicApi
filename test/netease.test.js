@@ -5,10 +5,8 @@ import {neteaseMusic} from "./util"
 
 describe('网易云', () => {
     const params = {
-        keyword: '周杰伦',
-        limit: 30,
-        offset: 0,
-        type: 1
+        keyword: '薛之谦',
+        offset: 0
     }
     it('搜索歌曲 & 有30首歌', async () => {
         const data = await netease.searchSong(params)
