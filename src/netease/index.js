@@ -38,6 +38,9 @@ export default function (instance) {
             }
             try {
                 let {result} = await instance.post('/weapi/cloudsearch/get/web', params)
+                if(!result.songs) {
+                    result.songs = []
+                }
                 return {
                     status: true,
                     data: {

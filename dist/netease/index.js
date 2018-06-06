@@ -56,6 +56,10 @@ function _default(instance) {
           let _ref = yield instance.post('/weapi/cloudsearch/get/web', params),
               result = _ref.result;
 
+          if (!result.songs) {
+            result.songs = [];
+          }
+
           return {
             status: true,
             data: {

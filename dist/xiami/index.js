@@ -17,7 +17,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 let cache = {
   token: null,
-  signedToken: null
+  signedToken: null,
+  expire: null
 };
 
 function _default(instance, newApiInstance) {
@@ -25,7 +26,7 @@ function _default(instance, newApiInstance) {
     // 根据api获取虾米token
     getXiamiToken(api) {
       return _asyncToGenerator(function* () {
-        if (cache.token && cache.signedToken) {
+        if (cache.token && cache.signedToken && cache.expire <= Date.parse(new Date())) {
           return cache;
         }
 
@@ -38,7 +39,8 @@ function _default(instance, newApiInstance) {
             const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
             cache = {
               token,
-              signedToken: myToken
+              signedToken: myToken,
+              expire: Date.parse(new Date()) + 5 * 60 * 1000
             };
             return cache;
           } else {
