@@ -110,6 +110,50 @@ function _default(instance) {
       })();
     },
 
+    getBatchSongDetail(songmids) {
+      return _asyncToGenerator(function* () {
+        try {
+          const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
+            songmid: songmids.join(','),
+            tpl: 'yqq_song_detail',
+            format: 'jsonp',
+            callback: 'callback',
+            jsonpCallback: 'callback',
+            loginUin: 0,
+            hostUin: 0,
+            inCharset: 'utf8',
+            outCharset: 'utf-8',
+            notice: 0,
+            platform: 'yqq',
+            needNewCode: 0
+          });
+          return {
+            status: true,
+            data: data.data.map(info => {
+              return {
+                album: {
+                  id: info.album.id,
+                  name: info.album.name,
+                  cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
+                },
+                artists: info.singer,
+                name: info.name,
+                id: info.mid,
+                commentId: info.id,
+                cp: !info.action.alert
+              };
+            })
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
     getSongUrl(id, level = 'normal') {
       return _asyncToGenerator(function* () {
         const guid = Math.floor(Math.random() * 1000000000);

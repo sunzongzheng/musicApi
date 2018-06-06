@@ -196,8 +196,100 @@ function _default(instance, newApiInstance) {
       })();
     },
 
-    getSongUrl(id) {
+    getBatchSongDetail(ids) {
       var _this2 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const api = 'mtop.alimusic.music.songservice.getsongs';
+
+          const _ref2 = yield _this2.getXiamiToken(api),
+                token = _ref2.token,
+                signedToken = _ref2.signedToken;
+
+          const appKey = 12574478;
+          const queryStr = JSON.stringify({
+            requestStr: JSON.stringify({
+              header: {
+                appId: 200,
+                appVersion: 1000000,
+                callId: new Date().getTime(),
+                network: 1,
+                platformId: 'mac',
+                remoteIp: '192.168.1.101',
+                resolution: '1178*778'
+              },
+              model: {
+                songIds: ids
+              }
+            })
+          });
+          const t = new Date().getTime();
+
+          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
+
+          const data = yield newApiInstance.get(`/${api}/1.0/`, {
+            appKey,
+            // 会变化
+            t,
+            // 会变化
+            sign,
+            // 会变化
+            api: 'mtop.alimusic.social.commentservice.getcommentlist',
+            v: '1.0',
+            type: 'originaljson',
+            dataType: 'json',
+            // 会变化
+            data: queryStr
+          }, {
+            headers: {
+              'cookie': token.join(';') // 会变化
+
+            }
+          });
+          return {
+            status: true,
+            data: data.songs.map(info => {
+              return {
+                album: {
+                  id: info.albumId,
+                  name: info.albumName,
+                  cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                },
+                artists: [{
+                  id: info.artistId,
+                  name: info.artistName,
+                  avatar: info.artistLogo
+                }],
+                name: info.songName,
+                id: info.songId,
+                commentId: info.songId,
+                cp: !info.listenFiles.length
+              };
+            })
+          };
+        } catch (e) {
+          console.warn(e);
+
+          if (e.status === 200) {
+            return {
+              status: false,
+              msg: e.ret[0].slice('::')[1],
+              log: e
+            };
+          } else {
+            return {
+              status: false,
+              msg: '请求失败',
+              log: e
+            };
+          }
+        }
+      })();
+    },
+
+    getSongUrl(id) {
+      var _this3 = this;
 
       return _asyncToGenerator(function* () {
         try {
@@ -205,7 +297,7 @@ function _default(instance, newApiInstance) {
           return {
             status: true,
             data: {
-              url: _this2.parseLocation(data.trackList[0].location)
+              url: _this3.parseLocation(data.trackList[0].location)
             }
           };
         } catch (e) {
@@ -219,13 +311,13 @@ function _default(instance, newApiInstance) {
     },
 
     getLyric(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator(function* () {
         let lyric_url;
 
         try {
-          let data = yield _this3.getSongDetail(id, true);
+          let data = yield _this4.getSongDetail(id, true);
 
           if (data.status) {
             lyric_url = data.data.lyricInfo.lyricFile;
@@ -246,8 +338,8 @@ function _default(instance, newApiInstance) {
 
         if (lyric_url) {
           try {
-            let _ref2 = yield _flyio.default.get(lyric_url),
-                data = _ref2.data;
+            let _ref3 = yield _flyio.default.get(lyric_url),
+                data = _ref3.data;
 
             return {
               status: true,
@@ -271,15 +363,15 @@ function _default(instance, newApiInstance) {
     },
 
     getComment(objectId, offset, pageSize) {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator(function* () {
         try {
           const api = 'mtop.alimusic.social.commentservice.getcommentlist';
 
-          const _ref3 = yield _this4.getXiamiToken(api),
-                token = _ref3.token,
-                signedToken = _ref3.signedToken;
+          const _ref4 = yield _this5.getXiamiToken(api),
+                token = _ref4.token,
+                signedToken = _ref4.signedToken;
 
           const appKey = 12574478;
           const queryStr = JSON.stringify({

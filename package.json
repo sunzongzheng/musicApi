@@ -1,6 +1,6 @@
 {
   "name": "music-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "music api colletion",
   "main": "dist/app.js",
   "browser": "dist/app.native.js",

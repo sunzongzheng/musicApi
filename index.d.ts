@@ -43,6 +43,11 @@ declare module 'music-api' {
         data: musicInfo
     }
 
+    interface getBatchSongDetailResult {
+        status: true,
+        data: Array<musicInfo>
+    }
+
     enum qqSongLever {
         high,
         normal,
@@ -139,4 +144,6 @@ declare module 'music-api' {
     export function getTopList(id: string): Promise<getTopListResult | errorResult>
 
     export function getComment(vendor: vendor, id: number | string, offset?: number, limit?: number): Promise<getCommentResult | errorResult>
+
+    export function getBatchSongDetail(vendor: vendor, ids: Array<number | string>): Promise<getBatchSongDetailResult | errorResult>
 }
