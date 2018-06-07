@@ -1,5 +1,5 @@
 {
-  "name": "music-api",
+  "name": "@suen/music-api",
   "version": "1.0.2",
   "description": "music api colletion",
   "main": "dist/app.js",
@@ -10,7 +10,7 @@
     "build:node": "babel src -d dist",
     "build:web": "webpack"
   },
-  "author": "sunzongzhengwy@163.com",
+  "author": "i@zzsun.cc",
   "license": "ISC",
   "dependencies": {
     "big-integer": "^1.6.26",
