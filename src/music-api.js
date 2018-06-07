@@ -1,9 +1,16 @@
-export default function (netease, qq, xiami) {
-    const api = {
-        netease,
-        qq,
-        xiami
-    }
+import Netease from './netease'
+import QQ from './qq'
+import Xiami from './xiami'
+import neteaseBase from './netease/instance/base'
+import qqBase from './qq/instance/base'
+import xiamiBase from './xiami/instance/base'
+import xiamiNewBase from './xiami/instance/base.new'
+
+export default function (instance) {
+    const netease = Netease(neteaseBase(instance))
+    const qq = QQ(qqBase(instance))
+    const xiami = Xiami(xiamiBase(instance), xiamiNewBase(instance))
+
     const vendors = ['netease', 'qq', 'xiami']
     const paramsVerify = (vendor, id) => {
         // 参数校验
@@ -37,6 +44,9 @@ export default function (netease, qq, xiami) {
         }
     }
     return {
+        netease,
+        qq,
+        xiami,
         // 搜索歌曲
         searchSong(keyword, offset = 0) {
             // 关键字不能为空
@@ -54,22 +64,22 @@ export default function (netease, qq, xiami) {
         // 获取歌曲详情
         async getSongDetail(vendor, id) {
             await paramsVerify(vendor, id)
-            return await api[vendor]['getSongDetail'](id)
+            return await this[vendor]['getSongDetail'](id)
         },
         // 批量获取歌曲详情
         async getBatchSongDetail(vendor, ids) {
             await paramsVerify(vendor, ids)
-            return await api[vendor]['getBatchSongDetail'](ids)
+            return await this[vendor]['getBatchSongDetail'](ids)
         },
         // 获取歌曲url
         async getSongUrl(vendor, id) {
             await paramsVerify(vendor, id)
-            return await api[vendor]['getSongUrl'](id)
+            return await this[vendor]['getSongUrl'](id)
         },
         // 获取歌词
         async getLyric(vendor, id) {
             await paramsVerify(vendor, id)
-            return await api[vendor]['getLyric'](id)
+            return await this[vendor]['getLyric'](id)
         },
         // 获取排行榜
         getTopList(id) {
@@ -85,7 +95,7 @@ export default function (netease, qq, xiami) {
         // 获取歌曲评论
         async getComment(vendor, id, offset = 0, limit = 20) {
             await paramsVerify(vendor, id)
-            return await api[vendor]['getComment'](id, offset, limit)
+            return await this[vendor]['getComment'](id, offset, limit)
         },
     }
 }

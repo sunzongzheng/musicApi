@@ -1,5 +1,5 @@
 import musicApi from './music-api'
-import instance from './util/flyio.native'
+import instance from './util/flyio.web'
 
 const app = musicApi(instance)
 
