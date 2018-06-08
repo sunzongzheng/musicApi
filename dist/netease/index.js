@@ -138,6 +138,10 @@ function _default(instance) {
             ids: JSON.stringify(ids),
             csrf_token: ''
           });
+          const privilegeObject = {};
+          data.privileges.forEach(item => {
+            privilegeObject[item.id] = item;
+          });
           return {
             status: true,
             data: data.songs.map(info => {
@@ -151,7 +155,7 @@ function _default(instance) {
                 name: info.name,
                 id: info.id,
                 commentId: info.id,
-                cp: !data.privileges[0].cp
+                cp: !privilegeObject[info.id].cp
               };
             })
           };

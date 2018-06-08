@@ -38,7 +38,7 @@ export default function (instance) {
             }
             try {
                 let {result} = await instance.post('/weapi/cloudsearch/get/web', params)
-                if(!result.songs) {
+                if (!result.songs) {
                     result.songs = []
                 }
                 return {
@@ -108,6 +108,10 @@ export default function (instance) {
                     ids: JSON.stringify(ids),
                     csrf_token: ''
                 })
+                const privilegeObject = {}
+                data.privileges.forEach(item => {
+                    privilegeObject[item.id] = item
+                })
                 return {
                     status: true,
                     data: data.songs.map(info => {
@@ -121,7 +125,7 @@ export default function (instance) {
                             name: info.name,
                             id: info.id,
                             commentId: info.id,
-                            cp: !data.privileges[0].cp
+                            cp: !privilegeObject[info.id].cp
                         }
                     })
                 }
