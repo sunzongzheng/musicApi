@@ -7,7 +7,7 @@
 # Api列表
 - 歌曲搜索
 ````js
-function searchSong( keyword='关键字',offset='偏移页数' ) {
+function searchSong( keyword:关键字, offset:偏移页数 ) {
     return {
         status:Boolean, // 请求是否成功
         data:{
@@ -20,7 +20,7 @@ function searchSong( keyword='关键字',offset='偏移页数' ) {
 ````
 - 歌曲url
 ````js
-function getSongUrl( vendor='歌曲来源',id='歌曲id' ) {
+function getSongUrl( vendor:歌曲来源, id:歌曲id ) {
     return {
         status: Boolean, // 请求是否成功
         data: {
@@ -31,7 +31,7 @@ function getSongUrl( vendor='歌曲来源',id='歌曲id' ) {
 ````
 - 歌曲歌词
 ````js
-function getLyric( vendor='歌曲来源',id='歌曲id' ) {
+function getLyric( vendor:歌曲来源, id:歌曲id ) {
     return {
         status: Boolean, // 请求是否成功
         data: Array, // 歌词数组
@@ -42,7 +42,7 @@ function getLyric( vendor='歌曲来源',id='歌曲id' ) {
 
 **由于网易云、QQ音乐的`评论逻辑不一样`，`hotComments`及`comments`没有进行强封装**
 ````js
-function getComment( vendor='歌曲来源',id='歌曲id',offset='偏移页数',limit='页大小' ) {
+function getComment( vendor:歌曲来源, id:歌曲id, offset:偏移页数, limit:页大小 ) {
     return {
         status: Boolean, // 请求是否成功
         data: {
@@ -56,7 +56,7 @@ function getComment( vendor='歌曲来源',id='歌曲id',offset='偏移页数',l
 - 歌曲详情
 
 ````js
-function getSongDetail( vendor='歌曲来源',id='歌曲id' ) {
+function getSongDetail( vendor:歌曲来源, id:歌曲id ) {
     return {
         status: Boolean, // 请求是否成功
         data: {
@@ -76,8 +76,13 @@ function getSongDetail( vendor='歌曲来源',id='歌曲id' ) {
 ````
 - 批量获取歌曲详情
 
+  注意事项： 
+    - QQ音乐一次只能获取50条数据，不会去重
+    - 网易云音乐未发现单次数量限制，会去重
+    - 虾米音乐未发现单次数量限制，不会去重
+    - `去重`的意思是 `重复的歌曲id，只会返回一次歌曲信息`
 ````js
-function getBatchSongDetail( vendor='歌曲来源',ids='歌曲id数组' ) {
+function getBatchSongDetail( vendor:歌曲来源, ids:歌曲id数组 ) {
     return {
         status: Boolean, // 请求是否成功
         data: [{
