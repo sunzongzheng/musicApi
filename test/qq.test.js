@@ -13,7 +13,6 @@ describe('QQ音乐', () => {
     it('搜索歌曲 & keyword=周杰伦', async () => {
         const data = await qq.searchSong(params)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.keyword === '周杰伦')
     })
     it('获取歌曲地址 & 歌曲地址可连通', async () => {
         const data = await qq.getSongUrl(qqMusic.id)
@@ -30,5 +29,10 @@ describe('QQ音乐', () => {
         const data = await qq.getComment(qqMusic.commentId, 0, 1)
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
+    })
+    it('获取歌手详情', async () => {
+        const {data, status} = await qq.getArtistSongs(qqMusic.artistId)
+        assert.equal(true, status)
+        assert.equal(true, data.songs.length > 0)
     })
 })

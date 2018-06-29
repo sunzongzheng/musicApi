@@ -76,5 +76,19 @@ describe('musicApi', () => {
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })
-
+    it('获取歌手详情 网易云', async () => {
+        const {data, status} = await musicApi.getArtistSongs('netease', neteaseMusic.artistId)
+        assert.equal(true, status)
+        assert.equal(true, data.songs.length > 0)
+    })
+    it('获取歌手详情 QQ音乐', async () => {
+        const {data, status} = await musicApi.getArtistSongs('qq', qqMusic.artistId)
+        assert.equal(true, status)
+        assert.equal(true, data.songs.length > 0)
+    })
+    it('获取歌手详情 虾米音乐', async () => {
+        const {data, status} = await musicApi.getArtistSongs('xiami', xiamiMusic.artistId)
+        assert.equal(true, status)
+        assert.equal(true, data.songs.length > 0)
+    })
 })

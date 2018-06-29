@@ -45,4 +45,9 @@ describe('网易云', () => {
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })
+    it('获取歌手详情', async () => {
+        const {data, status} = await netease.getArtistSongs(neteaseMusic.artistId)
+        assert.equal(true, status)
+        assert.equal(true, data.songs.length > 0)
+    })
 })

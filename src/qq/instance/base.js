@@ -22,7 +22,7 @@ export default function (createInstance) {
         let hasCallback = false
         const callbackArr = ['callback', 'jsonCallback', 'MusicJsonCallback']
         callbackArr.forEach(item => {
-            if (res.data.toString().startsWith(item)) {
+            if (res.data.toString().trim().startsWith(item)) {
                 res.data = eval(`function ${item}(val){return val} ${res.data}`)
                 hasCallback = true
             }

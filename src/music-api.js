@@ -97,5 +97,10 @@ export default function (instance) {
             await paramsVerify(vendor, id)
             return await this[vendor]['getComment'](id, offset, limit)
         },
+        // 获取歌手单曲
+        async getArtistSongs(vendor, id, offset = 0, limit = 50) {
+            await paramsVerify(vendor, id)
+            return await this[vendor]['getArtistSongs'](id, offset, limit)
+        }
     }
 }

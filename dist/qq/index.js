@@ -39,7 +39,6 @@ function _default(instance) {
           return {
             status: true,
             data: {
-              keyword: data.data.keyword,
               total: data.data.song.totalnum,
               songs: data.data.song.list.map(item => {
                 return {
@@ -48,7 +47,12 @@ function _default(instance) {
                     name: item.album.name,
                     cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg`
                   },
-                  artists: item.singer,
+                  artists: item.singer.map(singer => {
+                    return {
+                      id: singer.mid,
+                      name: singer.name
+                    };
+                  }),
                   name: item.name,
                   id: item.mid,
                   commentId: item.id,
@@ -93,7 +97,12 @@ function _default(instance) {
                 name: info.album.name,
                 cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
               },
-              artists: info.singer,
+              artists: info.singer.map(singer => {
+                return {
+                  id: singer.mid,
+                  name: singer.name
+                };
+              }),
               name: info.name,
               id: info.mid,
               commentId: info.id,
@@ -136,7 +145,12 @@ function _default(instance) {
                   name: info.album.name,
                   cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
                 },
-                artists: info.singer,
+                artists: info.singer.map(singer => {
+                  return {
+                    id: singer.mid,
+                    name: singer.name
+                  };
+                }),
                 name: info.name,
                 id: info.mid,
                 commentId: info.id,
@@ -289,6 +303,59 @@ function _default(instance) {
             log: e
           };
         }
+      })();
+    },
+
+    getArtistSongs(id, offset, limit) {
+      return _asyncToGenerator(function* () {
+        const params = {
+          format: 'jsonp',
+          callback: 'callback',
+          jsonpCallback: 'callback',
+          loginUin: 0,
+          hostUin: 0,
+          inCharset: 'utf8',
+          outCharset: 'utf-8',
+          notice: 0,
+          platform: 'yqq',
+          needNewCode: 0,
+          singermid: id,
+          order: 'listen',
+          begin: offset * limit,
+          num: limit,
+          songstatus: 1
+        };
+        const data = yield instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params);
+        return {
+          status: true,
+          data: {
+            detail: {
+              id,
+              name: data.data.singer_name,
+              avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`
+            },
+            songs: data.data.list.map(item => {
+              const info = item.musicData;
+              return {
+                album: {
+                  id: info.albumid,
+                  name: info.albumname,
+                  cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.albummid}.jpg`
+                },
+                artists: info.singer.map(singer => {
+                  return {
+                    id: singer.mid,
+                    name: singer.name
+                  };
+                }),
+                name: info.songname,
+                id: info.songmid,
+                commentId: info.songmid,
+                cp: !info.alertid
+              };
+            })
+          }
+        };
       })();
     }
 

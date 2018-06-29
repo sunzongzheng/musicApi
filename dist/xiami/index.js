@@ -82,8 +82,7 @@ function _default(instance, newApiInstance) {
                   },
                   artists: [{
                     id: item.artist_id,
-                    name: item.artist_name,
-                    avatar: item.artist_logo
+                    name: item.artist_name
                   }],
                   name: item.song_name,
                   id: item.song_id,
@@ -169,8 +168,7 @@ function _default(instance, newApiInstance) {
               },
               artists: [{
                 id: info.artistId,
-                name: info.artistName,
-                avatar: info.artistLogo
+                name: info.artistName
               }],
               name: info.songName,
               id: info.songId,
@@ -260,8 +258,7 @@ function _default(instance, newApiInstance) {
                 },
                 artists: [{
                   id: info.artistId,
-                  name: info.artistName,
-                  avatar: info.artistLogo
+                  name: info.artistName
                 }],
                 name: info.songName,
                 id: info.songId,
@@ -484,6 +481,101 @@ function _default(instance, newApiInstance) {
       }
 
       return decodeURIComponent(output).replace(/\^/g, '0');
+    },
+
+    getArtistSongs(id, offset, limit) {
+      var _this6 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const api = 'mtop.alimusic.music.songservice.getartistsongs';
+
+          const _ref5 = yield _this6.getXiamiToken(api),
+                token = _ref5.token,
+                signedToken = _ref5.signedToken;
+
+          const appKey = 12574478;
+          const queryStr = JSON.stringify({
+            requestStr: JSON.stringify({
+              header: {
+                appId: 200,
+                appVersion: 1000000,
+                callId: new Date().getTime(),
+                network: 1,
+                platformId: 'mac',
+                remoteIp: '192.168.1.101',
+                resolution: '1178*778'
+              },
+              model: {
+                artistId: id,
+                backwardOffSale: true,
+                pagingVO: {
+                  page: offset + 1,
+                  pageSize: limit
+                }
+              }
+            })
+          });
+          const t = new Date().getTime();
+
+          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
+
+          const data = yield newApiInstance.get(`/${api}/1.0/`, {
+            appKey,
+            // 会变化
+            t,
+            // 会变化
+            sign,
+            // 会变化
+            api,
+            v: '1.0',
+            type: 'originaljson',
+            dataType: 'json',
+            // 会变化
+            data: queryStr
+          }, {
+            headers: {
+              'cookie': token.join(';') // 会变化
+
+            }
+          });
+          return {
+            status: true,
+            data: {
+              detail: {
+                id,
+                name: data.songs[0].artistName,
+                avatar: data.songs[0].artistLogo
+              },
+              songs: data.songs.map(item => {
+                return {
+                  album: {
+                    id: item.albumId,
+                    name: item.albumName,
+                    cover: item.albumLogo
+                  },
+                  artists: item.artistVOs.map(artist => {
+                    return {
+                      id: artist.artistId,
+                      name: artist.artistName
+                    };
+                  }),
+                  name: item.songName,
+                  id: item.songId,
+                  commentId: item.songId,
+                  cp: !item.listenFiles
+                };
+              })
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

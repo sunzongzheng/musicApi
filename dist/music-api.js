@@ -153,6 +153,16 @@ function _default(instance) {
         yield paramsVerify(vendor, id);
         return yield _this5[vendor]['getComment'](id, offset, limit);
       })();
+    },
+
+    // 获取歌手单曲
+    getArtistSongs(vendor, id, offset = 0, limit = 50) {
+      var _this6 = this;
+
+      return _asyncToGenerator(function* () {
+        yield paramsVerify(vendor, id);
+        return yield _this6[vendor]['getArtistSongs'](id, offset, limit);
+      })();
     }
 
   };

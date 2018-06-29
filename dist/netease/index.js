@@ -71,7 +71,12 @@ function _default(instance) {
                     name: item.al.name,
                     cover: item.al.picUrl
                   },
-                  artists: item.ar,
+                  artists: item.ar.map(ar => {
+                    return {
+                      id: ar.id,
+                      name: ar.name
+                    };
+                  }),
                   name: item.name,
                   id: item.id,
                   commentId: item.id,
@@ -109,7 +114,12 @@ function _default(instance) {
                 name: info.al.name,
                 cover: info.al.picUrl
               },
-              artists: info.ar,
+              artists: info.ar.map(ar => {
+                return {
+                  id: ar.id,
+                  name: ar.name
+                };
+              }),
               name: info.name,
               id: info.id,
               commentId: info.id,
@@ -151,7 +161,12 @@ function _default(instance) {
                   name: info.al.name,
                   cover: info.al.picUrl
                 },
-                artists: info.ar,
+                artists: info.ar.map(ar => {
+                  return {
+                    id: ar.id,
+                    name: ar.name
+                  };
+                }),
                 name: info.name,
                 id: info.id,
                 commentId: info.id,
@@ -250,7 +265,12 @@ function _default(instance) {
                     name: item.al.name,
                     cover: item.al.picUrl
                   },
-                  artists: item.ar,
+                  artists: item.ar.map(ar => {
+                    return {
+                      id: ar.id,
+                      name: ar.name
+                    };
+                  }),
                   name: item.name,
                   id: item.id,
                   commentId: item.id,
@@ -288,6 +308,53 @@ function _default(instance) {
               hotComments,
               comments,
               total
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getArtistSongs(id, offset, limit) {
+      return _asyncToGenerator(function* () {
+        try {
+          let data = yield instance.post(`/weapi/v1/artist/${id}`, {
+            csrf_token: '',
+            offset,
+            limit
+          });
+          return {
+            status: true,
+            data: {
+              detail: {
+                id,
+                name: data.artist.name,
+                avatar: data.artist.img1v1Url
+              },
+              songs: data.hotSongs.map(item => {
+                return {
+                  album: {
+                    id: item.al.id,
+                    name: item.al.name,
+                    cover: item.al.picUrl
+                  },
+                  artists: item.ar.map(ar => {
+                    return {
+                      id: ar.id,
+                      name: ar.name
+                    };
+                  }),
+                  name: item.name,
+                  id: item.id,
+                  commentId: item.id,
+                  cp: !item.privilege.cp
+                };
+              })
             }
           };
         } catch (e) {

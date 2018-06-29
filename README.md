@@ -100,3 +100,35 @@ function getBatchSongDetail( vendor:歌曲来源, ids:歌曲id数组 ) {
     }
 }
 ````
+- 歌手详情
+
+  注意事项：
+    - 网易云没有分页，传页参数无效
+    - 默认第一页，50条数据
+
+````js
+function getArtistSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, limit:页大小 ) {
+    return {
+        status: Boolean, // 请求是否成功
+        data: {
+            detail: {
+                id: Number | String,
+                name: String,
+                avatar: String
+            },
+            songs: [{
+               album: {
+                   id: Number | String,
+                   name: String,
+                   cover: String
+               },
+               artists: Array,
+               name: String,
+               id: Number | String,
+               commentId: Number | String,
+               cp: Boolean
+           }]
+        }
+    }
+}
+````
