@@ -345,7 +345,7 @@ function _default(instance) {
                 album: {
                   id: info.albumid,
                   name: info.albumname,
-                  cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.albummid}.jpg`
+                  cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`
                 },
                 artists: info.singer.map(singer => {
                   return {
