@@ -275,24 +275,26 @@ export default function (instance) {
                 inCharset: 'utf8',
                 outCharset: 'utf-8',
                 notice: 0,
-                platform: 'yqq',
+                platform: 'h5page',
                 needNewCode: 0,
+                from: 'h5',
                 singermid: id,
                 order: 'listen',
                 begin: offset * limit,
                 num: limit,
                 songstatus: 1
             }
-            const data = await instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params)
+            const {data} = await instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params)
             return {
                 status: true,
                 data: {
                     detail: {
                         id,
-                        name: data.data.singer_name,
-                        avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`
+                        name: data.singer_name,
+                        avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`,
+                        desc: data.SingerDesc
                     },
-                    songs: data.data.list.map(item => {
+                    songs: data.list.map(item => {
                         const info = item.musicData
                         return {
                             album: {

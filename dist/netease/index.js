@@ -334,7 +334,8 @@ function _default(instance) {
               detail: {
                 id,
                 name: data.artist.name,
-                avatar: data.artist.img1v1Url
+                avatar: data.artist.img1v1Url,
+                desc: data.artist.briefDesc
               },
               songs: data.hotSongs.map(item => {
                 return {

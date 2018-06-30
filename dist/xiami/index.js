@@ -26,7 +26,7 @@ function _default(instance, newApiInstance) {
     // 根据api获取虾米token
     getXiamiToken(api) {
       return _asyncToGenerator(function* () {
-        if (cache.token && cache.signedToken && cache.expire <= Date.parse(new Date())) {
+        if (cache.token && cache.signedToken && +new Date() <= cache.expire) {
           return cache;
         }
 
@@ -40,7 +40,7 @@ function _default(instance, newApiInstance) {
             cache = {
               token,
               signedToken: myToken,
-              expire: Date.parse(new Date()) + 5 * 60 * 1000
+              expire: +new Date() + 5 * 60 * 1000
             };
             return cache;
           } else {
@@ -483,16 +483,90 @@ function _default(instance, newApiInstance) {
       return decodeURIComponent(output).replace(/\^/g, '0');
     },
 
-    getArtistSongs(id, offset, limit) {
+    getArtistDetail(id) {
       var _this6 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.music.songservice.getartistsongs';
+          const api = 'mtop.alimusic.music.artistservice.getartistdetail';
 
           const _ref5 = yield _this6.getXiamiToken(api),
                 token = _ref5.token,
                 signedToken = _ref5.signedToken;
+
+          const appKey = 12574478;
+          const queryStr = JSON.stringify({
+            requestStr: JSON.stringify({
+              header: {
+                appId: 200,
+                appVersion: 1000000,
+                callId: new Date().getTime(),
+                network: 1,
+                platformId: 'mac',
+                remoteIp: '192.168.1.101',
+                resolution: '1178*778'
+              },
+              model: {
+                artistId: id
+              }
+            })
+          });
+          const t = new Date().getTime();
+
+          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
+
+          const _ref6 = yield newApiInstance.get(`/${api}/1.0/`, {
+            appKey,
+            // 会变化
+            t,
+            // 会变化
+            sign,
+            // 会变化
+            api,
+            v: '1.0',
+            type: 'originaljson',
+            dataType: 'json',
+            // 会变化
+            data: queryStr
+          }, {
+            headers: {
+              'cookie': token.join(';') // 会变化
+
+            }
+          }),
+                artistDetailVO = _ref6.artistDetailVO;
+
+          return {
+            status: true,
+            data: {
+              id,
+              name: artistDetailVO.artistName,
+              avatar: artistDetailVO.artistLogo,
+              desc: artistDetailVO.description
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getArtistSongs(id, offset, limit) {
+      var _this7 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const detailInfo = yield _this7.getArtistDetail(id);
+          const detail = detailInfo.status ? detailInfo.data : {};
+          const api = 'mtop.alimusic.music.songservice.getartistsongs';
+
+          const _ref7 = yield _this7.getXiamiToken(api),
+                token = _ref7.token,
+                signedToken = _ref7.signedToken;
 
           const appKey = 12574478;
           const queryStr = JSON.stringify({
@@ -542,11 +616,7 @@ function _default(instance, newApiInstance) {
           return {
             status: true,
             data: {
-              detail: {
-                id,
-                name: data.songs[0].artistName,
-                avatar: data.songs[0].artistLogo
-              },
+              detail,
               songs: data.songs.map(item => {
                 return {
                   album: {

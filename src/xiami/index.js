@@ -11,7 +11,7 @@ export default function (instance, newApiInstance) {
     return {
         // 根据api获取虾米token
         async getXiamiToken(api) {
-            if (cache.token && cache.signedToken && cache.expire <= Date.parse(new Date())) {
+            if (cache.token && cache.signedToken && +new Date() <= cache.expire) {
                 return cache
             }
             try {
@@ -24,7 +24,7 @@ export default function (instance, newApiInstance) {
                     cache = {
                         token,
                         signedToken: myToken,
-                        expire: Date.parse(new Date()) + 5 * 60 * 1000
+                        expire: +new Date() + 5 * 60 * 1000
                     }
                     return cache
                 } else {
@@ -32,7 +32,6 @@ export default function (instance, newApiInstance) {
                         msg: '获取token失败'
                     })
                 }
-
             }
         },
         async searchSong({keyword, limit = 30, offset = 0}) {
@@ -387,8 +386,66 @@ export default function (instance, newApiInstance) {
             }
             return decodeURIComponent(output).replace(/\^/g, '0')
         },
+        async getArtistDetail(id) {
+            try {
+                const api = 'mtop.alimusic.music.artistservice.getartistdetail'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            artistId: id
+                        }
+                    })
+                })
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const {artistDetailVO} = await newApiInstance.get(`/${api}/1.0/`, {
+                    appKey, // 会变化
+                    t, // 会变化
+                    sign, // 会变化
+                    api,
+                    v: '1.0',
+                    type: 'originaljson',
+                    dataType: 'json', // 会变化
+                    data: queryStr
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
+                return {
+                    status: true,
+                    data: {
+                        id,
+                        name: artistDetailVO.artistName,
+                        avatar: artistDetailVO.artistLogo,
+                        desc: artistDetailVO.description
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
+        },
         async getArtistSongs(id, offset, limit) {
             try {
+                const detailInfo = await this.getArtistDetail(id)
+                const detail = detailInfo.status ? detailInfo.data : {}
                 const api = 'mtop.alimusic.music.songservice.getartistsongs'
                 const {token, signedToken} = await this.getXiamiToken(api)
                 const appKey = 12574478
@@ -434,11 +491,7 @@ export default function (instance, newApiInstance) {
                 return {
                     status: true,
                     data: {
-                        detail: {
-                            id,
-                            name: data.songs[0].artistName,
-                            avatar: data.songs[0].artistLogo
-                        },
+                        detail,
                         songs: data.songs.map(item => {
                             return {
                                 album: {

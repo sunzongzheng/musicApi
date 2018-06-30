@@ -100,7 +100,7 @@ function getBatchSongDetail( vendor:歌曲来源, ids:歌曲id数组 ) {
     }
 }
 ````
-- 歌手详情
+- 歌手单曲
 
   注意事项：
     - 网易云没有分页，传页参数无效
@@ -114,7 +114,8 @@ function getArtistSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, 
             detail: {
                 id: Number | String,
                 name: String,
-                avatar: String
+                avatar: String,
+                desc: String
             },
             songs: [{
                album: {

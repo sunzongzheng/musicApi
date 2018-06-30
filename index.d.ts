@@ -54,7 +54,8 @@ declare module '@suen/music-api' {
             detail: {
                 id: number | string,
                 name: string,
-                avatar: string
+                avatar: string,
+                desc: string
             },
             songs: Array<musicInfo>
         }
@@ -159,5 +160,5 @@ declare module '@suen/music-api' {
 
     export function getBatchSongDetail(vendor: vendor, ids: Array<number | string>): Promise<getBatchSongDetailResult | errorResult>
 
-    export function getArtistSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getBatchSongDetailResult | errorResult>
+    export function getArtistSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getArtistSongsResult | errorResult>
 }
