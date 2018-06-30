@@ -2,9 +2,21 @@
 - 对网易云、虾米音乐、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
 - Node >= 6
-- 支持[安卓/ios](https://github.com/sunzongzheng/musicApi/blob/master/dist/app.native.js)通过Fly调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
+- 支持安卓/ios
 
-# Api列表
+# Usage
+- node
+    ````js
+    npm install @suen/music-api
+    
+    import musicApi from '@suen/music-api'
+    ````
+- native
+  - 引入[js](https://github.com/sunzongzheng/musicApi/blob/master/dist/app.native.js)
+  - 通过Fly调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
+  - 已在window下注册，可直接通过window.musicApi调用
+  
+# Api
 - 歌曲搜索
 ````js
 function searchSong( keyword:关键字, offset:偏移页数 ) {
