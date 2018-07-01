@@ -266,102 +266,120 @@ export default function (instance) {
             }
         },
         async getArtistSongs(id, offset, limit) {
-            const params = {
-                format: 'jsonp',
-                callback: 'callback',
-                jsonpCallback: 'callback',
-                loginUin: 0,
-                hostUin: 0,
-                inCharset: 'utf8',
-                outCharset: 'utf-8',
-                notice: 0,
-                platform: 'h5page',
-                needNewCode: 0,
-                from: 'h5',
-                singermid: id,
-                order: 'listen',
-                begin: offset * limit,
-                num: limit,
-                songstatus: 1
-            }
-            const {data} = await instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params)
-            return {
-                status: true,
-                data: {
-                    detail: {
-                        id,
-                        name: data.singer_name,
-                        avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`,
-                        desc: data.SingerDesc
-                    },
-                    songs: data.list.map(item => {
-                        const info = item.musicData
-                        return {
-                            album: {
-                                id: info.albumid,
-                                name: info.albumname,
-                                cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`,
-                            },
-                            artists: info.singer.map(singer => {
-                                return {
-                                    id: singer.mid,
-                                    name: singer.name
-                                }
-                            }),
-                            name: info.songname,
-                            id: info.songmid,
-                            commentId: info.songmid,
-                            cp: !info.alertid,
-                        }
-                    })
+            try {
+                const params = {
+                    format: 'jsonp',
+                    callback: 'callback',
+                    jsonpCallback: 'callback',
+                    loginUin: 0,
+                    hostUin: 0,
+                    inCharset: 'utf8',
+                    outCharset: 'utf-8',
+                    notice: 0,
+                    platform: 'h5page',
+                    needNewCode: 0,
+                    from: 'h5',
+                    singermid: id,
+                    order: 'listen',
+                    begin: offset * limit,
+                    num: limit,
+                    songstatus: 1
+                }
+                const {data} = await instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params)
+                return {
+                    status: true,
+                    data: {
+                        detail: {
+                            id,
+                            name: data.singer_name,
+                            avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`,
+                            desc: data.SingerDesc
+                        },
+                        songs: data.list.map(item => {
+                            const info = item.musicData
+                            return {
+                                album: {
+                                    id: info.albumid,
+                                    name: info.albumname,
+                                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`,
+                                },
+                                artists: info.singer.map(singer => {
+                                    return {
+                                        id: singer.mid,
+                                        name: singer.name
+                                    }
+                                }),
+                                name: info.songname,
+                                id: info.songmid,
+                                commentId: info.songmid,
+                                cp: !info.alertid,
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                console.warn(e)
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
                 }
             }
         },
         async getAlbumSongs(id, offset, limit) {
-            const params = {
-                type: 1,
-                format: 'jsonp',
-                callback: 'callback',
-                jsonpCallback: 'callback',
-                loginUin: 0,
-                hostUin: 0,
-                inCharset: 'utf8',
-                outCharset: 'utf-8',
-                notice: 0,
-                platform: 'yqq',
-                needNewCode: 0,
-                onlysong: 0,
-                disstid: id
-            }
-            const {cdlist} = await instance.get('/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg', params)
-            return {
-                status: true,
-                data: {
-                    detail: {
-                        id: cdlist[0].disstid,
-                        name: cdlist[0].dissname,
-                        cover: cdlist[0].logo,
-                        desc: cdlist[0].desc
-                    },
-                    songs: cdlist[0].songlist.map(info => {
-                        return {
-                            album: {
-                                id: info.albumid,
-                                name: info.albumname,
-                                cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`,
-                            },
-                            artists: info.singer.map(singer => {
-                                return {
-                                    id: singer.mid,
-                                    name: singer.name
-                                }
-                            }),
-                            name: info.songname,
-                            id: info.songmid,
-                            commentId: info.songmid,
-                            cp: !info.alertid,
-                        }
-                    })
+            try {
+                const params = {
+                    type: 1,
+                    format: 'jsonp',
+                    callback: 'callback',
+                    jsonpCallback: 'callback',
+                    loginUin: 0,
+                    hostUin: 0,
+                    inCharset: 'utf8',
+                    outCharset: 'utf-8',
+                    notice: 0,
+                    platform: 'yqq',
+                    needNewCode: 0,
+                    onlysong: 0,
+                    disstid: id
+                }
+                const {cdlist} = await instance.get('/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg', params)
+                return {
+                    status: true,
+                    data: {
+                        detail: {
+                            id: cdlist[0].disstid,
+                            name: cdlist[0].dissname,
+                            cover: cdlist[0].logo,
+                            desc: cdlist[0].desc
+                        },
+                        songs: cdlist[0].songlist.map(info => {
+                            return {
+                                album: {
+                                    id: info.albumid,
+                                    name: info.albumname,
+                                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`,
+                                },
+                                artists: info.singer.map(singer => {
+                                    return {
+                                        id: singer.mid,
+                                        name: singer.name
+                                    }
+                                }),
+                                name: info.songname,
+                                id: info.songmid,
+                                commentId: info.songmid,
+                                cp: !info.alertid,
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                console.warn(e)
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
                 }
             }
         }

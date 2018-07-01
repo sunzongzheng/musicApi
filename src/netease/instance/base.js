@@ -32,7 +32,7 @@ export default function (createInstance) {
                 msg: '请求无结果'
             })
         }
-        const data = JSON.parse(res.data)
+        const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
         if (data.code !== 200) {
             return Promise.reject({
                 status: false,
