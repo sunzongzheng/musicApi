@@ -61,6 +61,19 @@ declare module '@suen/music-api' {
         }
     }
 
+    interface getAlbumSongsResult {
+        status: true,
+        data: {
+            detail: {
+                id: number | string,
+                name: string,
+                cover: string,
+                desc: string
+            },
+            songs: Array<musicInfo>
+        }
+    }
+
     enum qqSongLever {
         high,
         normal,
@@ -161,4 +174,6 @@ declare module '@suen/music-api' {
     export function getBatchSongDetail(vendor: vendor, ids: Array<number | string>): Promise<getBatchSongDetailResult | errorResult>
 
     export function getArtistSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getArtistSongsResult | errorResult>
+
+    export function getAlbumSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getAlbumSongsResult | errorResult>
 }

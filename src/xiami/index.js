@@ -520,6 +520,141 @@ export default function (instance, newApiInstance) {
                     log: e
                 }
             }
+        },
+        async getAlbumDetail(id) {
+            try {
+                const api = 'mtop.alimusic.music.list.collectservice.getcollectdetail'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            listId: id,
+                            isFullTags: false
+                        }
+                    })
+                })
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const {collectDetail} = await newApiInstance.get(`/${api}/1.0/`, {
+                    appKey, // 会变化
+                    t, // 会变化
+                    sign, // 会变化
+                    api,
+                    v: '1.0',
+                    type: 'originaljson',
+                    dataType: 'json', // 会变化
+                    data: queryStr
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
+                return {
+                    status: true,
+                    data: {
+                        id: collectDetail.listId,
+                        name: collectDetail.collectName,
+                        cover: collectDetail.collectLogo,
+                        desc: collectDetail.description
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
+        },
+        async getAlbumSongs(id, offset, limit) {
+            try {
+                const detailInfo = await this.getAlbumDetail(id)
+                const detail = detailInfo.status ? detailInfo.data : {}
+                const api = 'mtop.alimusic.music.list.collectservice.getcollectsongs'
+                const {token, signedToken} = await this.getXiamiToken(api)
+                const appKey = 12574478
+                const queryStr = JSON.stringify({
+                    requestStr: JSON.stringify({
+                        header: {
+                            appId: 200,
+                            appVersion: 1000000,
+                            callId: new Date().getTime(),
+                            network: 1,
+                            platformId: 'mac',
+                            remoteIp: '192.168.1.101',
+                            resolution: '1178*778',
+                        },
+                        model: {
+                            listId: id,
+                            pagingVO: {
+                                page: offset + 1,
+                                pageSize: limit
+                            }
+                        }
+                    })
+                })
+                const t = new Date().getTime()
+                const sign = Crypto.MD5(
+                    `${signedToken}&${t}&${appKey}&${queryStr}`
+                )
+                const {songs} = await newApiInstance.get(`/${api}/1.0/`, {
+                    appKey, // 会变化
+                    t, // 会变化
+                    sign, // 会变化
+                    api,
+                    v: '1.0',
+                    type: 'originaljson',
+                    dataType: 'json', // 会变化
+                    data: queryStr
+                }, {
+                    headers: {
+                        'cookie': token.join(';'), // 会变化
+                    }
+                })
+                return {
+                    status: true,
+                    data: {
+                        detail,
+                        songs: songs.map(item => {
+                            return {
+                                album: {
+                                    id: item.albumId,
+                                    name: item.albumName,
+                                    cover: item.albumLogo
+                                },
+                                artists: item.artistVOs.map(artist => {
+                                    return {
+                                        id: artist.artistId,
+                                        name: artist.artistName
+                                    }
+                                }),
+                                name: item.songName,
+                                id: item.songId,
+                                commentId: item.songId,
+                                cp: !item.listenFiles,
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '获取失败',
+                    log: e
+                }
+            }
         }
     }
 }

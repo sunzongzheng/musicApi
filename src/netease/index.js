@@ -310,6 +310,56 @@ export default function (instance) {
                     log: e
                 }
             }
+        },
+        async getAlbumSongs(id, offset, limit) {
+            try {
+                const {playlist, privileges} = await instance.post(`/weapi/v3/playlist/detail`, {
+                    id,
+                    n: limit,
+                    s: 8,
+                    csrf_token: ""
+                })
+                const privilegesObjects = {}
+                privileges.forEach(item => {
+                    privilegesObjects[item.id] = item
+                })
+                return {
+                    status: true,
+                    data: {
+                        detail: {
+                            id: playlist.id,
+                            name: playlist.name,
+                            cover: playlist.coverImgUrl,
+                            desc: playlist.description
+                        },
+                        songs: playlist.tracks.map(item => {
+                            return {
+                                album: {
+                                    id: item.al.id,
+                                    name: item.al.name,
+                                    cover: item.al.picUrl
+                                },
+                                artists: item.ar.map(ar => {
+                                    return {
+                                        id: ar.id,
+                                        name: ar.name
+                                    }
+                                }),
+                                name: item.name,
+                                id: item.id,
+                                commentId: item.id,
+                                cp: !privilegesObjects[item.id].cp
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
         }
     }
 }

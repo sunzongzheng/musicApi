@@ -145,3 +145,36 @@ function getArtistSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, 
     }
 }
 ````
+- 歌单信息
+
+  注意事项：
+    - QQ音乐没有分页，传页参数无效;网易云可传limit;虾米可传全部页参数
+    - 默认第一页，65535条数据
+
+````js
+function getAlbumSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, limit:页大小 ) {
+    return {
+        status: Boolean, // 请求是否成功
+        data: {
+            detail: {
+                id: Number | String,
+                name: String,
+                cover: String,
+                desc: String
+            },
+            songs: [{
+               album: {
+                   id: Number | String,
+                   name: String,
+                   cover: String
+               },
+               artists: Array,
+               name: String,
+               id: Number | String,
+               commentId: Number | String,
+               cp: Boolean
+           }]
+        }
+    }
+}
+````
