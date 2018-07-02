@@ -79,8 +79,7 @@ function getSongDetail( vendor:歌曲来源, id:歌曲id ) {
             },
             artists: Array,
             name: String,
-            id: Number | String,
-            commentId: Number | String,
+            id: Number,
             cp: Boolean
         }
     }
@@ -105,8 +104,7 @@ function getBatchSongDetail( vendor:歌曲来源, ids:歌曲id数组 ) {
             },
             artists: Array,
             name: String,
-            id: Number | String,
-            commentId: Number | String,
+            id: Number,
             cp: Boolean
         }]
     }
@@ -137,8 +135,7 @@ function getArtistSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, 
                },
                artists: Array,
                name: String,
-               id: Number | String,
-               commentId: Number | String,
+               id: Number,
                cp: Boolean
            }]
         }
@@ -170,8 +167,7 @@ function getAlbumSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, l
                },
                artists: Array,
                name: String,
-               id: Number | String,
-               commentId: Number | String,
+               id: Number,
                cp: Boolean
            }]
         }
