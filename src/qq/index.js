@@ -1,6 +1,24 @@
 import {lyric_decode} from '../util'
 
 export default function (instance) {
+    const getMusicInfo = (info) => {
+        return {
+            album: {
+                id: info.album.id,
+                name: info.album.name,
+                cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`,
+            },
+            artists: info.singer.map(singer => {
+                return {
+                    id: singer.id,
+                    name: singer.name
+                }
+            }),
+            name: info.name,
+            id: info.id,
+            cp: !info.action.alert,
+        }
+    }
     return {
         async searchSong({keyword, limit = 30, offset = 0}) {
             const params = {
@@ -25,25 +43,7 @@ export default function (instance) {
                     status: true,
                     data: {
                         total: data.data.song.totalnum,
-                        songs: data.data.song.list.map(item => {
-                            return {
-                                album: {
-                                    id: item.album.id,
-                                    name: item.album.name,
-                                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg`,
-                                },
-                                artists: item.singer.map(singer => {
-                                    return {
-                                        id: singer.mid,
-                                        name: singer.name
-                                    }
-                                }),
-                                name: item.name,
-                                id: item.mid,
-                                commentId: item.id,
-                                cp: !item.action.alert,
-                            }
-                        })
+                        songs: data.data.song.list.map(item => getMusicInfo(item))
                     }
                 }
             } catch (e) {
@@ -54,10 +54,10 @@ export default function (instance) {
                 }
             }
         },
-        async getSongDetail(songmid) {
+        async getSongDetail(songid, raw) {
             try {
                 const data = await instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-                    songmid,
+                    songid,
                     tpl: 'yqq_song_detail',
                     format: 'jsonp',
                     callback: 'callback',
@@ -71,25 +71,15 @@ export default function (instance) {
                     needNewCode: 0
                 })
                 const info = data.data[0]
+                if (!info) {
+                    return {
+                        status: false,
+                        msg: '无法获取信息，请检查songid',
+                    }
+                }
                 return {
                     status: true,
-                    data: {
-                        album: {
-                            id: info.album.id,
-                            name: info.album.name,
-                            cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`,
-                        },
-                        artists: info.singer.map(singer => {
-                            return {
-                                id: singer.mid,
-                                name: singer.name
-                            }
-                        }),
-                        name: info.name,
-                        id: info.mid,
-                        commentId: info.id,
-                        cp: !info.action.alert,
-                    }
+                    data: raw ? info : getMusicInfo(info)
                 }
             } catch (e) {
                 return {
@@ -99,10 +89,10 @@ export default function (instance) {
                 }
             }
         },
-        async getBatchSongDetail(songmids) {
+        async getBatchSongDetail(songids) {
             try {
                 const data = await instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-                    songmid: songmids.join(','),
+                    songid: songids.join(','),
                     tpl: 'yqq_song_detail',
                     format: 'jsonp',
                     callback: 'callback',
@@ -117,25 +107,7 @@ export default function (instance) {
                 })
                 return {
                     status: true,
-                    data: data.data.map(info => {
-                        return {
-                            album: {
-                                id: info.album.id,
-                                name: info.album.name,
-                                cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`,
-                            },
-                            artists: info.singer.map(singer => {
-                                return {
-                                    id: singer.mid,
-                                    name: singer.name
-                                }
-                            }),
-                            name: info.name,
-                            id: info.mid,
-                            commentId: info.id,
-                            cp: !info.action.alert,
-                        }
-                    })
+                    data: data.data.map(item => getMusicInfo(item))
                 }
             } catch (e) {
                 return {
@@ -145,7 +117,14 @@ export default function (instance) {
                 }
             }
         },
-        async getSongUrl(id, level = 'normal') {
+        async getMid(id) {
+            const detailInfo = await this.getSongDetail(id, true)
+            if (!detailInfo.status) {
+                throw new Error(detailInfo.msg)
+            }
+            return detailInfo.data.mid
+        },
+        async getSongUrl(songid, level = 'normal') {
             const guid = Math.floor(Math.random() * 1000000000)
             let data
             try {
@@ -153,12 +132,13 @@ export default function (instance) {
                     json: 3,
                     guid: guid
                 })
+                const mid = await this.getMid(songid)
                 switch (level) {
                     case 'high':
                         data = {
                             status: true,
                             data: {
-                                url: `http://dl.stream.qqmusic.qq.com/M800${id}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                                url: `http://dl.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                             }
                         }
                         break
@@ -166,7 +146,7 @@ export default function (instance) {
                         data = {
                             status: true,
                             data: {
-                                url: `http://dl.stream.qqmusic.qq.com/M500${id}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                                url: `http://dl.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                             }
                         }
                         break
@@ -174,7 +154,7 @@ export default function (instance) {
                         data = {
                             status: true,
                             data: {
-                                url: `http://ws.stream.qqmusic.qq.com/C100${id}.m4a?fromtag=38`
+                                url: `http://ws.stream.qqmusic.qq.com/C100${mid}.m4a?fromtag=38`
                             }
                         }
                         break
@@ -182,18 +162,19 @@ export default function (instance) {
             } catch (e) {
                 data = {
                     status: false,
-                    msg: '请求失败',
+                    msg: e.message || '请求失败',
                     log: e
                 }
             }
             return data
         },
-        async getLyric(id) {
+        async getLyric(songid) {
             try {
+                const mid = await this.getMid(songid)
                 let data = await instance.get('/lyric/fcgi-bin/fcg_query_lyric_new.fcg', {
                     'callback': 'callback',
                     'pcachetime': Date.parse(new Date()),
-                    'songmid': id,
+                    'songmid': mid,
                     'g_tk': 5381,
                     'jsonpCallback': 'callback',
                     'loginUin': 0,
@@ -219,13 +200,13 @@ export default function (instance) {
             } catch (e) {
                 return {
                     status: false,
-                    msg: '请求失败',
+                    msg: e.message || '请求失败',
                     log: e
                 }
             }
 
         },
-        async getComment(topid, pagenum = 0, pagesize = 20) {
+        async getComment(songid, pagenum = 0, pagesize = 20) {
             try {
                 const {comment, hot_comment} = await instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
                     jsonpCallback: 'callback',
@@ -239,7 +220,7 @@ export default function (instance) {
                     needNewCode: 0,
                     reqtype: 2,
                     biztype: 1,
-                    topid,
+                    topid: songid,
                     cmd: 8,
                     needmusiccrit: 0,
                     pagenum,
@@ -279,7 +260,7 @@ export default function (instance) {
                     platform: 'h5page',
                     needNewCode: 0,
                     from: 'h5',
-                    singermid: id,
+                    singerid: id,
                     order: 'listen',
                     begin: offset * limit,
                     num: limit,
@@ -305,13 +286,12 @@ export default function (instance) {
                                 },
                                 artists: info.singer.map(singer => {
                                     return {
-                                        id: singer.mid,
+                                        id: singer.id,
                                         name: singer.name
                                     }
                                 }),
                                 name: info.songname,
-                                id: info.songmid,
-                                commentId: info.songmid,
+                                id: info.songid,
                                 cp: !info.alertid,
                             }
                         })
@@ -362,13 +342,12 @@ export default function (instance) {
                                 },
                                 artists: info.singer.map(singer => {
                                     return {
-                                        id: singer.mid,
+                                        id: singer.id,
                                         name: singer.name
                                     }
                                 }),
                                 name: info.songname,
-                                id: info.songmid,
-                                commentId: info.songmid,
+                                id: info.songid,
                                 cp: !info.alertid,
                             }
                         })

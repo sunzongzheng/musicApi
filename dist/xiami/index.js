@@ -86,7 +86,6 @@ function _default(instance, newApiInstance) {
                   }],
                   name: item.song_name,
                   id: item.song_id,
-                  commentId: item.song_id,
                   cp: !item.listen_file
                 };
               })
@@ -172,7 +171,6 @@ function _default(instance, newApiInstance) {
               }],
               name: info.songName,
               id: info.songId,
-              commentId: info.songId,
               cp: !info.listenFiles.length
             }
           };
@@ -262,7 +260,6 @@ function _default(instance, newApiInstance) {
                 }],
                 name: info.songName,
                 id: info.songId,
-                commentId: info.songId,
                 cp: !info.listenFiles.length
               };
             })
@@ -632,7 +629,6 @@ function _default(instance, newApiInstance) {
                   }),
                   name: item.songName,
                   id: item.songId,
-                  commentId: item.songId,
                   cp: !item.listenFiles
                 };
               })
@@ -799,7 +795,6 @@ function _default(instance, newApiInstance) {
                   }),
                   name: item.songName,
                   id: item.songId,
-                  commentId: item.songId,
                   cp: !item.listenFiles
                 };
               })

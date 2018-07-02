@@ -79,7 +79,6 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  commentId: item.id,
                   cp: !item.privilege.cp
                 };
               })
@@ -122,7 +121,6 @@ function _default(instance) {
               }),
               name: info.name,
               id: info.id,
-              commentId: info.id,
               cp: !data.privileges[0].cp
             }
           };
@@ -169,7 +167,6 @@ function _default(instance) {
                 }),
                 name: info.name,
                 id: info.id,
-                commentId: info.id,
                 cp: !privilegeObject[info.id].cp
               };
             })
@@ -273,7 +270,6 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  commentId: item.id,
                   cp: !privileges[i].cp
                 };
               })
@@ -352,7 +348,6 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  commentId: item.id,
                   cp: !item.privilege.cp
                 };
               })
@@ -408,7 +403,6 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  commentId: item.id,
                   cp: !privilegesObjects[item.id].cp
                 };
               })

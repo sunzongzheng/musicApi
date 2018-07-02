@@ -10,6 +10,25 @@ var _util = require("../util");
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
 function _default(instance) {
+  const getMusicInfo = info => {
+    return {
+      album: {
+        id: info.album.id,
+        name: info.album.name,
+        cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
+      },
+      artists: info.singer.map(singer => {
+        return {
+          id: singer.id,
+          name: singer.name
+        };
+      }),
+      name: info.name,
+      id: info.id,
+      cp: !info.action.alert
+    };
+  };
+
   return {
     searchSong({
       keyword,
@@ -40,25 +59,7 @@ function _default(instance) {
             status: true,
             data: {
               total: data.data.song.totalnum,
-              songs: data.data.song.list.map(item => {
-                return {
-                  album: {
-                    id: item.album.id,
-                    name: item.album.name,
-                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.album.mid}.jpg`
-                  },
-                  artists: item.singer.map(singer => {
-                    return {
-                      id: singer.mid,
-                      name: singer.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.mid,
-                  commentId: item.id,
-                  cp: !item.action.alert
-                };
-              })
+              songs: data.data.song.list.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
@@ -71,11 +72,11 @@ function _default(instance) {
       })();
     },
 
-    getSongDetail(songmid) {
+    getSongDetail(songid, raw) {
       return _asyncToGenerator(function* () {
         try {
           const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-            songmid,
+            songid,
             tpl: 'yqq_song_detail',
             format: 'jsonp',
             callback: 'callback',
@@ -89,25 +90,17 @@ function _default(instance) {
             needNewCode: 0
           });
           const info = data.data[0];
+
+          if (!info) {
+            return {
+              status: false,
+              msg: '无法获取信息，请检查songid'
+            };
+          }
+
           return {
             status: true,
-            data: {
-              album: {
-                id: info.album.id,
-                name: info.album.name,
-                cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
-              },
-              artists: info.singer.map(singer => {
-                return {
-                  id: singer.mid,
-                  name: singer.name
-                };
-              }),
-              name: info.name,
-              id: info.mid,
-              commentId: info.id,
-              cp: !info.action.alert
-            }
+            data: raw ? info : getMusicInfo(info)
           };
         } catch (e) {
           return {
@@ -119,11 +112,11 @@ function _default(instance) {
       })();
     },
 
-    getBatchSongDetail(songmids) {
+    getBatchSongDetail(songids) {
       return _asyncToGenerator(function* () {
         try {
           const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-            songmid: songmids.join(','),
+            songid: songids.join(','),
             tpl: 'yqq_song_detail',
             format: 'jsonp',
             callback: 'callback',
@@ -138,25 +131,7 @@ function _default(instance) {
           });
           return {
             status: true,
-            data: data.data.map(info => {
-              return {
-                album: {
-                  id: info.album.id,
-                  name: info.album.name,
-                  cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.album.mid}.jpg`
-                },
-                artists: info.singer.map(singer => {
-                  return {
-                    id: singer.mid,
-                    name: singer.name
-                  };
-                }),
-                name: info.name,
-                id: info.mid,
-                commentId: info.id,
-                cp: !info.action.alert
-              };
-            })
+            data: data.data.map(item => getMusicInfo(item))
           };
         } catch (e) {
           return {
@@ -168,7 +143,23 @@ function _default(instance) {
       })();
     },
 
-    getSongUrl(id, level = 'normal') {
+    getMid(id) {
+      var _this = this;
+
+      return _asyncToGenerator(function* () {
+        const detailInfo = yield _this.getSongDetail(id, true);
+
+        if (!detailInfo.status) {
+          throw new Error(detailInfo.msg);
+        }
+
+        return detailInfo.data.mid;
+      })();
+    },
+
+    getSongUrl(songid, level = 'normal') {
+      var _this2 = this;
+
       return _asyncToGenerator(function* () {
         const guid = Math.floor(Math.random() * 1000000000);
         let data;
@@ -180,12 +171,14 @@ function _default(instance) {
           }),
                 key = _ref.key;
 
+          const mid = yield _this2.getMid(songid);
+
           switch (level) {
             case 'high':
               data = {
                 status: true,
                 data: {
-                  url: `http://dl.stream.qqmusic.qq.com/M800${id}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `http://dl.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -194,7 +187,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://dl.stream.qqmusic.qq.com/M500${id}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `http://dl.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -203,7 +196,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://ws.stream.qqmusic.qq.com/C100${id}.m4a?fromtag=38`
+                  url: `http://ws.stream.qqmusic.qq.com/C100${mid}.m4a?fromtag=38`
                 }
               };
               break;
@@ -211,7 +204,7 @@ function _default(instance) {
         } catch (e) {
           data = {
             status: false,
-            msg: '请求失败',
+            msg: e.message || '请求失败',
             log: e
           };
         }
@@ -220,13 +213,16 @@ function _default(instance) {
       })();
     },
 
-    getLyric(id) {
+    getLyric(songid) {
+      var _this3 = this;
+
       return _asyncToGenerator(function* () {
         try {
+          const mid = yield _this3.getMid(songid);
           let data = yield instance.get('/lyric/fcgi-bin/fcg_query_lyric_new.fcg', {
             'callback': 'callback',
             'pcachetime': Date.parse(new Date()),
-            'songmid': id,
+            'songmid': mid,
             'g_tk': 5381,
             'jsonpCallback': 'callback',
             'loginUin': 0,
@@ -253,14 +249,14 @@ function _default(instance) {
         } catch (e) {
           return {
             status: false,
-            msg: '请求失败',
+            msg: e.message || '请求失败',
             log: e
           };
         }
       })();
     },
 
-    getComment(topid, pagenum = 0, pagesize = 20) {
+    getComment(songid, pagenum = 0, pagesize = 20) {
       return _asyncToGenerator(function* () {
         try {
           const _ref2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
@@ -275,7 +271,7 @@ function _default(instance) {
             needNewCode: 0,
             reqtype: 2,
             biztype: 1,
-            topid,
+            topid: songid,
             cmd: 8,
             needmusiccrit: 0,
             pagenum,
@@ -321,7 +317,7 @@ function _default(instance) {
             platform: 'h5page',
             needNewCode: 0,
             from: 'h5',
-            singermid: id,
+            singerid: id,
             order: 'listen',
             begin: offset * limit,
             num: limit,
@@ -350,13 +346,12 @@ function _default(instance) {
                   },
                   artists: info.singer.map(singer => {
                     return {
-                      id: singer.mid,
+                      id: singer.id,
                       name: singer.name
                     };
                   }),
                   name: info.songname,
-                  id: info.songmid,
-                  commentId: info.songmid,
+                  id: info.songid,
                   cp: !info.alertid
                 };
               })
@@ -413,13 +408,12 @@ function _default(instance) {
                   },
                   artists: info.singer.map(singer => {
                     return {
-                      id: singer.mid,
+                      id: singer.id,
                       name: singer.name
                     };
                   }),
                   name: info.songname,
-                  id: info.songmid,
-                  commentId: info.songmid,
+                  id: info.songid,
                   cp: !info.alertid
                 };
               })

@@ -60,7 +60,6 @@ export default function (instance) {
                                 }),
                                 name: item.name,
                                 id: item.id,
-                                commentId: item.id,
                                 cp: !item.privilege.cp
                             }
                         })
@@ -98,7 +97,6 @@ export default function (instance) {
                         }),
                         name: info.name,
                         id: info.id,
-                        commentId: info.id,
                         cp: !data.privileges[0].cp
                     }
                 }
@@ -139,7 +137,6 @@ export default function (instance) {
                             }),
                             name: info.name,
                             id: info.id,
-                            commentId: info.id,
                             cp: !privilegeObject[info.id].cp
                         }
                     })
@@ -228,7 +225,6 @@ export default function (instance) {
                                 }),
                                 name: item.name,
                                 id: item.id,
-                                commentId: item.id,
                                 cp: !privileges[i].cp
                             }
                         })
@@ -297,7 +293,6 @@ export default function (instance) {
                                 }),
                                 name: item.name,
                                 id: item.id,
-                                commentId: item.id,
                                 cp: !item.privilege.cp
                             }
                         })
@@ -347,7 +342,6 @@ export default function (instance) {
                                 }),
                                 name: item.name,
                                 id: item.id,
-                                commentId: item.id,
                                 cp: !privilegesObjects[item.id].cp
                             }
                         })
