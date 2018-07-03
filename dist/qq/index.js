@@ -72,11 +72,11 @@ function _default(instance) {
       })();
     },
 
-    getSongDetail(songid, raw) {
+    getSongDetail(id, raw = false, type = 'songid') {
       return _asyncToGenerator(function* () {
         try {
           const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-            songid,
+            [type]: id,
             tpl: 'yqq_song_detail',
             format: 'jsonp',
             callback: 'callback',
