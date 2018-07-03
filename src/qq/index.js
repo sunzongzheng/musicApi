@@ -54,10 +54,10 @@ export default function (instance) {
                 }
             }
         },
-        async getSongDetail(songid, raw) {
+        async getSongDetail(id, raw = false, type = 'songid') {
             try {
                 const data = await instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
-                    songid,
+                    [type]: id,
                     tpl: 'yqq_song_detail',
                     format: 'jsonp',
                     callback: 'callback',
