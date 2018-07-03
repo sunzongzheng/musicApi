@@ -273,7 +273,7 @@ export default function (instance) {
                         detail: {
                             id,
                             name: data.singer_name,
-                            avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${id}.jpg`,
+                            avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${data.singer_mid}.jpg`,
                             desc: data.SingerDesc
                         },
                         songs: data.list.map(item => {
