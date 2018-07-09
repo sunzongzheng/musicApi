@@ -1,4 +1,4 @@
-import {lyric_decode} from '../util'
+import {lyric_decode, noSongsDetailMsg} from '../util'
 
 const top_list_all = {
     "0": ["云音乐新歌榜", "3779629"],
@@ -81,6 +81,12 @@ export default function (instance) {
                     csrf_token: ''
                 })
                 const info = data.songs[0]
+                if (!info) {
+                    return {
+                        status: false,
+                        msg: noSongsDetailMsg,
+                    }
+                }
                 return {
                     status: true,
                     data: {
@@ -249,8 +255,8 @@ export default function (instance) {
                 return {
                     status: true,
                     data: {
-                        hotComments,
-                        comments,
+                        hotComments: hotComments || [],
+                        comments: comments || [],
                         total
                     }
                 }

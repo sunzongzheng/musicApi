@@ -94,7 +94,7 @@ function _default(instance) {
           if (!info) {
             return {
               status: false,
-              msg: '无法获取信息，请检查songid'
+              msg: _util.noSongsDetailMsg
             };
           }
 
@@ -286,8 +286,8 @@ function _default(instance) {
           return {
             status: true,
             data: {
-              hotComments: hot_comment ? hot_comment.commentlist : [],
-              comments: comment.commentlist,
+              hotComments: hot_comment && hot_comment.commentlist ? hot_comment.commentlist : [],
+              comments: comment.commentlist || [],
               total: comment.commenttotal
             }
           };

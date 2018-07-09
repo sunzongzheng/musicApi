@@ -1,4 +1,4 @@
-import {lyric_decode} from '../util'
+import {lyric_decode, noSongsDetailMsg} from '../util'
 
 export default function (instance) {
     const getMusicInfo = (info) => {
@@ -74,7 +74,7 @@ export default function (instance) {
                 if (!info) {
                     return {
                         status: false,
-                        msg: '无法获取信息，请检查songid',
+                        msg: noSongsDetailMsg,
                     }
                 }
                 return {
@@ -232,8 +232,8 @@ export default function (instance) {
                 return {
                     status: true,
                     data: {
-                        hotComments: hot_comment ? hot_comment.commentlist : [],
-                        comments: comment.commentlist,
+                        hotComments: (hot_comment && hot_comment.commentlist) ? hot_comment.commentlist : [],
+                        comments: comment.commentlist || [],
                         total: comment.commenttotal
                     }
                 }

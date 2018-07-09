@@ -52,6 +52,56 @@ function _default(instance, newApiInstance) {
       })();
     },
 
+    // 根据签名token获取数据
+    getDataWithSign(api, model) {
+      var _this = this;
+
+      return _asyncToGenerator(function* () {
+        const _ref = yield _this.getXiamiToken(api),
+              token = _ref.token,
+              signedToken = _ref.signedToken;
+
+        const appKey = 12574478;
+        const queryStr = JSON.stringify({
+          requestStr: JSON.stringify({
+            header: {
+              appId: 200,
+              appVersion: 1000000,
+              callId: new Date().getTime(),
+              network: 1,
+              platformId: 'mac',
+              remoteIp: '192.168.1.101',
+              resolution: '1178*778'
+            },
+            model
+          })
+        });
+        const t = new Date().getTime();
+
+        const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
+
+        return yield newApiInstance.get(`/${api}/1.0/`, {
+          appKey,
+          // 会变化
+          t,
+          // 会变化
+          sign,
+          // 会变化
+          api,
+          v: '1.0',
+          type: 'originaljson',
+          dataType: 'json',
+          // 会变化
+          data: queryStr
+        }, {
+          headers: {
+            'cookie': token.join(';') // 会变化
+
+          }
+        });
+      })();
+    },
+
     searchSong({
       keyword,
       limit = 30,
@@ -98,57 +148,21 @@ function _default(instance, newApiInstance) {
     },
 
     getSongDetail(id, getRaw = false) {
-      var _this = this;
+      var _this2 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.music.songservice.getsongs';
-
-          const _ref = yield _this.getXiamiToken(api),
-                token = _ref.token,
-                signedToken = _ref.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                songIds: [id]
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const data = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api: 'mtop.alimusic.social.commentservice.getcommentlist',
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
-            }
+          const data = yield _this2.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+            songIds: [id]
           });
           const info = data.songs[0];
+
+          if (!info) {
+            return {
+              status: false,
+              msg: _util.noSongsDetailMsg
+            };
+          }
 
           if (getRaw) {
             return {
@@ -195,55 +209,12 @@ function _default(instance, newApiInstance) {
     },
 
     getBatchSongDetail(ids) {
-      var _this2 = this;
+      var _this3 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.music.songservice.getsongs';
-
-          const _ref2 = yield _this2.getXiamiToken(api),
-                token = _ref2.token,
-                signedToken = _ref2.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                songIds: ids
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const data = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api: 'mtop.alimusic.social.commentservice.getcommentlist',
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
-            }
+          const data = yield _this3.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+            songIds: ids
           });
           return {
             status: true,
@@ -285,7 +256,7 @@ function _default(instance, newApiInstance) {
     },
 
     getSongUrl(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       return _asyncToGenerator(function* () {
         try {
@@ -293,7 +264,7 @@ function _default(instance, newApiInstance) {
           return {
             status: true,
             data: {
-              url: _this3.parseLocation(data.trackList[0].location)
+              url: _this4.parseLocation(data.trackList[0].location)
             }
           };
         } catch (e) {
@@ -307,13 +278,13 @@ function _default(instance, newApiInstance) {
     },
 
     getLyric(id) {
-      var _this4 = this;
+      var _this5 = this;
 
       return _asyncToGenerator(function* () {
         let lyric_url;
 
         try {
-          let data = yield _this4.getSongDetail(id, true);
+          let data = yield _this5.getSongDetail(id, true);
 
           if (data.status) {
             lyric_url = data.data.lyricInfo.lyricFile;
@@ -334,8 +305,8 @@ function _default(instance, newApiInstance) {
 
         if (lyric_url) {
           try {
-            let _ref3 = yield _flyio.default.get(lyric_url),
-                data = _ref3.data;
+            let _ref2 = yield _flyio.default.get(lyric_url),
+                data = _ref2.data;
 
             return {
               status: true,
@@ -359,67 +330,24 @@ function _default(instance, newApiInstance) {
     },
 
     getComment(objectId, offset, pageSize) {
-      var _this5 = this;
+      var _this6 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.social.commentservice.getcommentlist';
-
-          const _ref4 = yield _this5.getXiamiToken(api),
-                token = _ref4.token,
-                signedToken = _ref4.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                objectId,
-                // 会变化
-                objectType: 'song',
-                pagingVO: {
-                  page: offset + 1,
-                  pageSize
-                }
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const data = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
+          const data = yield _this6.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
+            objectId,
             // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api: 'mtop.alimusic.social.commentservice.getcommentlist',
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
+            objectType: 'song',
+            pagingVO: {
+              page: offset + 1,
+              pageSize
             }
           });
           return {
             status: true,
             data: {
               hotComments: [],
-              comments: data.commentVOList,
+              comments: data.commentVOList || [],
               total: data.pagingVO.count
             }
           };
@@ -481,57 +409,14 @@ function _default(instance, newApiInstance) {
     },
 
     getArtistDetail(id) {
-      var _this6 = this;
+      var _this7 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.music.artistservice.getartistdetail';
-
-          const _ref5 = yield _this6.getXiamiToken(api),
-                token = _ref5.token,
-                signedToken = _ref5.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                artistId: id
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const _ref6 = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api,
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
-            }
+          const _ref3 = yield _this7.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
+            artistId: id
           }),
-                artistDetailVO = _ref6.artistDetailVO;
+                artistDetailVO = _ref3.artistDetailVO;
 
           return {
             status: true,
@@ -553,61 +438,18 @@ function _default(instance, newApiInstance) {
     },
 
     getArtistSongs(id, offset, limit) {
-      var _this7 = this;
+      var _this8 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this7.getArtistDetail(id);
+          const detailInfo = yield _this8.getArtistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
-          const api = 'mtop.alimusic.music.songservice.getartistsongs';
-
-          const _ref7 = yield _this7.getXiamiToken(api),
-                token = _ref7.token,
-                signedToken = _ref7.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                artistId: id,
-                backwardOffSale: true,
-                pagingVO: {
-                  page: offset + 1,
-                  pageSize: limit
-                }
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const data = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api,
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
+          const data = yield _this8.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
+            artistId: id,
+            backwardOffSale: true,
+            pagingVO: {
+              page: offset + 1,
+              pageSize: limit
             }
           });
           return {
@@ -645,58 +487,15 @@ function _default(instance, newApiInstance) {
     },
 
     getAlbumDetail(id) {
-      var _this8 = this;
+      var _this9 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const api = 'mtop.alimusic.music.list.collectservice.getcollectdetail';
-
-          const _ref8 = yield _this8.getXiamiToken(api),
-                token = _ref8.token,
-                signedToken = _ref8.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                listId: id,
-                isFullTags: false
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const _ref9 = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api,
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
-            }
+          const _ref4 = yield _this9.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+            listId: id,
+            isFullTags: false
           }),
-                collectDetail = _ref9.collectDetail;
+                collectDetail = _ref4.collectDetail;
 
           return {
             status: true,
@@ -718,63 +517,21 @@ function _default(instance, newApiInstance) {
     },
 
     getAlbumSongs(id, offset, limit) {
-      var _this9 = this;
+      var _this10 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this9.getAlbumDetail(id);
+          const detailInfo = yield _this10.getAlbumDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
-          const api = 'mtop.alimusic.music.list.collectservice.getcollectsongs';
 
-          const _ref10 = yield _this9.getXiamiToken(api),
-                token = _ref10.token,
-                signedToken = _ref10.signedToken;
-
-          const appKey = 12574478;
-          const queryStr = JSON.stringify({
-            requestStr: JSON.stringify({
-              header: {
-                appId: 200,
-                appVersion: 1000000,
-                callId: new Date().getTime(),
-                network: 1,
-                platformId: 'mac',
-                remoteIp: '192.168.1.101',
-                resolution: '1178*778'
-              },
-              model: {
-                listId: id,
-                pagingVO: {
-                  page: offset + 1,
-                  pageSize: limit
-                }
-              }
-            })
-          });
-          const t = new Date().getTime();
-
-          const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-          const _ref11 = yield newApiInstance.get(`/${api}/1.0/`, {
-            appKey,
-            // 会变化
-            t,
-            // 会变化
-            sign,
-            // 会变化
-            api,
-            v: '1.0',
-            type: 'originaljson',
-            dataType: 'json',
-            // 会变化
-            data: queryStr
-          }, {
-            headers: {
-              'cookie': token.join(';') // 会变化
-
+          const _ref5 = yield _this10.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+            listId: id,
+            pagingVO: {
+              page: offset + 1,
+              pageSize: limit
             }
           }),
-                songs = _ref11.songs;
+                songs = _ref5.songs;
 
           return {
             status: true,

@@ -41,3 +41,5 @@ export function lyric_decode(str) {
     })
     return lyric_arr.sort()
 }
+
+export const noSongsDetailMsg = '无法获取信息，请检查songId'

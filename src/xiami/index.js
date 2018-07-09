@@ -1,5 +1,5 @@
 import fly from "flyio"
-import {lyric_decode} from '../util'
+import {lyric_decode, noSongsDetailMsg} from '../util'
 import Crypto from './crypto'
 
 let cache = {
@@ -33,6 +33,43 @@ export default function (instance, newApiInstance) {
                     })
                 }
             }
+        },
+        // 根据签名token获取数据
+        async getDataWithSign(api, model) {
+            const {token, signedToken} = await this.getXiamiToken(api)
+            const appKey = 12574478
+            const queryStr = JSON.stringify({
+                requestStr: JSON.stringify({
+                    header: {
+                        appId: 200,
+                        appVersion: 1000000,
+                        callId: new Date().getTime(),
+                        network: 1,
+                        platformId: 'mac',
+                        remoteIp: '192.168.1.101',
+                        resolution: '1178*778',
+                    },
+                    model
+                })
+            })
+            const t = new Date().getTime()
+            const sign = Crypto.MD5(
+                `${signedToken}&${t}&${appKey}&${queryStr}`
+            )
+            return await newApiInstance.get(`/${api}/1.0/`, {
+                appKey, // 会变化
+                t, // 会变化
+                sign, // 会变化
+                api,
+                v: '1.0',
+                type: 'originaljson',
+                dataType: 'json', // 会变化
+                data: queryStr
+            }, {
+                headers: {
+                    'cookie': token.join(';'), // 会变化
+                }
+            })
         },
         async searchSong({keyword, limit = 30, offset = 0}) {
             const params = {
@@ -73,44 +110,16 @@ export default function (instance, newApiInstance) {
         },
         async getSongDetail(id, getRaw = false) {
             try {
-                const api = 'mtop.alimusic.music.songservice.getsongs'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            songIds: [id]
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const data = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api: 'mtop.alimusic.social.commentservice.getcommentlist',
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
-                    }
+                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+                    songIds: [id]
                 })
                 const info = data.songs[0]
+                if (!info) {
+                    return {
+                        status: false,
+                        msg: noSongsDetailMsg,
+                    }
+                }
                 if (getRaw) {
                     return {
                         status: true,
@@ -153,42 +162,8 @@ export default function (instance, newApiInstance) {
         },
         async getBatchSongDetail(ids) {
             try {
-                const api = 'mtop.alimusic.music.songservice.getsongs'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            songIds: ids
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const data = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api: 'mtop.alimusic.social.commentservice.getcommentlist',
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
-                    }
+                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+                    songIds: ids
                 })
                 return {
                     status: true,
@@ -288,53 +263,19 @@ export default function (instance, newApiInstance) {
         },
         async getComment(objectId, offset, pageSize) {
             try {
-                const api = 'mtop.alimusic.social.commentservice.getcommentlist'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            objectId, // 会变化
-                            objectType: 'song',
-                            pagingVO: {
-                                page: offset + 1,
-                                pageSize
-                            }
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const data = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api: 'mtop.alimusic.social.commentservice.getcommentlist',
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
+                const data = await this.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
+                    objectId, // 会变化
+                    objectType: 'song',
+                    pagingVO: {
+                        page: offset + 1,
+                        pageSize
                     }
                 })
                 return {
                     status: true,
                     data: {
                         hotComments: [],
-                        comments: data.commentVOList,
+                        comments: data.commentVOList || [],
                         total: data.pagingVO.count
                     }
                 }
@@ -385,42 +326,8 @@ export default function (instance, newApiInstance) {
         },
         async getArtistDetail(id) {
             try {
-                const api = 'mtop.alimusic.music.artistservice.getartistdetail'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            artistId: id
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const {artistDetailVO} = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api,
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
-                    }
+                const {artistDetailVO} = await this.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
+                    artistId: id
                 })
                 return {
                     status: true,
@@ -443,46 +350,12 @@ export default function (instance, newApiInstance) {
             try {
                 const detailInfo = await this.getArtistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const api = 'mtop.alimusic.music.songservice.getartistsongs'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            artistId: id,
-                            backwardOffSale: true,
-                            pagingVO: {
-                                page: offset + 1,
-                                pageSize: limit
-                            }
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const data = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api,
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
+                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
+                    artistId: id,
+                    backwardOffSale: true,
+                    pagingVO: {
+                        page: offset + 1,
+                        pageSize: limit
                     }
                 })
                 return {
@@ -519,43 +392,9 @@ export default function (instance, newApiInstance) {
         },
         async getAlbumDetail(id) {
             try {
-                const api = 'mtop.alimusic.music.list.collectservice.getcollectdetail'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            listId: id,
-                            isFullTags: false
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const {collectDetail} = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api,
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
-                    }
+                const {collectDetail} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+                    listId: id,
+                    isFullTags: false
                 })
                 return {
                     status: true,
@@ -578,45 +417,11 @@ export default function (instance, newApiInstance) {
             try {
                 const detailInfo = await this.getAlbumDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const api = 'mtop.alimusic.music.list.collectservice.getcollectsongs'
-                const {token, signedToken} = await this.getXiamiToken(api)
-                const appKey = 12574478
-                const queryStr = JSON.stringify({
-                    requestStr: JSON.stringify({
-                        header: {
-                            appId: 200,
-                            appVersion: 1000000,
-                            callId: new Date().getTime(),
-                            network: 1,
-                            platformId: 'mac',
-                            remoteIp: '192.168.1.101',
-                            resolution: '1178*778',
-                        },
-                        model: {
-                            listId: id,
-                            pagingVO: {
-                                page: offset + 1,
-                                pageSize: limit
-                            }
-                        }
-                    })
-                })
-                const t = new Date().getTime()
-                const sign = Crypto.MD5(
-                    `${signedToken}&${t}&${appKey}&${queryStr}`
-                )
-                const {songs} = await newApiInstance.get(`/${api}/1.0/`, {
-                    appKey, // 会变化
-                    t, // 会变化
-                    sign, // 会变化
-                    api,
-                    v: '1.0',
-                    type: 'originaljson',
-                    dataType: 'json', // 会变化
-                    data: queryStr
-                }, {
-                    headers: {
-                        'cookie': token.join(';'), // 会变化
+                const {songs} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+                    listId: id,
+                    pagingVO: {
+                        page: offset + 1,
+                        pageSize: limit
                     }
                 })
                 return {

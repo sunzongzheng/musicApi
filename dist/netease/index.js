@@ -105,6 +105,14 @@ function _default(instance) {
             csrf_token: ''
           });
           const info = data.songs[0];
+
+          if (!info) {
+            return {
+              status: false,
+              msg: _util.noSongsDetailMsg
+            };
+          }
+
           return {
             status: true,
             data: {
@@ -301,8 +309,8 @@ function _default(instance) {
           return {
             status: true,
             data: {
-              hotComments,
-              comments,
+              hotComments: hotComments || [],
+              comments: comments || [],
               total
             }
           };
