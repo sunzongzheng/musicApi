@@ -377,7 +377,7 @@ export default function (instance, newApiInstance) {
                                 }),
                                 name: item.songName,
                                 id: item.songId,
-                                cp: !item.listenFiles,
+                                cp: !item.listenFiles.length,
                             }
                         })
                     }
@@ -443,7 +443,7 @@ export default function (instance, newApiInstance) {
                                 }),
                                 name: item.songName,
                                 id: item.songId,
-                                cp: !item.listenFiles,
+                                cp: !item.listenFiles.length,
                             }
                         })
                     }

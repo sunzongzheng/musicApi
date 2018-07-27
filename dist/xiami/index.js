@@ -471,7 +471,7 @@ function _default(instance, newApiInstance) {
                   }),
                   name: item.songName,
                   id: item.songId,
-                  cp: !item.listenFiles
+                  cp: !item.listenFiles.length
                 };
               })
             }
@@ -552,7 +552,7 @@ function _default(instance, newApiInstance) {
                   }),
                   name: item.songName,
                   id: item.songId,
-                  cp: !item.listenFiles
+                  cp: !item.listenFiles.length
                 };
               })
             }
