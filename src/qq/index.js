@@ -362,7 +362,8 @@ export default function (instance) {
                 }
             }
         },
-        async getArtists(offset = 0, {area = -100, sex = -100, genre = -100, index = -100}) {
+        async getArtists(offset = 0, param) {
+            const {area = -100, sex = -100, genre = -100, index = -100} = param || {}
             try {
                 const {singerList} = await instance.get('/cgi-bin/musicu.fcg', {
                     jsonpCallback: 'callback',

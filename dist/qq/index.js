@@ -430,10 +430,20 @@ function _default(instance) {
       })();
     },
 
-    getArtists(offset = 0, limit = 80) {
+    getArtists(offset = 0, param) {
       return _asyncToGenerator(function* () {
+        const _ref5 = param || {},
+              _ref5$area = _ref5.area,
+              area = _ref5$area === void 0 ? -100 : _ref5$area,
+              _ref5$sex = _ref5.sex,
+              sex = _ref5$sex === void 0 ? -100 : _ref5$sex,
+              _ref5$genre = _ref5.genre,
+              genre = _ref5$genre === void 0 ? -100 : _ref5$genre,
+              _ref5$index = _ref5.index,
+              index = _ref5$index === void 0 ? -100 : _ref5$index;
+
         try {
-          const _ref5 = yield instance.get('/cgi-bin/musicu.fcg', {
+          const _ref6 = yield instance.get('/cgi-bin/musicu.fcg', {
             jsonpCallback: 'callback',
             callback: 'callback',
             loginUin: 0,
@@ -453,11 +463,11 @@ function _default(instance) {
                 module: 'Music.SingerListServer',
                 method: 'get_singer_list',
                 param: {
-                  area: -100,
-                  sex: -100,
-                  genre: -100,
-                  index: -100,
-                  sin: offset * limit,
+                  area,
+                  sex,
+                  genre,
+                  index,
+                  sin: offset * 80,
                   cur_page: offset + 1
                 }
               }
@@ -467,7 +477,7 @@ function _default(instance) {
               newApi: true
             }
           }),
-                singerList = _ref5.singerList;
+                singerList = _ref6.singerList;
 
           return {
             status: true,
