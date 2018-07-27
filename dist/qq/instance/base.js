@@ -17,6 +17,14 @@ function _default(createInstance) {
     Referer: 'https://y.qq.com/portal/player.html',
     'User-Agent': (0, _util.randomUserAgent)()
   };
+  fly.interceptors.request.use(config => {
+    if (config.headers.newApi) {
+      config.baseURL = 'https://u.y.qq.com';
+      delete config.headers.newApi;
+    }
+
+    return config;
+  }, e => Promise.reject(e));
   fly.interceptors.response.use(res => {
     if (!res.data) {
       return Promise.reject({

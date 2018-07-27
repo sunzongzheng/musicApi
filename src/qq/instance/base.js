@@ -11,6 +11,13 @@ export default function (createInstance) {
         'User-Agent': randomUserAgent()
     }
 
+    fly.interceptors.request.use(config => {
+        if(config.headers.newApi) {
+            config.baseURL = 'https://u.y.qq.com'
+            delete config.headers.newApi
+        }
+        return config
+    }, e => Promise.reject(e))
     fly.interceptors.response.use(res => {
         if (!res.data) {
             return Promise.reject({

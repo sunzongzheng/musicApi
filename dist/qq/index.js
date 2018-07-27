@@ -428,6 +428,60 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getArtists(offset = 0, limit = 80) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref5 = yield instance.get('/cgi-bin/musicu.fcg', {
+            jsonpCallback: 'callback',
+            callback: 'callback',
+            loginUin: 0,
+            hostUin: 0,
+            format: 'jsonp',
+            inCharset: 'utf8',
+            outCharset: 'utf8',
+            notice: 0,
+            platform: 'yqq',
+            needNewCode: 0,
+            data: JSON.stringify({
+              comm: {
+                ct: 24,
+                cv: 10000
+              },
+              singerList: {
+                module: 'Music.SingerListServer',
+                method: 'get_singer_list',
+                param: {
+                  area: -100,
+                  sex: -100,
+                  genre: -100,
+                  index: -100,
+                  sin: offset * limit,
+                  cur_page: offset + 1
+                }
+              }
+            })
+          }, {
+            headers: {
+              newApi: true
+            }
+          }),
+                singerList = _ref5.singerList;
+
+          return {
+            status: true,
+            data: singerList.data
+          };
+        } catch (e) {
+          console.warn(e);
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

@@ -35,4 +35,9 @@ describe('QQ音乐', () => {
         assert.equal(true, status)
         assert.equal(true, data.songs.length > 0)
     })
+    it('获取歌手列表', async () => {
+        const {data, status} = await qq.getArtists()
+        assert.equal(true, status)
+        assert.equal(true, data.singerlist.length > 0)
+    })
 })
