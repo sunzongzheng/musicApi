@@ -217,7 +217,7 @@
                     data: {
                         area: '地区分类',
                         genre: '音乐分类',
-                        index: '未知',
+                        index: '热门 + 首字母',
                         sex: '性别',
                         singerlist: [{
                            country: '地区分类',
