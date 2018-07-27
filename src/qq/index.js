@@ -362,7 +362,7 @@ export default function (instance) {
                 }
             }
         },
-        async getArtists(offset = 0, limit = 80) {
+        async getArtists(offset = 0, {area = -100, sex = -100, genre = -100, index = -100}) {
             try {
                 const {singerList} = await instance.get('/cgi-bin/musicu.fcg', {
                     jsonpCallback: 'callback',
@@ -384,16 +384,16 @@ export default function (instance) {
                             module: 'Music.SingerListServer',
                             method: 'get_singer_list',
                             param: {
-                                area: -100,
-                                sex: -100,
-                                genre: -100,
-                                index: -100,
-                                sin: offset * limit,
+                                area,
+                                sex,
+                                genre,
+                                index,
+                                sin: offset * 80,
                                 cur_page: offset + 1,
                             }
                         }
                     })
-                },{
+                }, {
                     headers: {
                         newApi: true
                     }

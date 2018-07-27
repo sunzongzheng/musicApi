@@ -211,7 +211,7 @@
             
             注意事项：一页限制80条
             ````js
-            function getArtists( offset : '偏移页数' ) {
+            function getArtists( offset : '偏移页数', { area = -100, sex = -100, genre = -100, index = -100 } ) {
                 return {
                     status: Boolean, // 请求是否成功
                     data: {
