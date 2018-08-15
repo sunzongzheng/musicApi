@@ -9,6 +9,8 @@ var _util = require("../../util");
 
 var _crypto = _interopRequireDefault(require("../crypto"));
 
+var _fetchVisitorHash = _interopRequireDefault(require("../fetch-visitor-hash"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default(createInstance) {
@@ -25,7 +27,8 @@ function _default(createInstance) {
     'Content-Type': 'application/x-www-form-urlencoded',
     Referer: 'http://music.163.com',
     Host: 'music.163.com',
-    'User-Agent': (0, _util.randomUserAgent)()
+    'User-Agent': (0, _util.randomUserAgent)(),
+    Cookie: `_ntes_nuid=${(0, _fetchVisitorHash.default)()}`
   };
   fly.interceptors.request.use(config => {
     const cryptoreq = (0, _crypto.default)(config.body);

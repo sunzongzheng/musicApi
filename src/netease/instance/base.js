@@ -1,5 +1,6 @@
 import {randomUserAgent} from '../../util'
 import Encrypt from '../crypto'
+import fetch_visitor_hash from '../fetch-visitor-hash'
 
 export default function (createInstance) {
     const fly = createInstance()
@@ -14,7 +15,8 @@ export default function (createInstance) {
         'Content-Type': 'application/x-www-form-urlencoded',
         Referer: 'http://music.163.com',
         Host: 'music.163.com',
-        'User-Agent': randomUserAgent()
+        'User-Agent': randomUserAgent(),
+        Cookie: `_ntes_nuid=${fetch_visitor_hash()}`
     }
 
     fly.interceptors.request.use(config => {
