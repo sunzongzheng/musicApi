@@ -38,8 +38,11 @@ export default function (instance) {
             }
             try {
                 let {result} = await instance.post('/weapi/cloudsearch/get/web', params)
-                if (!result.songs) {
-                    result.songs = []
+                if(!result) {
+                    result = {
+                        songCount: 0,
+                        songs: []
+                    }
                 }
                 return {
                     status: true,
@@ -66,6 +69,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
+                console.warn(e)
                 return {
                     status: false,
                     msg: '获取失败',

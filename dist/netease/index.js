@@ -56,8 +56,11 @@ function _default(instance) {
           let _ref = yield instance.post('/weapi/cloudsearch/get/web', params),
               result = _ref.result;
 
-          if (!result.songs) {
-            result.songs = [];
+          if (!result) {
+            result = {
+              songCount: 0,
+              songs: []
+            };
           }
 
           return {
@@ -85,6 +88,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
+          console.warn(e);
           return {
             status: false,
             msg: '获取失败',
