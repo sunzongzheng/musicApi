@@ -390,7 +390,7 @@ export default function (instance, newApiInstance) {
                 }
             }
         },
-        async getAlbumDetail(id) {
+        async getPlaylistDetail(id) {
             try {
                 const {collectDetail} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
                     listId: id,
@@ -415,7 +415,7 @@ export default function (instance, newApiInstance) {
         },
         async getAlbumSongs(id, offset, limit) {
             try {
-                const detailInfo = await this.getAlbumDetail(id)
+                const detailInfo = await this.getPlaylistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
                 const {songs} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
                     listId: id,
@@ -453,6 +453,59 @@ export default function (instance, newApiInstance) {
                     status: false,
                     msg: '获取失败',
                     log: e
+                }
+            }
+        },
+        async getAlbumDetail(id) {
+            try {
+                const {albumDetail} = await this.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
+                    albumId: id
+                })
+                return {
+                    status: true,
+                    data: {
+                        name: albumDetail.albumName,
+                        cover: albumDetail.albumLogo,
+                        artist: {
+                            id: albumDetail.artistId,
+                            name: albumDetail.artistName
+                        },
+                        desc: albumDetail.description,
+                        publishTime: albumDetail.gmtPublish,
+                        songs: albumDetail.songs.map(item => {
+                            return {
+                                album: {
+                                    id: item.albumId,
+                                    name: item.albumName,
+                                    cover: item.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                                },
+                                artists: item.artistVOs.map(singer => {
+                                    return {
+                                        id: singer.artistId,
+                                        name: singer.artistName
+                                    }
+                                }),
+                                name: item.songName,
+                                id: item.songId,
+                                cp: !item.listenFiles.length,
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                console.warn(e)
+                if (e.status === 200) {
+                    return {
+                        status: false,
+                        msg: e.ret[0].slice('::')[1],
+                        log: e
+                    }
+                } else {
+                    return {
+                        status: false,
+                        msg: '请求失败',
+                        log: e
+                    }
                 }
             }
         }

@@ -38,7 +38,7 @@ export default function (instance) {
             }
             try {
                 let {result} = await instance.post('/weapi/cloudsearch/get/web', params)
-                if(!result) {
+                if (!result) {
                     result = {
                         songCount: 0,
                         songs: []
@@ -353,6 +353,48 @@ export default function (instance) {
                                 name: item.name,
                                 id: item.id,
                                 cp: !privilegesObjects[item.id].cp
+                            }
+                        })
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
+        async getAlbumDetail(id) {
+            try {
+                const {album, songs} = await instance.post(`/weapi/v1/album/${id}`, {})
+                return {
+                    status: true,
+                    data: {
+                        name: album.name,
+                        cover: album.picUrl,
+                        artist: {
+                            id: album.artist.id,
+                            name: album.artist.name
+                        },
+                        desc: album.description,
+                        publishTime: album.publishTime,
+                        songs: songs.map(item => {
+                            return {
+                                album: {
+                                    id: item.al.id,
+                                    name: item.al.name,
+                                    cover: item.al.picUrl
+                                },
+                                artists: item.ar.map(ar => {
+                                    return {
+                                        id: ar.id,
+                                        name: ar.name
+                                    }
+                                }),
+                                name: item.name,
+                                id: item.id,
+                                cp: !item.privilege.cp
                             }
                         })
                     }

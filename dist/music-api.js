@@ -173,6 +173,16 @@ function _default(instance) {
         yield paramsVerify(vendor, id);
         return yield _this7[vendor]['getAlbumSongs'](id, offset, limit);
       })();
+    },
+
+    // 获取专辑详情
+    getAlbumDetail(vendor, id) {
+      var _this8 = this;
+
+      return _asyncToGenerator(function* () {
+        yield paramsVerify(vendor, id);
+        return yield _this8[vendor]['getAlbumDetail'](id);
+      })();
     }
 
   };

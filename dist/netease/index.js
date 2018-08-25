@@ -428,6 +428,54 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getAlbumDetail(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref6 = yield instance.post(`/weapi/v1/album/${id}`, {}),
+                album = _ref6.album,
+                songs = _ref6.songs;
+
+          return {
+            status: true,
+            data: {
+              name: album.name,
+              cover: album.picUrl,
+              artist: {
+                id: album.artist.id,
+                name: album.artist.name
+              },
+              desc: album.description,
+              publishTime: album.publishTime,
+              songs: songs.map(item => {
+                return {
+                  album: {
+                    id: item.al.id,
+                    name: item.al.name,
+                    cover: item.al.picUrl
+                  },
+                  artists: item.ar.map(ar => {
+                    return {
+                      id: ar.id,
+                      name: ar.name
+                    };
+                  }),
+                  name: item.name,
+                  id: item.id,
+                  cp: !item.privilege.cp
+                };
+              })
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

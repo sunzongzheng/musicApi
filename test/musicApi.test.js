@@ -91,4 +91,16 @@ describe('musicApi', () => {
         assert.equal(true, status)
         assert.equal(true, data.songs.length > 0)
     })
+    it('获取专辑详情 网易云', async () => {
+        const {data, status} = await musicApi.getAlbumDetail('netease', neteaseMusic.albumId)
+        assert.equal(true, status)
+    })
+    it('获取专辑详情 QQ音乐', async () => {
+        const {data, status} = await musicApi.getAlbumDetail('qq', qqMusic.albumId)
+        assert.equal(true, status)
+    })
+    it('获取专辑详情 虾米音乐', async () => {
+        const {data, status} = await musicApi.getAlbumDetail('xiami', xiamiMusic.albumId)
+        assert.equal(true, status)
+    })
 })

@@ -1,15 +1,18 @@
 export const neteaseMusic = {
     id: 27808044,
     artistId: 11127,
-    albumId: 483222600
+    playlistId: 483222600,
+    albumId: 29597
 }
 export const qqMusic = {
     id: 5106429,
     artistId: 2,
-    albumId: 2890182907
+    playlistId: 2890182907,
+    albumId: 1458791
 }
 export const xiamiMusic = {
     id: 74204,
     artistId: 2629,
-    albumId: 412499071
+    playlistId: 412499071,
+    albumId: 2100350206
 }

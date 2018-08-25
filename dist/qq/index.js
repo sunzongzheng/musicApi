@@ -29,6 +29,25 @@ function _default(instance) {
     };
   };
 
+  const getMusicInfo2 = info => {
+    return {
+      album: {
+        id: info.albumid,
+        name: info.albumname,
+        cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`
+      },
+      artists: info.singer.map(singer => {
+        return {
+          id: singer.id,
+          name: singer.name
+        };
+      }),
+      name: info.songname,
+      id: info.songid,
+      cp: !info.alertid
+    };
+  };
+
   return {
     searchSong({
       keyword,
@@ -336,25 +355,7 @@ function _default(instance) {
                 avatar: `http://y.gtimg.cn/music/photo_new/T001R300x300M000${data.singer_mid}.jpg`,
                 desc: data.SingerDesc
               },
-              songs: data.list.map(item => {
-                const info = item.musicData;
-                return {
-                  album: {
-                    id: info.albumid,
-                    name: info.albumname,
-                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`
-                  },
-                  artists: info.singer.map(singer => {
-                    return {
-                      id: singer.id,
-                      name: singer.name
-                    };
-                  }),
-                  name: info.songname,
-                  id: info.songid,
-                  cp: !info.alertid
-                };
-              })
+              songs: data.list.map(item => getMusicInfo2(item.musicData))
             }
           };
         } catch (e) {
@@ -399,24 +400,7 @@ function _default(instance) {
                 cover: cdlist[0].logo,
                 desc: cdlist[0].desc
               },
-              songs: cdlist[0].songlist.map(info => {
-                return {
-                  album: {
-                    id: info.albumid,
-                    name: info.albumname,
-                    cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${info.albummid}.jpg`
-                  },
-                  artists: info.singer.map(singer => {
-                    return {
-                      id: singer.id,
-                      name: singer.name
-                    };
-                  }),
-                  name: info.songname,
-                  id: info.songid,
-                  cp: !info.alertid
-                };
-              })
+              songs: cdlist[0].songlist.map(info => getMusicInfo2(info))
             }
           };
         } catch (e) {
@@ -485,6 +469,49 @@ function _default(instance) {
           };
         } catch (e) {
           console.warn(e);
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getAlbumDetail(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref7 = yield instance.get('https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg', {
+            albumid: id,
+            tpl: 'yqq_song_detail',
+            format: 'jsonp',
+            callback: 'callback',
+            jsonpCallback: 'callback',
+            loginUin: 0,
+            hostUin: 0,
+            inCharset: 'utf8',
+            outCharset: 'utf-8',
+            notice: 0,
+            platform: 'yqq',
+            needNewCode: 0
+          }),
+                data = _ref7.data;
+
+          return {
+            status: true,
+            data: {
+              name: data.name,
+              cover: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${data.mid}.jpg`,
+              artist: {
+                id: data.singerid,
+                name: data.singername
+              },
+              desc: data.desc,
+              publishTime: Date.parse(data.aDate),
+              songs: data.list.map(item => getMusicInfo2(item))
+            }
+          };
+        } catch (e) {
           return {
             status: false,
             msg: '请求失败',

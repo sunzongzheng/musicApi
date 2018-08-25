@@ -486,7 +486,7 @@ function _default(instance, newApiInstance) {
       })();
     },
 
-    getAlbumDetail(id) {
+    getPlaylistDetail(id) {
       var _this9 = this;
 
       return _asyncToGenerator(function* () {
@@ -521,7 +521,7 @@ function _default(instance, newApiInstance) {
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this10.getAlbumDetail(id);
+          const detailInfo = yield _this10.getPlaylistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
 
           const _ref5 = yield _this10.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
@@ -563,6 +563,67 @@ function _default(instance, newApiInstance) {
             msg: '获取失败',
             log: e
           };
+        }
+      })();
+    },
+
+    getAlbumDetail(id) {
+      var _this11 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref6 = yield _this11.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
+            albumId: id
+          }),
+                albumDetail = _ref6.albumDetail;
+
+          return {
+            status: true,
+            data: {
+              name: albumDetail.albumName,
+              cover: albumDetail.albumLogo,
+              artist: {
+                id: albumDetail.artistId,
+                name: albumDetail.artistName
+              },
+              desc: albumDetail.description,
+              publishTime: albumDetail.gmtPublish,
+              songs: albumDetail.songs.map(item => {
+                return {
+                  album: {
+                    id: item.albumId,
+                    name: item.albumName,
+                    cover: item.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                  },
+                  artists: item.artistVOs.map(singer => {
+                    return {
+                      id: singer.artistId,
+                      name: singer.artistName
+                    };
+                  }),
+                  name: item.songName,
+                  id: item.songId,
+                  cp: !item.listenFiles.length
+                };
+              })
+            }
+          };
+        } catch (e) {
+          console.warn(e);
+
+          if (e.status === 200) {
+            return {
+              status: false,
+              msg: e.ret[0].slice('::')[1],
+              log: e
+            };
+          } else {
+            return {
+              status: false,
+              msg: '请求失败',
+              log: e
+            };
+          }
         }
       })();
     }
