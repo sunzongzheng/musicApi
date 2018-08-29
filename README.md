@@ -175,6 +175,37 @@
             }
         }
         ````
+        
+    - 专辑信息
+        
+        ````js
+        function getAlbumDetail( vendor:歌曲来源, id:专辑id ) {
+            return {
+                status: Boolean, // 请求是否成功
+                data: {
+                    name: String,
+                    cover: String,
+                    artist: {
+                        id: Number,
+                        name: String,
+                    },
+                    desc: String,
+                    publishTime: Number,
+                    songs: [{
+                       album: {
+                           id: Number | String,
+                           name: String,
+                           cover: String
+                       },
+                       artists: Array,
+                       name: String,
+                       id: Number,
+                       cp: Boolean
+                   }]
+                }
+            }
+        }
+        ````
     
 - ## Difference
     - 网易云
