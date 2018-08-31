@@ -109,12 +109,15 @@ export default function (instance, newApiInstance) {
             }
         },
         async getSongDetail(id, getRaw = false) {
+            const params = {
+                v: '2.0',
+                id,
+                r: 'song/detail',
+                app_key: 1
+            }
             try {
-                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
-                    songIds: [id]
-                })
-                const info = data.songs[0]
-                if (!info) {
+                const {song} = await instance.post('/web?', params)
+                if (!song.song_id) {
                     return {
                         status: false,
                         msg: noSongsDetailMsg,
@@ -123,24 +126,24 @@ export default function (instance, newApiInstance) {
                 if (getRaw) {
                     return {
                         status: true,
-                        data: info
+                        data: song
                     }
                 }
                 return {
                     status: true,
                     data: {
                         album: {
-                            id: info.albumId,
-                            name: info.albumName,
-                            cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                            id: song.album_id,
+                            name: song.album_name,
+                            cover: song.logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
                         },
                         artists: [{
-                            id: info.artistId,
-                            name: info.artistName
+                            id: song.artist_id,
+                            name: song.artist_name
                         }],
-                        name: info.songName,
-                        id: info.songId,
-                        cp: !info.listenFiles.length,
+                        name: song.song_name,
+                        id: song.song_id,
+                        cp: !song.listen_file,
                     }
                 }
             } catch (e) {
@@ -223,7 +226,7 @@ export default function (instance, newApiInstance) {
             try {
                 let data = await this.getSongDetail(id, true)
                 if (data.status) {
-                    lyric_url = data.data.lyricInfo.lyricFile
+                    lyric_url = data.data.lyric
                 } else {
                     return {
                         status: false,
