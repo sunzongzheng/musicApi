@@ -21,6 +21,10 @@ let cache = {
   expire: null
 };
 
+const replaceImage = url => {
+  return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png');
+};
+
 function _default(instance, newApiInstance) {
   return {
     // 根据api获取虾米token
@@ -128,7 +132,7 @@ function _default(instance, newApiInstance) {
                   album: {
                     id: item.album_id,
                     name: item.album_name,
-                    cover: item.album_logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                    cover: replaceImage(item.album_logo)
                   },
                   artists: [{
                     id: item.artist_id,
@@ -148,16 +152,19 @@ function _default(instance, newApiInstance) {
     },
 
     getSongDetail(id, getRaw = false) {
-      var _this2 = this;
-
       return _asyncToGenerator(function* () {
-        try {
-          const data = yield _this2.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
-            songIds: [id]
-          });
-          const info = data.songs[0];
+        const params = {
+          v: '2.0',
+          id,
+          r: 'song/detail',
+          app_key: 1
+        };
 
-          if (!info) {
+        try {
+          const _ref2 = yield instance.post('/web?', params),
+                song = _ref2.song;
+
+          if (!song.song_id) {
             return {
               status: false,
               msg: _util.noSongsDetailMsg
@@ -167,7 +174,7 @@ function _default(instance, newApiInstance) {
           if (getRaw) {
             return {
               status: true,
-              data: info
+              data: song
             };
           }
 
@@ -175,17 +182,17 @@ function _default(instance, newApiInstance) {
             status: true,
             data: {
               album: {
-                id: info.albumId,
-                name: info.albumName,
-                cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                id: song.album_id,
+                name: song.album_name,
+                cover: replaceImage(song.logo)
               },
               artists: [{
-                id: info.artistId,
-                name: info.artistName
+                id: song.artist_id,
+                name: song.artist_name
               }],
-              name: info.songName,
-              id: info.songId,
-              cp: !info.listenFiles.length
+              name: song.song_name,
+              id: song.song_id,
+              cp: !song.listen_file
             }
           };
         } catch (e) {
@@ -209,11 +216,11 @@ function _default(instance, newApiInstance) {
     },
 
     getBatchSongDetail(ids) {
-      var _this3 = this;
+      var _this2 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const data = yield _this3.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+          const data = yield _this2.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
             songIds: ids
           });
           return {
@@ -223,7 +230,7 @@ function _default(instance, newApiInstance) {
                 album: {
                   id: info.albumId,
                   name: info.albumName,
-                  cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                  cover: replaceImage(info.albumLogo)
                 },
                 artists: [{
                   id: info.artistId,
@@ -256,7 +263,7 @@ function _default(instance, newApiInstance) {
     },
 
     getSongUrl(id) {
-      var _this4 = this;
+      var _this3 = this;
 
       return _asyncToGenerator(function* () {
         try {
@@ -264,7 +271,7 @@ function _default(instance, newApiInstance) {
           return {
             status: true,
             data: {
-              url: _this4.parseLocation(data.trackList[0].location)
+              url: _this3.parseLocation(data.trackList[0].location)
             }
           };
         } catch (e) {
@@ -278,16 +285,16 @@ function _default(instance, newApiInstance) {
     },
 
     getLyric(id) {
-      var _this5 = this;
+      var _this4 = this;
 
       return _asyncToGenerator(function* () {
         let lyric_url;
 
         try {
-          let data = yield _this5.getSongDetail(id, true);
+          let data = yield _this4.getSongDetail(id, true);
 
           if (data.status) {
-            lyric_url = data.data.lyricInfo.lyricFile;
+            lyric_url = data.data.lyric;
           } else {
             return {
               status: false,
@@ -305,8 +312,8 @@ function _default(instance, newApiInstance) {
 
         if (lyric_url) {
           try {
-            let _ref2 = yield _flyio.default.get(lyric_url),
-                data = _ref2.data;
+            let _ref3 = yield _flyio.default.get(lyric_url),
+                data = _ref3.data;
 
             return {
               status: true,
@@ -330,11 +337,11 @@ function _default(instance, newApiInstance) {
     },
 
     getComment(objectId, offset, pageSize) {
-      var _this6 = this;
+      var _this5 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const data = yield _this6.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
+          const data = yield _this5.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
             objectId,
             // 会变化
             objectType: 'song',
@@ -409,14 +416,14 @@ function _default(instance, newApiInstance) {
     },
 
     getArtistDetail(id) {
-      var _this7 = this;
+      var _this6 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref3 = yield _this7.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
+          const _ref4 = yield _this6.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
             artistId: id
           }),
-                artistDetailVO = _ref3.artistDetailVO;
+                artistDetailVO = _ref4.artistDetailVO;
 
           return {
             status: true,
@@ -438,13 +445,13 @@ function _default(instance, newApiInstance) {
     },
 
     getArtistSongs(id, offset, limit) {
-      var _this8 = this;
+      var _this7 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this8.getArtistDetail(id);
+          const detailInfo = yield _this7.getArtistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
-          const data = yield _this8.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
+          const data = yield _this7.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
             artistId: id,
             backwardOffSale: true,
             pagingVO: {
@@ -487,15 +494,15 @@ function _default(instance, newApiInstance) {
     },
 
     getPlaylistDetail(id) {
-      var _this9 = this;
+      var _this8 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref4 = yield _this9.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+          const _ref5 = yield _this8.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
             listId: id,
             isFullTags: false
           }),
-                collectDetail = _ref4.collectDetail;
+                collectDetail = _ref5.collectDetail;
 
           return {
             status: true,
@@ -517,21 +524,21 @@ function _default(instance, newApiInstance) {
     },
 
     getAlbumSongs(id, offset, limit) {
-      var _this10 = this;
+      var _this9 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this10.getPlaylistDetail(id);
+          const detailInfo = yield _this9.getPlaylistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
 
-          const _ref5 = yield _this10.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+          const _ref6 = yield _this9.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
             listId: id,
             pagingVO: {
               page: offset + 1,
               pageSize: limit
             }
           }),
-                songs = _ref5.songs;
+                songs = _ref6.songs;
 
           return {
             status: true,
@@ -568,14 +575,14 @@ function _default(instance, newApiInstance) {
     },
 
     getAlbumDetail(id) {
-      var _this11 = this;
+      var _this10 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref6 = yield _this11.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
+          const _ref7 = yield _this10.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
             albumId: id
           }),
-                albumDetail = _ref6.albumDetail;
+                albumDetail = _ref7.albumDetail;
 
           return {
             status: true,
@@ -593,7 +600,7 @@ function _default(instance, newApiInstance) {
                   album: {
                     id: item.albumId,
                     name: item.albumName,
-                    cover: item.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                    cover: replaceImage(item.albumLogo)
                   },
                   artists: item.artistVOs.map(singer => {
                     return {

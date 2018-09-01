@@ -7,6 +7,9 @@ let cache = {
     signedToken: null,
     expire: null
 }
+const replaceImage = (url) => {
+    return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
+}
 export default function (instance, newApiInstance) {
     return {
         // 根据api获取虾米token
@@ -91,7 +94,7 @@ export default function (instance, newApiInstance) {
                                 album: {
                                     id: item.album_id,
                                     name: item.album_name,
-                                    cover: item.album_logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                                    cover: replaceImage(item.album_logo)
                                 },
                                 artists: [{
                                     id: item.artist_id,
@@ -135,7 +138,7 @@ export default function (instance, newApiInstance) {
                         album: {
                             id: song.album_id,
                             name: song.album_name,
-                            cover: song.logo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                            cover: replaceImage(song.logo)
                         },
                         artists: [{
                             id: song.artist_id,
@@ -175,7 +178,7 @@ export default function (instance, newApiInstance) {
                             album: {
                                 id: info.albumId,
                                 name: info.albumName,
-                                cover: info.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                                cover: replaceImage(info.albumLogo)
                             },
                             artists: [{
                                 id: info.artistId,
@@ -480,7 +483,7 @@ export default function (instance, newApiInstance) {
                                 album: {
                                     id: item.albumId,
                                     name: item.albumName,
-                                    cover: item.albumLogo.replace('http', 'https').replace('1.jpg', '2.jpg').replace('1.png', '4.png')
+                                    cover: replaceImage(item.albumLogo)
                                 },
                                 artists: item.artistVOs.map(singer => {
                                     return {
