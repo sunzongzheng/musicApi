@@ -1,12 +1,50 @@
 import fly from "flyio"
-import {lyric_decode, noSongsDetailMsg} from '../util'
+import {lyric_decode, noSongsDetailMsg, getCookies, setCookie} from '../util'
 import Crypto from './crypto'
 
-let cache = {
-    token: null,
-    signedToken: null,
-    expire: null
+let cache = getCache()
+
+function getCache() {
+    if (typeof(window) !== 'undefined') {
+        const cookies = getCookies()
+        if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
+            return {
+                token: [
+                    `_m_h5_tk=${cookies['_m_h5_tk']}`,
+                    `_m_h5_tk_enc${cookies['_m_h5_tk_enc']}`
+                ],
+                signedToken: cookies['_m_h5_tk'].split('_')[0],
+                expire: +new Date() + 365 * 24 * 60 * 1000, // 浏览器环境 此字段无效 以cookie有效期为准
+            }
+        } else {
+            return {
+                token: null,
+                signedToken: null
+            }
+        }
+    } else {
+        return {
+            token: null,
+            signedToken: null
+        }
+    }
 }
+
+function setCache({token, signedToken}) {
+    cache = {
+        token,
+        signedToken,
+        expire: +new Date() + 7 * 24 * 60 * 1000, // 7天有效 浏览器环境此字段无效
+    }
+    // 浏览器环境 存cookie
+    if (typeof(window) !== 'undefined') {
+        token.forEach(item => {
+            const arr = item.split('=')
+            setCookie(arr[0], arr[1])
+        })
+    }
+}
+
 const replaceImage = (url) => {
     return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
 }
@@ -24,11 +62,10 @@ export default function (instance, newApiInstance) {
                     let token = res.headers['set-cookie'].split('Path=/,')
                     token = token.map(i => i.split(';')[0].trim())
                     const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
-                    cache = {
+                    setCache({
                         token,
-                        signedToken: myToken,
-                        expire: +new Date() + 5 * 60 * 1000
-                    }
+                        signedToken: myToken
+                    })
                     return cache
                 } else {
                     return Promise.reject({

@@ -15,11 +15,52 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
-let cache = {
-  token: null,
-  signedToken: null,
-  expire: null
-};
+let cache = getCache();
+
+function getCache() {
+  if (typeof window !== 'undefined') {
+    const cookies = (0, _util.getCookies)();
+
+    if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
+      return {
+        token: [`_m_h5_tk=${cookies['_m_h5_tk']}`, `_m_h5_tk_enc${cookies['_m_h5_tk_enc']}`],
+        signedToken: cookies['_m_h5_tk'].split('_')[0],
+        expire: +new Date() + 365 * 24 * 60 * 1000 // 浏览器环境 此字段无效 以cookie有效期为准
+
+      };
+    } else {
+      return {
+        token: null,
+        signedToken: null
+      };
+    }
+  } else {
+    return {
+      token: null,
+      signedToken: null
+    };
+  }
+}
+
+function setCache({
+  token,
+  signedToken
+}) {
+  cache = {
+    token,
+    signedToken,
+    expire: +new Date() + 7 * 24 * 60 * 1000 // 7天有效 浏览器环境此字段无效
+    // 浏览器环境 存cookie
+
+  };
+
+  if (typeof window !== 'undefined') {
+    token.forEach(item => {
+      const arr = item.split('=');
+      (0, _util.setCookie)(arr[0], arr[1]);
+    });
+  }
+}
 
 const replaceImage = url => {
   return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png');
@@ -41,11 +82,10 @@ function _default(instance, newApiInstance) {
             let token = res.headers['set-cookie'].split('Path=/,');
             token = token.map(i => i.split(';')[0].trim());
             const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
-            cache = {
+            setCache({
               token,
-              signedToken: myToken,
-              expire: +new Date() + 5 * 60 * 1000
-            };
+              signedToken: myToken
+            });
             return cache;
           } else {
             return Promise.reject({

@@ -1,6 +1,6 @@
 {
   "name": "@suen/music-api",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "music api colletion",
   "main": "dist/app.js",
   "scripts": {

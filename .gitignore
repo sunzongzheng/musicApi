@@ -5,3 +5,4 @@ package-lock.json
 .vscode/
 controllers/
 yarn.lock
+.DS_Store

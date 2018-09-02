@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.randomUserAgent = randomUserAgent;
 exports.lyric_decode = lyric_decode;
+exports.getCookies = getCookies;
+exports.setCookie = setCookie;
 exports.noSongsDetailMsg = void 0;
 
 function randomUserAgent() {
@@ -31,3 +33,40 @@ function lyric_decode(str) {
 
 const noSongsDetailMsg = '无法获取信息，请检查songId';
 exports.noSongsDetailMsg = noSongsDetailMsg;
+
+function getCookies() {
+  let result = {};
+
+  if (document.cookie) {
+    const cookies = document.cookie.split('; ');
+    cookies.forEach(item => {
+      console.log(item);
+      const cookie = item.split('=');
+      result[cookie[0]] = cookie[1];
+    });
+  }
+
+  return result;
+}
+
+const expiresTime = (day = 7) => {
+  // 获取过期时间
+  const exp = new Date();
+  exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000);
+  return exp.toUTCString();
+};
+
+function setCookie(key, value, {
+  path = '/',
+  domain = location.hostname
+}) {
+  let str = key + '=' + encodeURIComponent(value) + ';';
+  str += 'path=' + path + ';';
+  str += 'expires=' + expiresTime() + ';';
+
+  if (domain !== 'localhost') {
+    str += 'domain=' + domain + ';';
+  }
+
+  document.cookie = str;
+}
