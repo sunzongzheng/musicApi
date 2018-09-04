@@ -519,6 +519,91 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getAllTopList() {
+      return _asyncToGenerator(function* () {
+        const params = {
+          page: 'index',
+          format: 'html',
+          tpl: 'macv4',
+          v8debug: 1,
+          jsonCallback: 'jsonCallback'
+        };
+
+        try {
+          let data = yield instance.get('/v8/fcg-bin/fcg_v8_toplist_opt.fcg', params, {
+            nocode: true
+          });
+          return {
+            status: true,
+            data: data.reduce((a, b) => a.List.concat(b.List)).map(item => {
+              return {
+                id: item.topID,
+                name: item.ListName,
+                cover: item.MacListPicUrl,
+                list: item.songlist.map((item, i) => {
+                  return {
+                    artists: {
+                      id: item.singerid,
+                      name: item.singername
+                    },
+                    name: item.songname,
+                    id: item.songid
+                  };
+                })
+              };
+            })
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getTopList(id) {
+      return _asyncToGenerator(function* () {
+        const params = {
+          format: 'jsonp',
+          callback: 'callback',
+          jsonpCallback: 'callback',
+          loginUin: 0,
+          hostUin: 0,
+          inCharset: 'utf8',
+          outCharset: 'utf-8',
+          notice: 0,
+          platform: 'h5',
+          needNewCode: 0,
+          topid: id,
+          tpl: 3,
+          page: 'detail',
+          type: 'top'
+        };
+
+        try {
+          let data = yield instance.get('/v8/fcg-bin/fcg_v8_toplist_cp.fcg', params);
+          return {
+            status: true,
+            data: {
+              name: data.topinfo.ListName,
+              description: data.topinfo.info,
+              cover: data.topinfo.MacDetailPicUrl,
+              playCount: data.topinfo.listennum,
+              list: data.songlist.map(item => getMusicInfo2(item.data))
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '获取失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

@@ -52,7 +52,7 @@ function _default(createInstance) {
     } // code是否正确
 
 
-    if (res.data.code !== 0) {
+    if (!res.request.nocode && res.data.code !== 0) {
       return Promise.reject({
         status: false,
         msg: '请求结果报错',
