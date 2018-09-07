@@ -507,6 +507,28 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getMvDetail(id) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref8 = yield instance.post(`/weapi/mv/detail`, {
+            id
+          }),
+                data = _ref8.data;
+
+          return {
+            status: true,
+            data
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

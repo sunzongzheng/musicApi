@@ -430,6 +430,23 @@ export default function (instance) {
                     log: e
                 }
             }
+        },
+        async getMvDetail(id) {
+            try {
+                const {data} = await instance.post(`/weapi/mv/detail`, {
+                    id
+                })
+                return {
+                    status: true,
+                    data
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
         }
     }
 }
