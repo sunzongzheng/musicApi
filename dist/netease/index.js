@@ -7,6 +7,10 @@ exports.default = _default;
 
 var _util = require("../util");
 
+var _flyio = _interopRequireDefault(require("flyio"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
 
 const top_list_all = {
@@ -467,6 +471,33 @@ function _default(instance) {
                 };
               })
             }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getBanner() {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref7 = yield _flyio.default.get('http://music.163.com/discover', {
+            headers: {
+              Referer: "http://music.163.com",
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3380.0 Safari/537.36"
+            }
+          }),
+                data = _ref7.data;
+
+          const pattern = /<script[^>]*>\s*window\.Gbanners\s*=\s*([^;]+?);\s*<\/script>/g;
+          const banners = pattern.exec(data)[1];
+          return {
+            status: true,
+            data: eval(banners)
           };
         } catch (e) {
           return {

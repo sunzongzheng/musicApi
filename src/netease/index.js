@@ -1,4 +1,5 @@
 import {lyric_decode, noSongsDetailMsg} from '../util'
+import fly from 'flyio'
 
 const top_list_all = {
     "0": ["云音乐新歌榜", "3779629"],
@@ -398,6 +399,29 @@ export default function (instance) {
                             }
                         })
                     }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
+        async getBanner() {
+            try {
+                const {data} = await fly.get('http://music.163.com/discover', {
+                    headers: {
+                        Referer: "http://music.163.com",
+                        "User-Agent":
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3380.0 Safari/537.36"
+                    }
+                })
+                const pattern = /<script[^>]*>\s*window\.Gbanners\s*=\s*([^;]+?);\s*<\/script>/g;
+                const banners = pattern.exec(data)[1]
+                return {
+                    status: true,
+                    data: eval(banners)
                 }
             } catch (e) {
                 return {
