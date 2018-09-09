@@ -447,6 +447,30 @@ export default function (instance) {
                     log: e
                 }
             }
+        },
+        async getMvComment(id, offset = 0, limit = 20) {
+            try {
+                const data = await instance.post(`/weapi/v1/resource/comments/R_MV_5_${id}/?csrf_token=`, {
+                    offset,
+                    rid: id,
+                    limit,
+                    csrf_token: ""
+                })
+                return {
+                    status: true,
+                    data: {
+                        total: data.total || 0,
+                        hotComments: data.hotComments || [],
+                        comments: data.comments || []
+                    }
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
         }
     }
 }

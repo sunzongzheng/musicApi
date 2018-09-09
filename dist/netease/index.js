@@ -529,6 +529,33 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getMvComment(id, offset = 0, limit = 20) {
+      return _asyncToGenerator(function* () {
+        try {
+          const data = yield instance.post(`/weapi/v1/resource/comments/R_MV_5_${id}/?csrf_token=`, {
+            offset,
+            rid: id,
+            limit,
+            csrf_token: ""
+          });
+          return {
+            status: true,
+            data: {
+              total: data.total || 0,
+              hotComments: data.hotComments || [],
+              comments: data.comments || []
+            }
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };
