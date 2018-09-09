@@ -61,18 +61,18 @@ describe('musicApi', () => {
         assert.equal(true, data.data.length > 0)
     })
 
-    it('获取歌词评论 网易云', async () => {
-        const data = await musicApi.getComment('netease', neteaseMusic.id, 0, 1)
+    it('获取歌曲评论 网易云', async () => {
+        const data = await musicApi.getComment('netease', neteaseMusic.id, 1, 1)
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })
-    it('获取歌词评论 QQ音乐', async () => {
-        const data = await musicApi.getComment('qq', qqMusic.id, 0, 1)
+    it('获取歌曲评论 QQ音乐', async () => {
+        const data = await musicApi.getComment('qq', qqMusic.id, 1, 1)
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })
-    it('获取歌词评论 虾米音乐', async () => {
-        const data = await musicApi.getComment('xiami', xiamiMusic.id, 0, 1)
+    it('获取歌曲评论 虾米音乐', async () => {
+        const data = await musicApi.getComment('xiami', xiamiMusic.id, 1, 1)
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })

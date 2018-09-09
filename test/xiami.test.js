@@ -25,7 +25,7 @@ describe('虾米音乐', () => {
         assert.equal(true, data.data.length > 0)
     })
     it('获取歌曲评论 & 评论不为空', async () => {
-        const data = await xiami.getComment(xiamiMusic.id, 0, 1)
+        const data = await xiami.getComment(xiamiMusic.id, 1, 1)
         assert.equal(true, data.status)
         assert.equal(true, data.data.comments.length > 0)
     })
