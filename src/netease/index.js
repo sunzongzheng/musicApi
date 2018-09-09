@@ -471,6 +471,26 @@ export default function (instance) {
                     log: e
                 }
             }
-        }
+        },
+        async getTopPlaylist(cat = '全部', page = 1, limit = 20) {
+            try {
+                const data = await instance.post(`/weapi/playlist/highquality/list`, {
+                    cat,
+                    offset: (page - 1) * limit,
+                    limit,
+                    csrf_token: ''
+                })
+                return {
+                    status: true,
+                    data: data.playlists
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
     }
 }

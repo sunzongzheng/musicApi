@@ -556,6 +556,29 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getTopPlaylist(cat = '全部', page = 1, limit = 20) {
+      return _asyncToGenerator(function* () {
+        try {
+          const data = yield instance.post(`/weapi/playlist/highquality/list`, {
+            cat,
+            offset: (page - 1) * limit,
+            limit,
+            csrf_token: ''
+          });
+          return {
+            status: true,
+            data: data.playlists
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };
