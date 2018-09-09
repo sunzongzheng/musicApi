@@ -301,11 +301,11 @@ function _default(instance) {
       })();
     },
 
-    getComment(rid, offset = 0, limit = 20) {
+    getComment(rid, page, limit = 20) {
       return _asyncToGenerator(function* () {
         try {
           let _ref4 = yield instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
-            offset,
+            offset: (page - 1) * limit,
             rid,
             limit,
             csrf_token: ""
@@ -531,11 +531,11 @@ function _default(instance) {
       })();
     },
 
-    getMvComment(id, offset = 0, limit = 20) {
+    getMvComment(id, page = 1, limit = 20) {
       return _asyncToGenerator(function* () {
         try {
           const data = yield instance.post(`/weapi/v1/resource/comments/R_MV_5_${id}/?csrf_token=`, {
-            offset,
+            offset: (page - 1) * limit,
             rid: id,
             limit,
             csrf_token: ""

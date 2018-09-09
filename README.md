@@ -55,7 +55,7 @@
     
         **由于网易云、QQ音乐的`评论逻辑不一样`，`hotComments`及`comments`没有进行强封装**
         ````js
-        function getComment( vendor:歌曲来源, id:歌曲id, offset:偏移页数, limit:页大小 ) {
+        function getComment( vendor:歌曲来源, id:歌曲id, page:页数, limit:页大小 ) {
             return {
                 status: Boolean, // 请求是否成功
                 data: {

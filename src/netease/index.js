@@ -249,10 +249,10 @@ export default function (instance) {
                 }
             }
         },
-        async getComment(rid, offset = 0, limit = 20) {
+        async getComment(rid, page, limit = 20) {
             try {
                 let {hotComments, comments, total} = await instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
-                    offset,
+                    offset: (page - 1) * limit,
                     rid,
                     limit,
                     csrf_token: ""
@@ -448,10 +448,10 @@ export default function (instance) {
                 }
             }
         },
-        async getMvComment(id, offset = 0, limit = 20) {
+        async getMvComment(id, page = 1, limit = 20) {
             try {
                 const data = await instance.post(`/weapi/v1/resource/comments/R_MV_5_${id}/?csrf_token=`, {
-                    offset,
+                    offset: (page - 1) * limit,
                     rid: id,
                     limit,
                     csrf_token: ""

@@ -304,13 +304,13 @@ export default function (instance, newApiInstance) {
             }
 
         },
-        async getComment(objectId, offset, pageSize) {
+        async getComment(objectId, page, pageSize) {
             try {
                 const data = await this.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
                     objectId, // 会变化
                     objectType: 'song',
                     pagingVO: {
-                        page: offset + 1,
+                        page,
                         pageSize
                     }
                 })

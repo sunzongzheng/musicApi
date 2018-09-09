@@ -146,12 +146,12 @@ function _default(instance) {
     },
 
     // 获取歌曲评论
-    getComment(vendor, id, offset = 0, limit = 20) {
+    getComment(vendor, id, page = 1, limit = 20) {
       var _this5 = this;
 
       return _asyncToGenerator(function* () {
         yield paramsVerify(vendor, id);
-        return yield _this5[vendor]['getComment'](id, offset, limit);
+        return yield _this5[vendor]['getComment'](id, page, limit);
       })();
     },
 

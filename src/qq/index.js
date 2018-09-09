@@ -224,7 +224,7 @@ export default function (instance) {
             }
 
         },
-        async getComment(songid, pagenum = 0, pagesize = 20) {
+        async getComment(songid, page, pagesize = 20) {
             try {
                 const {comment, hot_comment} = await instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
                     jsonpCallback: 'callback',
@@ -241,7 +241,7 @@ export default function (instance) {
                     topid: songid,
                     cmd: 8,
                     needmusiccrit: 0,
-                    pagenum,
+                    pagenum: page - 1,
                     pagesize,
                     lasthotcommentid: '',
                     callback: 'callback',

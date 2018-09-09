@@ -275,7 +275,7 @@ function _default(instance) {
       })();
     },
 
-    getComment(songid, pagenum = 0, pagesize = 20) {
+    getComment(songid, page, pagesize = 20) {
       return _asyncToGenerator(function* () {
         try {
           const _ref2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
@@ -293,7 +293,7 @@ function _default(instance) {
             topid: songid,
             cmd: 8,
             needmusiccrit: 0,
-            pagenum,
+            pagenum: page - 1,
             pagesize,
             lasthotcommentid: '',
             callback: 'callback',

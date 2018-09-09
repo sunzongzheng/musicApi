@@ -93,9 +93,9 @@ export default function (instance) {
             return netease.getTopList(id)
         },
         // 获取歌曲评论
-        async getComment(vendor, id, offset = 0, limit = 20) {
+        async getComment(vendor, id, page = 1, limit = 20) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getComment'](id, offset, limit)
+            return await this[vendor]['getComment'](id, page, limit)
         },
         // 获取歌手单曲
         async getArtistSongs(vendor, id, offset = 0, limit = 50) {

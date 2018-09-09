@@ -376,7 +376,7 @@ function _default(instance, newApiInstance) {
       })();
     },
 
-    getComment(objectId, offset, pageSize) {
+    getComment(objectId, page, pageSize) {
       var _this5 = this;
 
       return _asyncToGenerator(function* () {
@@ -386,7 +386,7 @@ function _default(instance, newApiInstance) {
             // 会变化
             objectType: 'song',
             pagingVO: {
-              page: offset + 1,
+              page,
               pageSize
             }
           });
