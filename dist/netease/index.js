@@ -40,6 +40,8 @@ const top_list_all = {
 
 function _default(instance) {
   return {
+    instance,
+
     searchSong({
       keyword,
       limit = 30,

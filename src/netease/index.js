@@ -28,6 +28,7 @@ const top_list_all = {
 
 export default function (instance) {
     return {
+        instance,
         async searchSong({keyword, limit = 30, offset = 0, type = 1}) {
             // *(type)* 搜索单曲(1)，歌手(100)，专辑(10)，歌单(1000)，用户(1002)
             const params = {
