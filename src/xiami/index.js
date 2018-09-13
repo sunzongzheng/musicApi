@@ -45,10 +45,44 @@ function setCache({token, signedToken}) {
     }
 }
 
-const replaceImage = (url) => {
+const replaceImage = (url = '') => {
     return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
 }
 export default function (instance, newApiInstance) {
+    const getMusicInfo = (info) => {
+        return {
+            album: {
+                id: info.album_id,
+                name: info.album_name,
+                cover: replaceImage(info.album_logo)
+            },
+            artists: [{
+                id: info.artist_id,
+                name: info.artist_name
+            }],
+            name: info.song_name,
+            id: info.song_id,
+            cp: !info.listen_file,
+            dl: !info.need_pay_flag
+        }
+    }
+    const getMusicInfo2 = (info) => {
+        return {
+            album: {
+                id: info.albumId,
+                name: info.albumName,
+                cover: replaceImage(info.albumLogo)
+            },
+            artists: [{
+                id: info.artistId,
+                name: info.artistName
+            }],
+            name: info.songName,
+            id: info.songId,
+            cp: !info.listenFiles.length,
+            dl: !info.needPayFlag
+        }
+    }
     return {
         // 根据api获取虾米token
         async getXiamiToken(api) {
@@ -126,22 +160,7 @@ export default function (instance, newApiInstance) {
                     status: true,
                     data: {
                         total: data.total,
-                        songs: data.songs.map(item => {
-                            return {
-                                album: {
-                                    id: item.album_id,
-                                    name: item.album_name,
-                                    cover: replaceImage(item.album_logo)
-                                },
-                                artists: [{
-                                    id: item.artist_id,
-                                    name: item.artist_name
-                                }],
-                                name: item.song_name,
-                                id: item.song_id,
-                                cp: !item.listen_file,
-                            }
-                        })
+                        songs: data.songs.map(item => getMusicInfo(item))
                     }
                 }
             } catch (e) {
@@ -171,20 +190,7 @@ export default function (instance, newApiInstance) {
                 }
                 return {
                     status: true,
-                    data: {
-                        album: {
-                            id: song.album_id,
-                            name: song.album_name,
-                            cover: replaceImage(song.logo)
-                        },
-                        artists: [{
-                            id: song.artist_id,
-                            name: song.artist_name
-                        }],
-                        name: song.song_name,
-                        id: song.song_id,
-                        cp: !song.listen_file,
-                    }
+                    data: getMusicInfo(song)
                 }
             } catch (e) {
                 console.warn(e)
@@ -210,22 +216,7 @@ export default function (instance, newApiInstance) {
                 })
                 return {
                     status: true,
-                    data: data.songs.map(info => {
-                        return {
-                            album: {
-                                id: info.albumId,
-                                name: info.albumName,
-                                cover: replaceImage(info.albumLogo)
-                            },
-                            artists: [{
-                                id: info.artistId,
-                                name: info.artistName
-                            }],
-                            name: info.songName,
-                            id: info.songId,
-                            cp: !info.listenFiles.length,
-                        }
-                    })
+                    data: data.songs.map(info => getMusicInfo2(info))
                 }
             } catch (e) {
                 console.warn(e)
@@ -405,24 +396,7 @@ export default function (instance, newApiInstance) {
                     status: true,
                     data: {
                         detail,
-                        songs: data.songs.map(item => {
-                            return {
-                                album: {
-                                    id: item.albumId,
-                                    name: item.albumName,
-                                    cover: item.albumLogo
-                                },
-                                artists: item.artistVOs.map(artist => {
-                                    return {
-                                        id: artist.artistId,
-                                        name: artist.artistName
-                                    }
-                                }),
-                                name: item.songName,
-                                id: item.songId,
-                                cp: !item.listenFiles.length,
-                            }
-                        })
+                        songs: data.songs.map(item => getMusicInfo2(item))
                     }
                 }
             } catch (e) {
@@ -471,24 +445,7 @@ export default function (instance, newApiInstance) {
                     status: true,
                     data: {
                         detail,
-                        songs: songs.map(item => {
-                            return {
-                                album: {
-                                    id: item.albumId,
-                                    name: item.albumName,
-                                    cover: item.albumLogo
-                                },
-                                artists: item.artistVOs.map(artist => {
-                                    return {
-                                        id: artist.artistId,
-                                        name: artist.artistName
-                                    }
-                                }),
-                                name: item.songName,
-                                id: item.songId,
-                                cp: !item.listenFiles.length,
-                            }
-                        })
+                        songs: songs.map(item => getMusicInfo2(item))
                     }
                 }
             } catch (e) {
@@ -515,24 +472,7 @@ export default function (instance, newApiInstance) {
                         },
                         desc: albumDetail.description,
                         publishTime: albumDetail.gmtPublish,
-                        songs: albumDetail.songs.map(item => {
-                            return {
-                                album: {
-                                    id: item.albumId,
-                                    name: item.albumName,
-                                    cover: replaceImage(item.albumLogo)
-                                },
-                                artists: item.artistVOs.map(singer => {
-                                    return {
-                                        id: singer.artistId,
-                                        name: singer.artistName
-                                    }
-                                }),
-                                name: item.songName,
-                                id: item.songId,
-                                cp: !item.listenFiles.length,
-                            }
-                        })
+                        songs: albumDetail.songs.map(item => getMusicInfo2(item))
                     }
                 }
             } catch (e) {
