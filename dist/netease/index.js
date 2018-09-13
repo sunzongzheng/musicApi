@@ -88,7 +88,8 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  cp: !item.privilege.cp
+                  cp: !item.privilege.cp,
+                  dl: !item.privilege.fee
                 };
               })
             }
@@ -139,7 +140,8 @@ function _default(instance) {
               }),
               name: info.name,
               id: info.id,
-              cp: !data.privileges[0].cp
+              cp: !data.privileges[0].cp,
+              dl: !data.privilege[0].fee
             }
           };
         } catch (e) {
@@ -185,7 +187,8 @@ function _default(instance) {
                 }),
                 name: info.name,
                 id: info.id,
-                cp: !privilegeObject[info.id].cp
+                cp: !privilegeObject[info.id].cp,
+                dl: !privilegeObject[info.id].fee
               };
             })
           };
@@ -288,7 +291,8 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  cp: !privileges[i].cp
+                  cp: !privileges[i].cp,
+                  dl: !privileges[i].fee
                 };
               })
             }
@@ -366,7 +370,8 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  cp: !item.privilege.cp
+                  cp: !item.privilege.cp,
+                  dl: !item.privilege.fee
                 };
               })
             }
@@ -421,7 +426,8 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  cp: !privilegesObjects[item.id].cp
+                  cp: !privilegesObjects[item.id].cp,
+                  dl: !privilegesObjects[item.id].fee
                 };
               })
             }
@@ -469,7 +475,8 @@ function _default(instance) {
                   }),
                   name: item.name,
                   id: item.id,
-                  cp: !item.privilege.cp
+                  cp: !item.privilege.cp,
+                  dl: !item.privilege.fee
                 };
               })
             }
