@@ -111,7 +111,7 @@ export default function (instance) {
                         name: info.name,
                         id: info.id,
                         cp: !data.privileges[0].cp,
-                        dl: !data.privilege[0].fee
+                        dl: !data.privileges[0].fee
                     }
                 }
             } catch (e) {
