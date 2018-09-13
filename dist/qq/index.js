@@ -25,7 +25,8 @@ function _default(instance) {
       }),
       name: info.name,
       id: info.id,
-      cp: !info.action.alert
+      cp: !info.action.alert,
+      dl: !info.pay.pay_down
     };
   };
 
@@ -44,7 +45,8 @@ function _default(instance) {
       }),
       name: info.songname,
       id: info.songid,
-      cp: !info.alertid
+      cp: !info.alertid,
+      dl: !info.pay.paydownload
     };
   };
 

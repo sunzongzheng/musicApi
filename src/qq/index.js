@@ -17,6 +17,7 @@ export default function (instance) {
             name: info.name,
             id: info.id,
             cp: !info.action.alert,
+            dl: !info.pay.pay_down
         }
     }
     const getMusicInfo2 = (info) => {
@@ -35,6 +36,7 @@ export default function (instance) {
             name: info.songname,
             id: info.songid,
             cp: !info.alertid,
+            dl: !info.pay.paydownload
         }
     }
     return {
