@@ -39,6 +39,30 @@ const top_list_all = {
 };
 
 function _default(instance) {
+  const getMusicInfo = (info, privilege) => {
+    if (!privilege) {
+      privilege = info.privilege;
+    }
+
+    return {
+      album: {
+        id: info.al.id,
+        name: info.al.name,
+        cover: info.al.picUrl
+      },
+      artists: info.ar.map(ar => {
+        return {
+          id: ar.id,
+          name: ar.name
+        };
+      }),
+      name: info.name,
+      id: info.id,
+      cp: !privilege.cp,
+      dl: !privilege.fee
+    };
+  };
+
   return {
     instance,
 
@@ -73,25 +97,7 @@ function _default(instance) {
             status: true,
             data: {
               total: result.songCount,
-              songs: result.songs.map(item => {
-                return {
-                  album: {
-                    id: item.al.id,
-                    name: item.al.name,
-                    cover: item.al.picUrl
-                  },
-                  artists: item.ar.map(ar => {
-                    return {
-                      id: ar.id,
-                      name: ar.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.id,
-                  cp: !item.privilege.cp,
-                  dl: !item.privilege.fee
-                };
-              })
+              songs: result.songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
@@ -126,23 +132,7 @@ function _default(instance) {
 
           return {
             status: true,
-            data: {
-              album: {
-                id: info.al.id,
-                name: info.al.name,
-                cover: info.al.picUrl
-              },
-              artists: info.ar.map(ar => {
-                return {
-                  id: ar.id,
-                  name: ar.name
-                };
-              }),
-              name: info.name,
-              id: info.id,
-              cp: !data.privileges[0].cp,
-              dl: !data.privileges[0].fee
-            }
+            data: getMusicInfo(info, data.privileges[0])
           };
         } catch (e) {
           return {
@@ -172,25 +162,7 @@ function _default(instance) {
           });
           return {
             status: true,
-            data: data.songs.map(info => {
-              return {
-                album: {
-                  id: info.al.id,
-                  name: info.al.name,
-                  cover: info.al.picUrl
-                },
-                artists: info.ar.map(ar => {
-                  return {
-                    id: ar.id,
-                    name: ar.name
-                  };
-                }),
-                name: info.name,
-                id: info.id,
-                cp: !privilegeObject[info.id].cp,
-                dl: !privilegeObject[info.id].fee
-              };
-            })
+            data: data.songs.map(info => getMusicInfo(info, privilegeObject[info.id]))
           };
         } catch (e) {
           return {
@@ -276,25 +248,7 @@ function _default(instance) {
               description: playlist.description,
               cover: playlist.coverImgUrl,
               playCount: playlist.playCount,
-              list: playlist.tracks.map((item, i) => {
-                return {
-                  album: {
-                    id: item.al.id,
-                    name: item.al.name,
-                    cover: item.al.picUrl
-                  },
-                  artists: item.ar.map(ar => {
-                    return {
-                      id: ar.id,
-                      name: ar.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.id,
-                  cp: !privileges[i].cp,
-                  dl: !privileges[i].fee
-                };
-              })
+              list: playlist.tracks.map((item, i) => getMusicInfo(item, privileges[i]))
             }
           };
         } catch (e) {
@@ -355,25 +309,7 @@ function _default(instance) {
                 avatar: data.artist.img1v1Url,
                 desc: data.artist.briefDesc
               },
-              songs: data.hotSongs.map(item => {
-                return {
-                  album: {
-                    id: item.al.id,
-                    name: item.al.name,
-                    cover: item.al.picUrl
-                  },
-                  artists: item.ar.map(ar => {
-                    return {
-                      id: ar.id,
-                      name: ar.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.id,
-                  cp: !item.privilege.cp,
-                  dl: !item.privilege.fee
-                };
-              })
+              songs: data.hotSongs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
@@ -411,25 +347,7 @@ function _default(instance) {
                 cover: playlist.coverImgUrl,
                 desc: playlist.description
               },
-              songs: playlist.tracks.map(item => {
-                return {
-                  album: {
-                    id: item.al.id,
-                    name: item.al.name,
-                    cover: item.al.picUrl
-                  },
-                  artists: item.ar.map(ar => {
-                    return {
-                      id: ar.id,
-                      name: ar.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.id,
-                  cp: !privilegesObjects[item.id].cp,
-                  dl: !privilegesObjects[item.id].fee
-                };
-              })
+              songs: playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]))
             }
           };
         } catch (e) {
@@ -460,25 +378,7 @@ function _default(instance) {
               },
               desc: album.description,
               publishTime: album.publishTime,
-              songs: songs.map(item => {
-                return {
-                  album: {
-                    id: item.al.id,
-                    name: item.al.name,
-                    cover: item.al.picUrl
-                  },
-                  artists: item.ar.map(ar => {
-                    return {
-                      id: ar.id,
-                      name: ar.name
-                    };
-                  }),
-                  name: item.name,
-                  id: item.id,
-                  cp: !item.privilege.cp,
-                  dl: !item.privilege.fee
-                };
-              })
+              songs: songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
