@@ -2,7 +2,10 @@
 - 对网易云、虾米音乐、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
 - Node >= 6
-- 支持安卓/ios
+- 支持安卓/ios/electron
+
+# 注意事项
+- 项目仍在开发阶段，即使是小版本之间也会出现不兼容，如用在`生产环境`，请写死版本号使用
 
 # Usage
 - node
