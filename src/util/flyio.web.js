@@ -1,4 +1,6 @@
-export default function () {
+export default function (adapter) {
     const Fly = require("flyio/dist/npm/fly")
-    return new Fly()
+    const EngineWrapper = require("flyio/dist/npm/engine-wrapper")
+    const engine = EngineWrapper(adapter)
+    return () => new Fly(engine)
 }
