@@ -63,7 +63,8 @@ const expiresTime = (day = 7) => { // 获取过期时间
     return exp.toUTCString()
 }
 
-export function setCookie(key, value, {path = '/', domain = location.hostname}) {
+export function setCookie(key, value, info) {
+    const {path = '/', domain = location.hostname} = info || {}
     let str = key + '=' + encodeURIComponent(value) + ';'
     str += 'path=' + path + ';'
     str += 'expires=' + expiresTime() + ';'
