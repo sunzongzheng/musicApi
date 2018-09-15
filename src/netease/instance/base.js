@@ -20,6 +20,7 @@ export default function (createInstance) {
     }
 
     fly.interceptors.request.use(config => {
+        if(config.pureFly) return config
         const cryptoreq = Encrypt(config.body)
         config.body = {
             params: cryptoreq.params,
@@ -28,6 +29,9 @@ export default function (createInstance) {
         return config
     }, e => Promise.reject(e))
     fly.interceptors.response.use(res => {
+        if(res.request.pureFly) {
+            return res
+        }
         if (!res.data) {
             return Promise.reject({
                 status: false,
