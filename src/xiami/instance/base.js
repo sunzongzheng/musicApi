@@ -13,6 +13,7 @@ export default function (createInstance) {
     }
 
     fly.interceptors.request.use(config => {
+        if(config.pureFly) return config
         const query = querystring.stringify(config.body)
         config.body = query
         config.url += query
@@ -20,6 +21,7 @@ export default function (createInstance) {
     }, e => Promise.reject(e))
 
     fly.interceptors.response.use(res => {
+        if(res.request.pureFly) return res
         if (!res.data) {
             return Promise.reject({
                 status: false,

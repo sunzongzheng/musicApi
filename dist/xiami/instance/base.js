@@ -22,6 +22,8 @@ function _default(createInstance) {
     'User-Agent': (0, _util.randomUserAgent)()
   };
   fly.interceptors.request.use(config => {
+    if (config.pureFly) return config;
+
     const query = _querystring.default.stringify(config.body);
 
     config.body = query;
@@ -29,6 +31,8 @@ function _default(createInstance) {
     return config;
   }, e => Promise.reject(e));
   fly.interceptors.response.use(res => {
+    if (res.request.pureFly) return res;
+
     if (!res.data) {
       return Promise.reject({
         status: false,

@@ -5,62 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
-var _flyio = _interopRequireDefault(require("flyio"));
-
 var _util = require("../util");
 
-var _crypto = _interopRequireDefault(require("./crypto"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } } function _next(value) { step("next", value); } function _throw(err) { step("throw", err); } _next(); }); }; }
-
-let cache = getCache();
-
-function getCache() {
-  if (typeof window !== 'undefined') {
-    const cookies = (0, _util.getCookies)();
-
-    if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
-      return {
-        token: [`_m_h5_tk=${cookies['_m_h5_tk']}`, `_m_h5_tk_enc${cookies['_m_h5_tk_enc']}`],
-        signedToken: cookies['_m_h5_tk'].split('_')[0],
-        expire: +new Date() + 365 * 24 * 60 * 1000 // 浏览器环境 此字段无效 以cookie有效期为准
-
-      };
-    } else {
-      return {
-        token: null,
-        signedToken: null
-      };
-    }
-  } else {
-    return {
-      token: null,
-      signedToken: null
-    };
-  }
-}
-
-function setCache({
-  token,
-  signedToken
-}) {
-  cache = {
-    token,
-    signedToken,
-    expire: +new Date() + 7 * 24 * 60 * 1000 // 7天有效 浏览器环境此字段无效
-    // 浏览器环境 存cookie
-
-  };
-
-  if (typeof window !== 'undefined') {
-    token.forEach(item => {
-      const arr = item.split('=');
-      (0, _util.setCookie)(arr[0], arr[1]);
-    });
-  }
-}
 
 const replaceImage = (url = '') => {
   return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png');
@@ -104,84 +51,6 @@ function _default(instance, newApiInstance) {
   };
 
   return {
-    // 根据api获取虾米token
-    getXiamiToken(api) {
-      return _asyncToGenerator(function* () {
-        if (cache.token && cache.signedToken && +new Date() <= cache.expire) {
-          return cache;
-        }
-
-        try {
-          yield newApiInstance.get(`/${api}/1.0/`);
-        } catch (res) {
-          if (res.status === 200) {
-            let token = res.headers['set-cookie'].split('Path=/,');
-            token = token.map(i => i.split(';')[0].trim());
-            const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
-            setCache({
-              token,
-              signedToken: myToken
-            });
-            return cache;
-          } else {
-            return Promise.reject({
-              msg: '获取token失败'
-            });
-          }
-        }
-      })();
-    },
-
-    // 根据签名token获取数据
-    getDataWithSign(api, model) {
-      var _this = this;
-
-      return _asyncToGenerator(function* () {
-        const _ref = yield _this.getXiamiToken(api),
-              token = _ref.token,
-              signedToken = _ref.signedToken;
-
-        const appKey = 12574478;
-        const queryStr = JSON.stringify({
-          requestStr: JSON.stringify({
-            header: {
-              appId: 200,
-              appVersion: 1000000,
-              callId: new Date().getTime(),
-              network: 1,
-              platformId: 'mac',
-              remoteIp: '192.168.1.101',
-              resolution: '1178*778'
-            },
-            model
-          })
-        });
-        const t = new Date().getTime();
-
-        const sign = _crypto.default.MD5(`${signedToken}&${t}&${appKey}&${queryStr}`);
-
-        return yield newApiInstance.get(`/${api}/1.0/`, {
-          appKey,
-          // 会变化
-          t,
-          // 会变化
-          sign,
-          // 会变化
-          api,
-          v: '1.0',
-          type: 'originaljson',
-          dataType: 'json',
-          // 会变化
-          data: queryStr
-        }, {
-          headers: {
-            'cookie': token.join(';') // 会变化
-
-          }
-        });
-      })();
-    },
-
     searchSong({
       keyword,
       limit = 30,
@@ -222,8 +91,8 @@ function _default(instance, newApiInstance) {
         };
 
         try {
-          const _ref2 = yield instance.post('/web?', params),
-                song = _ref2.song;
+          const _ref = yield instance.post('/web?', params),
+                song = _ref.song;
 
           if (!song.song_id) {
             return {
@@ -264,11 +133,9 @@ function _default(instance, newApiInstance) {
     },
 
     getBatchSongDetail(ids) {
-      var _this2 = this;
-
       return _asyncToGenerator(function* () {
         try {
-          const data = yield _this2.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+          const data = yield newApiInstance.get('mtop.alimusic.music.songservice.getsongs', {
             songIds: ids
           });
           return {
@@ -276,27 +143,13 @@ function _default(instance, newApiInstance) {
             data: data.songs.map(info => getMusicInfo2(info))
           };
         } catch (e) {
-          console.warn(e);
-
-          if (e.status === 200) {
-            return {
-              status: false,
-              msg: e.ret[0].slice('::')[1],
-              log: e
-            };
-          } else {
-            return {
-              status: false,
-              msg: '请求失败',
-              log: e
-            };
-          }
+          return e;
         }
       })();
     },
 
     getSongUrl(id) {
-      var _this3 = this;
+      var _this = this;
 
       return _asyncToGenerator(function* () {
         try {
@@ -304,7 +157,7 @@ function _default(instance, newApiInstance) {
           return {
             status: true,
             data: {
-              url: _this3.parseLocation(data.trackList[0].location)
+              url: _this.parseLocation(data.trackList[0].location)
             }
           };
         } catch (e) {
@@ -318,13 +171,13 @@ function _default(instance, newApiInstance) {
     },
 
     getLyric(id) {
-      var _this4 = this;
+      var _this2 = this;
 
       return _asyncToGenerator(function* () {
         let lyric_url;
 
         try {
-          let data = yield _this4.getSongDetail(id, true);
+          let data = yield _this2.getSongDetail(id, true);
 
           if (data.status) {
             lyric_url = data.data.lyric;
@@ -345,8 +198,10 @@ function _default(instance, newApiInstance) {
 
         if (lyric_url) {
           try {
-            let _ref3 = yield _flyio.default.get(lyric_url),
-                data = _ref3.data;
+            let _ref2 = yield instance.get(lyric_url, {}, {
+              pureFly: true
+            }),
+                data = _ref2.data;
 
             return {
               status: true,
@@ -370,11 +225,9 @@ function _default(instance, newApiInstance) {
     },
 
     getComment(objectId, page, pageSize) {
-      var _this5 = this;
-
       return _asyncToGenerator(function* () {
         try {
-          const data = yield _this5.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
+          const data = yield newApiInstance.get('mtop.alimusic.social.commentservice.getcommentlist', {
             objectId,
             // 会变化
             objectType: 'song',
@@ -392,21 +245,7 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-
-          if (e.status === 200) {
-            return {
-              status: false,
-              msg: e.ret[0].slice('::')[1],
-              log: e
-            };
-          } else {
-            return {
-              status: false,
-              msg: '请求失败',
-              log: e
-            };
-          }
+          return e;
         }
       })();
     },
@@ -449,14 +288,12 @@ function _default(instance, newApiInstance) {
     },
 
     getArtistDetail(id) {
-      var _this6 = this;
-
       return _asyncToGenerator(function* () {
         try {
-          const _ref4 = yield _this6.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
+          const _ref3 = yield newApiInstance.get('mtop.alimusic.music.artistservice.getartistdetail', {
             artistId: id
           }),
-                artistDetailVO = _ref4.artistDetailVO;
+                artistDetailVO = _ref3.artistDetailVO;
 
           return {
             status: true,
@@ -468,23 +305,19 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
     getArtistSongs(id, offset, limit) {
-      var _this7 = this;
+      var _this3 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this7.getArtistDetail(id);
+          const detailInfo = yield _this3.getArtistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
-          const data = yield _this7.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
+          const data = yield newApiInstance.get('mtop.alimusic.music.songservice.getartistsongs', {
             artistId: id,
             backwardOffSale: true,
             pagingVO: {
@@ -500,25 +333,19 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
     getPlaylistDetail(id) {
-      var _this8 = this;
-
       return _asyncToGenerator(function* () {
         try {
-          const _ref5 = yield _this8.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+          const _ref4 = yield newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
             listId: id,
             isFullTags: false
           }),
-                collectDetail = _ref5.collectDetail;
+                collectDetail = _ref4.collectDetail;
 
           return {
             status: true,
@@ -530,31 +357,27 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
     getAlbumSongs(id, offset, limit) {
-      var _this9 = this;
+      var _this4 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this9.getPlaylistDetail(id);
+          const detailInfo = yield _this4.getPlaylistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
 
-          const _ref6 = yield _this9.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+          const _ref5 = yield newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
             listId: id,
             pagingVO: {
               page: offset + 1,
               pageSize: limit
             }
           }),
-                songs = _ref6.songs;
+                songs = _ref5.songs;
 
           return {
             status: true,
@@ -564,24 +387,18 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
     getAlbumDetail(id) {
-      var _this10 = this;
-
       return _asyncToGenerator(function* () {
         try {
-          const _ref7 = yield _this10.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
+          const _ref6 = yield newApiInstance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
             albumId: id
           }),
-                albumDetail = _ref7.albumDetail;
+                albumDetail = _ref6.albumDetail;
 
           return {
             status: true,
@@ -598,21 +415,7 @@ function _default(instance, newApiInstance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-
-          if (e.status === 200) {
-            return {
-              status: false,
-              msg: e.ret[0].slice('::')[1],
-              log: e
-            };
-          } else {
-            return {
-              status: false,
-              msg: '请求失败',
-              log: e
-            };
-          }
+          return e;
         }
       })();
     }

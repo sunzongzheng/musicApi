@@ -1,49 +1,4 @@
-import fly from "flyio"
-import {lyric_decode, noSongsDetailMsg, getCookies, setCookie} from '../util'
-import Crypto from './crypto'
-
-let cache = getCache()
-
-function getCache() {
-    if (typeof(window) !== 'undefined') {
-        const cookies = getCookies()
-        if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
-            return {
-                token: [
-                    `_m_h5_tk=${cookies['_m_h5_tk']}`,
-                    `_m_h5_tk_enc${cookies['_m_h5_tk_enc']}`
-                ],
-                signedToken: cookies['_m_h5_tk'].split('_')[0],
-                expire: +new Date() + 365 * 24 * 60 * 1000, // 浏览器环境 此字段无效 以cookie有效期为准
-            }
-        } else {
-            return {
-                token: null,
-                signedToken: null
-            }
-        }
-    } else {
-        return {
-            token: null,
-            signedToken: null
-        }
-    }
-}
-
-function setCache({token, signedToken}) {
-    cache = {
-        token,
-        signedToken,
-        expire: +new Date() + 7 * 24 * 60 * 1000, // 7天有效 浏览器环境此字段无效
-    }
-    // 浏览器环境 存cookie
-    if (typeof(window) !== 'undefined') {
-        token.forEach(item => {
-            const arr = item.split('=')
-            setCookie(arr[0], arr[1])
-        })
-    }
-}
+import {lyric_decode, noSongsDetailMsg} from '../util'
 
 const replaceImage = (url = '') => {
     return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
@@ -84,67 +39,6 @@ export default function (instance, newApiInstance) {
         }
     }
     return {
-        // 根据api获取虾米token
-        async getXiamiToken(api) {
-            if (cache.token && cache.signedToken && +new Date() <= cache.expire) {
-                return cache
-            }
-            try {
-                await newApiInstance.get(`/${api}/1.0/`)
-            } catch (res) {
-                if (res.status === 200) {
-                    let token = res.headers['set-cookie'].split('Path=/,')
-                    token = token.map(i => i.split(';')[0].trim())
-                    const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
-                    setCache({
-                        token,
-                        signedToken: myToken
-                    })
-                    return cache
-                } else {
-                    return Promise.reject({
-                        msg: '获取token失败'
-                    })
-                }
-            }
-        },
-        // 根据签名token获取数据
-        async getDataWithSign(api, model) {
-            const {token, signedToken} = await this.getXiamiToken(api)
-            const appKey = 12574478
-            const queryStr = JSON.stringify({
-                requestStr: JSON.stringify({
-                    header: {
-                        appId: 200,
-                        appVersion: 1000000,
-                        callId: new Date().getTime(),
-                        network: 1,
-                        platformId: 'mac',
-                        remoteIp: '192.168.1.101',
-                        resolution: '1178*778',
-                    },
-                    model
-                })
-            })
-            const t = new Date().getTime()
-            const sign = Crypto.MD5(
-                `${signedToken}&${t}&${appKey}&${queryStr}`
-            )
-            return await newApiInstance.get(`/${api}/1.0/`, {
-                appKey, // 会变化
-                t, // 会变化
-                sign, // 会变化
-                api,
-                v: '1.0',
-                type: 'originaljson',
-                dataType: 'json', // 会变化
-                data: queryStr
-            }, {
-                headers: {
-                    'cookie': token.join(';'), // 会变化
-                }
-            })
-        },
         async searchSong({keyword, limit = 30, offset = 0}) {
             const params = {
                 v: '2.0',
@@ -211,7 +105,7 @@ export default function (instance, newApiInstance) {
         },
         async getBatchSongDetail(ids) {
             try {
-                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getsongs', {
+                const data = await newApiInstance.get('mtop.alimusic.music.songservice.getsongs', {
                     songIds: ids
                 })
                 return {
@@ -219,20 +113,7 @@ export default function (instance, newApiInstance) {
                     data: data.songs.map(info => getMusicInfo2(info))
                 }
             } catch (e) {
-                console.warn(e)
-                if (e.status === 200) {
-                    return {
-                        status: false,
-                        msg: e.ret[0].slice('::')[1],
-                        log: e
-                    }
-                } else {
-                    return {
-                        status: false,
-                        msg: '请求失败',
-                        log: e
-                    }
-                }
+                return e
             }
         },
         async getSongUrl(id) {
@@ -274,7 +155,9 @@ export default function (instance, newApiInstance) {
             }
             if (lyric_url) {
                 try {
-                    let {data} = await fly.get(lyric_url)
+                    let {data} = await instance.get(lyric_url, {}, {
+                        pureFly: true
+                    })
                     return {
                         status: true,
                         data: lyric_decode(data)
@@ -297,7 +180,7 @@ export default function (instance, newApiInstance) {
         },
         async getComment(objectId, page, pageSize) {
             try {
-                const data = await this.getDataWithSign('mtop.alimusic.social.commentservice.getcommentlist', {
+                const data = await newApiInstance.get('mtop.alimusic.social.commentservice.getcommentlist', {
                     objectId, // 会变化
                     objectType: 'song',
                     pagingVO: {
@@ -314,20 +197,7 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                if (e.status === 200) {
-                    return {
-                        status: false,
-                        msg: e.ret[0].slice('::')[1],
-                        log: e
-                    }
-                } else {
-                    return {
-                        status: false,
-                        msg: '请求失败',
-                        log: e
-                    }
-                }
+                return e
             }
         },
         parseLocation(location) {
@@ -360,7 +230,7 @@ export default function (instance, newApiInstance) {
         },
         async getArtistDetail(id) {
             try {
-                const {artistDetailVO} = await this.getDataWithSign('mtop.alimusic.music.artistservice.getartistdetail', {
+                const {artistDetailVO} = await newApiInstance.get('mtop.alimusic.music.artistservice.getartistdetail', {
                     artistId: id
                 })
                 return {
@@ -373,18 +243,14 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getArtistSongs(id, offset, limit) {
             try {
                 const detailInfo = await this.getArtistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const data = await this.getDataWithSign('mtop.alimusic.music.songservice.getartistsongs', {
+                const data = await newApiInstance.get('mtop.alimusic.music.songservice.getartistsongs', {
                     artistId: id,
                     backwardOffSale: true,
                     pagingVO: {
@@ -400,16 +266,12 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getPlaylistDetail(id) {
             try {
-                const {collectDetail} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+                const {collectDetail} = await newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
                     listId: id,
                     isFullTags: false
                 })
@@ -423,18 +285,14 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getAlbumSongs(id, offset, limit) {
             try {
                 const detailInfo = await this.getPlaylistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const {songs} = await this.getDataWithSign('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+                const {songs} = await newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
                     listId: id,
                     pagingVO: {
                         page: offset + 1,
@@ -449,16 +307,12 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getAlbumDetail(id) {
             try {
-                const {albumDetail} = await this.getDataWithSign('mtop.alimusic.music.albumservice.getalbumdetail', {
+                const {albumDetail} = await newApiInstance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
                     albumId: id
                 })
                 return {
@@ -476,20 +330,7 @@ export default function (instance, newApiInstance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                if (e.status === 200) {
-                    return {
-                        status: false,
-                        msg: e.ret[0].slice('::')[1],
-                        log: e
-                    }
-                } else {
-                    return {
-                        status: false,
-                        msg: '请求失败',
-                        log: e
-                    }
-                }
+                return e
             }
         }
     }

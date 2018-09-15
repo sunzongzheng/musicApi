@@ -56,10 +56,13 @@ const expiresTime = (day = 7) => {
   return exp.toUTCString();
 };
 
-function setCookie(key, value, {
-  path = '/',
-  domain = location.hostname
-}) {
+function setCookie(key, value, info) {
+  const _ref = info || {},
+        _ref$path = _ref.path,
+        path = _ref$path === void 0 ? '/' : _ref$path,
+        _ref$domain = _ref.domain,
+        domain = _ref$domain === void 0 ? location.hostname : _ref$domain;
+
   let str = key + '=' + encodeURIComponent(value) + ';';
   str += 'path=' + path + ';';
   str += 'expires=' + expiresTime() + ';';

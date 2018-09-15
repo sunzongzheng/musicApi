@@ -31,6 +31,7 @@ function _default(createInstance) {
     Cookie: `_ntes_nuid=${(0, _fetchVisitorHash.default)()}`
   };
   fly.interceptors.request.use(config => {
+    if (config.pureFly) return config;
     const cryptoreq = (0, _crypto.default)(config.body);
     config.body = {
       params: cryptoreq.params,
@@ -39,6 +40,10 @@ function _default(createInstance) {
     return config;
   }, e => Promise.reject(e));
   fly.interceptors.response.use(res => {
+    if (res.request.pureFly) {
+      return res;
+    }
+
     if (!res.data) {
       return Promise.reject({
         status: false,
