@@ -18,6 +18,24 @@ module.exports = [
             path: path.resolve(__dirname, 'dist'),
             libraryTarget: 'umd'
         },
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /(node_modules|bower_components)/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env'],
+                            plugins: [
+                                "@babel/plugin-transform-runtime",
+                                "@babel/plugin-proposal-object-rest-spread"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
         target: "electron-renderer"
     }
 ]
