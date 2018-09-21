@@ -21,7 +21,7 @@ function _default(instance, newApiInstance) {
       album: {
         id: info.album_id,
         name: info.album_name,
-        cover: replaceImage(info.album_logo)
+        cover: replaceImage(info.album_logo || info.logo)
       },
       artists: [{
         id: info.artist_id,
