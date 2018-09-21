@@ -214,7 +214,10 @@ function _default(instance) {
               }
             }
 
-            translate.push(translateDecodeData.pop());
+            if (translateDecodeData.length) {
+              translate.push(translateDecodeData.pop());
+            }
+
             return {
               status: true,
               data: {

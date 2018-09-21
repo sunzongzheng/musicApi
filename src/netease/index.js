@@ -166,7 +166,9 @@ export default function (instance) {
                             translate.push(translateDecodeData[i])
                         }
                     }
-                    translate.push(translateDecodeData.pop())
+                    if (translateDecodeData.length) {
+                        translate.push(translateDecodeData.pop())
+                    }
                     return {
                         status: true,
                         data: {

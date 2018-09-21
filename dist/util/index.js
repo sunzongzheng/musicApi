@@ -16,6 +16,13 @@ function randomUserAgent() {
 }
 
 function lyric_decode(str, needTranslate = false) {
+  if (!str) {
+    return needTranslate ? {
+      lyric: [],
+      translate: []
+    } : [];
+  }
+
   let list = str.replace(/\<\d+\>/g, '').split('\n');
   const lyric_arr = [];
   const translate_lyric_arr = [];
