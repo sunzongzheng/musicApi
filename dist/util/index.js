@@ -25,7 +25,7 @@ function lyric_decode(str, needTranslate = false) {
 
   let list = str.replace(/\<\d+\>/g, '').split('\n');
   const lyric_arr = [];
-  const translate_lyric_arr = [];
+  let translate_lyric_arr = [];
   list.forEach((item, index) => {
     const matchs = item.match(/((\[\d+:\d+\.\d+\])+)(.*)/);
 
@@ -48,6 +48,11 @@ function lyric_decode(str, needTranslate = false) {
       });
     }
   });
+
+  if (needTranslate && translate_lyric_arr.filter(item => item[1]).length === 0) {
+    translate_lyric_arr = [];
+  }
+
   return needTranslate ? {
     lyric: lyric_arr.sort(),
     translate: translate_lyric_arr.sort()
