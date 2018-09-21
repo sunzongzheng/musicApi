@@ -209,12 +209,18 @@ export default function (instance) {
                 if (data.lyric) {
                     return {
                         status: true,
-                        data: lyric_decode(new Buffer(data.lyric, 'base64').toString())
+                        data: {
+                            lyric: lyric_decode(new Buffer(data.lyric, 'base64').toString()),
+                            translate: lyric_decode(new Buffer(data.trans, 'base64').toString()),
+                        }
                     }
                 } else {
                     return {
                         status: true,
-                        data: []
+                        data: {
+                            lyric: [],
+                            translate: []
+                        }
                     }
                 }
             } catch (e) {

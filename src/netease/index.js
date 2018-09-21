@@ -159,14 +159,28 @@ export default function (instance) {
             try {
                 let data = await instance.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {})
                 if (data.lrc && data.lrc.lyric) {
+                    const translateDecodeData = lyric_decode(data.tlyric.lyric) || []
+                    const translate = []
+                    for (let i = 0; i < translateDecodeData.length - 1; i++) {
+                        if (translateDecodeData[i][1] !== translateDecodeData[i + 1][1]) {
+                            translate.push(translateDecodeData[i])
+                        }
+                    }
+                    translate.push(translateDecodeData.pop())
                     return {
                         status: true,
-                        data: lyric_decode(data.lrc.lyric)
+                        data: {
+                            lyric: lyric_decode(data.lrc.lyric),
+                            translate
+                        }
                     }
                 } else {
                     return {
                         status: true,
-                        data: []
+                        data: {
+                            lyric: [],
+                            translate: []
+                        }
                     }
                 }
             } catch (e) {

@@ -160,19 +160,25 @@ export default function (instance, newApiInstance) {
                     })
                     return {
                         status: true,
-                        data: lyric_decode(data)
+                        data: lyric_decode(data, true)
                     }
                 } catch (e) {
                     return {
                         status: true,
-                        data: [],
+                        data: {
+                            lyric: [],
+                            translate: []
+                        },
                         log: e
                     }
                 }
             } else {
                 return {
                     status: true,
-                    data: [],
+                    data: {
+                        lyric: [],
+                        translate: []
+                    },
                     log: '未获取到歌曲url'
                 }
             }

@@ -46,19 +46,22 @@ describe('musicApi', () => {
     })
 
     it('获取歌词 & 歌词有内容 网易云', async () => {
-        const data = await musicApi.getLyric('netease', neteaseMusic.id)
+        const data = await musicApi.getLyric('netease', neteaseMusic.translateLyricId)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.length > 0)
+        assert.equal(true, data.data.lyric.length > 0)
+        assert.equal(true, data.data.translate.length > 0)
     })
     it('获取歌词 & 歌词有内容 QQ音乐', async () => {
-        const data = await musicApi.getLyric('qq', qqMusic.id)
+        const data = await musicApi.getLyric('qq', qqMusic.translateLyricId)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.length > 0)
+        assert.equal(true, data.data.lyric.length > 0)
+        assert.equal(true, data.data.translate.length > 0)
     })
     it('获取歌词 & 歌词有内容 虾米音乐', async () => {
-        const data = await musicApi.getLyric('xiami', xiamiMusic.id)
+        const data = await musicApi.getLyric('xiami', xiamiMusic.translateLyricId)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.length > 0)
+        assert.equal(true, data.data.lyric.length > 0)
+        assert.equal(true, data.data.translate.length > 0)
     })
 
     it('获取歌曲评论 网易云', async () => {

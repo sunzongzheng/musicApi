@@ -20,9 +20,10 @@ describe('虾米音乐', () => {
         assert.equal(true, status === 200 || status === 201)
     })
     it('获取歌词 & 歌词有内容', async () => {
-        const data = await xiami.getLyric(xiamiMusic.id)
+        const data = await xiami.getLyric(xiamiMusic.translateLyricId)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.length > 0)
+        assert.equal(true, data.data.lyric.length > 0)
+        assert.equal(true, data.data.translate.length > 0)
     })
     it('获取歌曲评论 & 评论不为空', async () => {
         const data = await xiami.getComment(xiamiMusic.id, 1, 1)

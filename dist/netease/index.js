@@ -205,14 +205,30 @@ function _default(instance) {
           let data = yield instance.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {});
 
           if (data.lrc && data.lrc.lyric) {
+            const translateDecodeData = (0, _util.lyric_decode)(data.tlyric.lyric) || [];
+            const translate = [];
+
+            for (let i = 0; i < translateDecodeData.length - 1; i++) {
+              if (translateDecodeData[i][1] !== translateDecodeData[i + 1][1]) {
+                translate.push(translateDecodeData[i]);
+              }
+            }
+
+            translate.push(translateDecodeData.pop());
             return {
               status: true,
-              data: (0, _util.lyric_decode)(data.lrc.lyric)
+              data: {
+                lyric: (0, _util.lyric_decode)(data.lrc.lyric),
+                translate
+              }
             };
           } else {
             return {
               status: true,
-              data: []
+              data: {
+                lyric: [],
+                translate: []
+              }
             };
           }
         } catch (e) {

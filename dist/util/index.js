@@ -15,20 +15,36 @@ function randomUserAgent() {
   return userAgentList[num];
 }
 
-function lyric_decode(str) {
+function lyric_decode(str, needTranslate = false) {
   let list = str.replace(/\<\d+\>/g, '').split('\n');
-  let lyric_arr = [];
-  list.forEach(item => {
+  const lyric_arr = [];
+  const translate_lyric_arr = [];
+  list.forEach((item, index) => {
     const matchs = item.match(/((\[\d+:\d+\.\d+\])+)(.*)/);
 
     if (matchs && matchs[1]) {
       const t_array = matchs[1].match(/\[\d+:\d+\.\d+\]/g);
       t_array.forEach(item => {
         lyric_arr.push([item.substring(1, item.length - 1), matchs[3]]);
+
+        if (needTranslate && list[index + 1]) {
+          const translateMatchs = list[index + 1].match(/(\[x\-trans\])(.*)/);
+
+          if (translateMatchs && translateMatchs[2]) {
+            translate_lyric_arr.push([item.substring(1, item.length - 1), translateMatchs[2]]);
+          } else {
+            translate_lyric_arr.push([item.substring(1, item.length - 1), '']);
+          }
+        } else {
+          translate_lyric_arr.push([item.substring(1, item.length - 1), '']);
+        }
       });
     }
   });
-  return lyric_arr.sort();
+  return needTranslate ? {
+    lyric: lyric_arr.sort(),
+    translate: translate_lyric_arr.sort()
+  } : lyric_arr.sort();
 }
 
 const noSongsDetailMsg = '无法获取信息，请检查songId';
@@ -40,7 +56,6 @@ function getCookies() {
   if (document.cookie) {
     const cookies = document.cookie.split('; ');
     cookies.forEach(item => {
-      console.log(item);
       const cookie = item.split('=');
       result[cookie[0]] = cookie[1];
     });

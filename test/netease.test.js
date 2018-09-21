@@ -20,9 +20,10 @@ describe('网易云', () => {
         assert.equal(true, status === 200 || status === 201)
     })
     it('获取歌词 & 歌词有内容', async () => {
-        const data = await netease.getLyric(neteaseMusic.id)
+        const data = await netease.getLyric(neteaseMusic.translateLyricId)
         assert.equal(true, data.status)
-        assert.equal(true, data.data.length > 0)
+        assert.equal(true, data.data.lyric.length > 0)
+        assert.equal(true, data.data.translate.length > 0)
     })
     it('获取新歌榜', async () => {
         const {data} = await netease.getTopList("0")

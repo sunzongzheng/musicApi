@@ -261,12 +261,18 @@ function _default(instance) {
           if (data.lyric) {
             return {
               status: true,
-              data: (0, _util.lyric_decode)(new Buffer(data.lyric, 'base64').toString())
+              data: {
+                lyric: (0, _util.lyric_decode)(new Buffer(data.lyric, 'base64').toString()),
+                translate: (0, _util.lyric_decode)(new Buffer(data.trans, 'base64').toString())
+              }
             };
           } else {
             return {
               status: true,
-              data: []
+              data: {
+                lyric: [],
+                translate: []
+              }
             };
           }
         } catch (e) {
