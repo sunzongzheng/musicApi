@@ -11,7 +11,7 @@ export default function (createInstance) {
         Accept: '*/*',
         'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
         Connection: 'keep-alive',
-        'X-Real-IP': '223.74.158.213', // 此处加上可以解决海外请求的问题
+        // 'X-Real-IP': '223.74.158.213', // 此处加上可以解决海外请求的问题
         'Content-Type': 'application/x-www-form-urlencoded',
         Referer: 'http://music.163.com',
         Host: 'music.163.com',
@@ -20,7 +20,7 @@ export default function (createInstance) {
     }
 
     fly.interceptors.request.use(config => {
-        if(config.pureFly) return config
+        if (config.pureFly) return config
         const cryptoreq = Encrypt(config.body)
         config.body = {
             params: cryptoreq.params,
@@ -29,7 +29,7 @@ export default function (createInstance) {
         return config
     }, e => Promise.reject(e))
     fly.interceptors.response.use(res => {
-        if(res.request.pureFly) {
+        if (res.request.pureFly) {
             return res
         }
         if (!res.data) {

@@ -51,13 +51,13 @@ function _default(instance) {
   const getData =
   /*#__PURE__*/
   function () {
-    var _ref = _asyncToGenerator(function* (api, params) {
+    var _ref = _asyncToGenerator(function* (api, params, errorResponse) {
       let netease_rs = yield netease[api](params);
-      netease_rs = netease_rs.status ? netease_rs.data : [];
+      netease_rs = netease_rs.status ? netease_rs.data : errorResponse;
       let qq_rs = yield qq[api](params);
-      qq_rs = qq_rs.status ? qq_rs.data : [];
+      qq_rs = qq_rs.status ? qq_rs.data : errorResponse;
       let xiami_rs = yield xiami[api](params);
-      xiami_rs = xiami_rs.status ? xiami_rs.data : [];
+      xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse;
       return {
         status: true,
         data: {
@@ -68,7 +68,7 @@ function _default(instance) {
       };
     });
 
-    return function getData(_x, _x2) {
+    return function getData(_x, _x2, _x3) {
       return _ref.apply(this, arguments);
     };
   }();
@@ -91,6 +91,9 @@ function _default(instance) {
       return getData('searchSong', {
         keyword,
         offset
+      }, {
+        total: 0,
+        songs: []
       });
     },
 

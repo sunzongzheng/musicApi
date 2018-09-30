@@ -27,13 +27,13 @@ export default function (instance) {
             })
         }
     }
-    const getData = async (api, params) => {
+    const getData = async (api, params, errorResponse) => {
         let netease_rs = await netease[api](params)
-        netease_rs = netease_rs.status ? netease_rs.data : []
+        netease_rs = netease_rs.status ? netease_rs.data : errorResponse
         let qq_rs = await qq[api](params)
-        qq_rs = qq_rs.status ? qq_rs.data : []
+        qq_rs = qq_rs.status ? qq_rs.data : errorResponse
         let xiami_rs = await xiami[api](params)
-        xiami_rs = xiami_rs.status ? xiami_rs.data : []
+        xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse
         return {
             status: true,
             data: {
@@ -59,6 +59,9 @@ export default function (instance) {
             return getData('searchSong', {
                 keyword,
                 offset
+            }, {
+                total: 0,
+                songs: []
             })
         },
         // 获取歌曲详情

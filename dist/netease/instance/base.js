@@ -22,8 +22,7 @@ function _default(createInstance) {
     Accept: '*/*',
     'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
     Connection: 'keep-alive',
-    'X-Real-IP': '223.74.158.213',
-    // 此处加上可以解决海外请求的问题
+    // 'X-Real-IP': '223.74.158.213', // 此处加上可以解决海外请求的问题
     'Content-Type': 'application/x-www-form-urlencoded',
     Referer: 'http://music.163.com',
     Host: 'music.163.com',
