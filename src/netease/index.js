@@ -45,7 +45,12 @@ export default function (instance) {
             name: info.name,
             id: info.id,
             cp: !privilege.cp,
-            dl: !privilege.fee
+            dl: !privilege.fee,
+            quality: {
+                192: privilege.fl >= 192000,
+                320: privilege.fl >= 320000,
+                999: privilege.fl >= 999000,
+            }
         }
     }
     return {
@@ -133,20 +138,22 @@ export default function (instance) {
                 }
             }
         },
-        async getSongUrl(id) {
-            return {
-                status: true,
-                data: {
-                    url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
-                }
-            }
+        async getSongUrl(id, br = 128000) {
             const params = {
                 ids: [id],
-                br: 999000,
+                br,
                 csrf_token: ''
             }
             try {
                 let {data} = await instance.post('/weapi/song/enhance/player/url', params)
+                return {
+                    status: true,
+                    data: {
+                        url: data[0].url,
+                        br: data[0].br,
+                        size: data[0].size
+                    }
+                }
             } catch (e) {
                 return {
                     status: false,

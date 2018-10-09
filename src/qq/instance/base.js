@@ -10,6 +10,7 @@ export default function (createInstance) {
         Referer: 'https://y.qq.com/portal/player.html',
         'User-Agent': randomUserAgent()
     }
+    fly.config.rejectUnauthorized = false
 
     fly.interceptors.request.use(config => {
         if(config.headers.newApi) {

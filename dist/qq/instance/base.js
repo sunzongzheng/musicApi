@@ -17,6 +17,7 @@ function _default(createInstance) {
     Referer: 'https://y.qq.com/portal/player.html',
     'User-Agent': (0, _util.randomUserAgent)()
   };
+  fly.config.rejectUnauthorized = false;
   fly.interceptors.request.use(config => {
     if (config.headers.newApi) {
       config.baseURL = 'https://u.y.qq.com';

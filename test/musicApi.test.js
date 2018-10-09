@@ -40,7 +40,7 @@ describe('musicApi', () => {
     })
     it('获取歌曲地址 & 歌曲地址可连通 虾米音乐', async () => {
         const data = await musicApi.getSongUrl('xiami', xiamiMusic.id)
-        const {status} = await fly.get('http:' + data.data.url)
+        const {status} = await fly.get(data.data.url)
         assert.equal(true, data.status)
         assert.equal(true, status === 200 || status === 201)
     })

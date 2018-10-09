@@ -4,12 +4,11 @@ import Xiami from './xiami'
 import neteaseBase from './netease/instance/base'
 import qqBase from './qq/instance/base'
 import xiamiBase from './xiami/instance/base'
-import xiamiNewBase from './xiami/instance/base.new'
 
 export default function (instance) {
     const netease = Netease(neteaseBase(instance))
     const qq = QQ(qqBase(instance))
-    const xiami = Xiami(xiamiBase(instance), xiamiNewBase(instance))
+    const xiami = Xiami(xiamiBase(instance))
 
     const vendors = ['netease', 'qq', 'xiami']
     const paramsVerify = (vendor, id) => {
@@ -75,9 +74,9 @@ export default function (instance) {
             return await this[vendor]['getBatchSongDetail'](ids)
         },
         // 获取歌曲url
-        async getSongUrl(vendor, id) {
+        async getSongUrl(vendor, id, br = 128000) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getSongUrl'](id)
+            return await this[vendor]['getSongUrl'](id, br)
         },
         // 获取歌词
         async getLyric(vendor, id) {

@@ -18,6 +18,12 @@ declare module '@suen/music-api' {
         artists: Array<artist>
         commentId: number | string
         cp: boolean
+        dl: boolean
+        quality: {
+            192: boolean,
+            320: boolean,
+            999: boolean
+        }
     }
 
     interface errorResult {

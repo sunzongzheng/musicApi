@@ -15,26 +15,13 @@ const replaceImage = (url = '') => {
   return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png');
 };
 
-function _default(instance, newApiInstance) {
+function _default(instance) {
   const getMusicInfo = info => {
-    return {
-      album: {
-        id: info.album_id,
-        name: info.album_name,
-        cover: replaceImage(info.album_logo || info.logo)
-      },
-      artists: [{
-        id: info.artist_id,
-        name: info.artist_name
-      }],
-      name: info.song_name,
-      id: info.song_id,
-      cp: !info.listen_file,
-      dl: !info.need_pay_flag
-    };
-  };
-
-  const getMusicInfo2 = info => {
+    const purviewRoleVOs = info.purviewRoleVOs;
+    const brObject = {};
+    purviewRoleVOs.forEach(item => {
+      brObject[item.quality] = !item.operationVOs[0].needVip;
+    });
     return {
       album: {
         id: info.albumId,
@@ -48,7 +35,12 @@ function _default(instance, newApiInstance) {
       name: info.songName,
       id: info.songId,
       cp: !info.listenFiles.length,
-      dl: !info.needPayFlag
+      dl: !info.needPayFlag,
+      quality: {
+        192: false,
+        320: brObject.h,
+        999: brObject.s
+      }
     };
   };
 
@@ -59,44 +51,36 @@ function _default(instance, newApiInstance) {
       offset = 0
     }) {
       return _asyncToGenerator(function* () {
-        const params = {
-          v: '2.0',
-          key: keyword,
-          limit: limit,
-          page: offset + 1,
-          r: 'search/songs',
-          app_key: 1
-        };
-
         try {
-          let data = yield instance.post('/web?', params);
+          const data = yield instance.get('mtop.alimusic.search.searchservice.searchsongs', {
+            key: keyword,
+            pagingVO: {
+              page: offset + 1,
+              pageSize: limit
+            }
+          });
           return {
             status: true,
             data: {
-              total: data.total,
+              total: data.pagingVO.count,
               songs: data.songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
-          return Promise.reject(e);
+          return e;
         }
       })();
     },
 
     getSongDetail(id, getRaw = false) {
       return _asyncToGenerator(function* () {
-        const params = {
-          v: '2.0',
-          id,
-          r: 'song/detail',
-          app_key: 1
-        };
-
         try {
-          const _ref = yield instance.post('/web?', params),
-                song = _ref.song;
+          const data = yield instance.get('mtop.alimusic.music.songservice.getsongs', {
+            songIds: [id]
+          });
+          const info = data.songs[0];
 
-          if (!song.song_id) {
+          if (!info) {
             return {
               status: false,
               msg: _util.noSongsDetailMsg
@@ -106,43 +90,13 @@ function _default(instance, newApiInstance) {
           if (getRaw) {
             return {
               status: true,
-              data: song
+              data: info
             };
           }
 
           return {
             status: true,
-            data: getMusicInfo(song)
-          };
-        } catch (e) {
-          console.warn(e);
-
-          if (e.status === 200) {
-            return {
-              status: false,
-              msg: e.ret[0].slice('::')[1],
-              log: e
-            };
-          } else {
-            return {
-              status: false,
-              msg: '请求失败',
-              log: e
-            };
-          }
-        }
-      })();
-    },
-
-    getBatchSongDetail(ids) {
-      return _asyncToGenerator(function* () {
-        try {
-          const data = yield newApiInstance.get('mtop.alimusic.music.songservice.getsongs', {
-            songIds: ids
-          });
-          return {
-            status: true,
-            data: data.songs.map(info => getMusicInfo2(info))
+            data: getMusicInfo(info)
           };
         } catch (e) {
           return e;
@@ -150,16 +104,55 @@ function _default(instance, newApiInstance) {
       })();
     },
 
-    getSongUrl(id) {
+    getBatchSongDetail(ids) {
+      return _asyncToGenerator(function* () {
+        try {
+          const data = yield instance.get('mtop.alimusic.music.songservice.getsongs', {
+            songIds: ids
+          });
+          return {
+            status: true,
+            data: data.songs.map(info => getMusicInfo(info))
+          };
+        } catch (e) {
+          return e;
+        }
+      })();
+    },
+
+    getSongUrl(id, br = 128000) {
       var _this = this;
 
       return _asyncToGenerator(function* () {
         try {
-          let data = yield instance.get(`http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`);
+          let url;
+          const data = yield _this.getSongDetail(id, true);
+          const brObject = {};
+          data.data.listenFiles.forEach(item => {
+            brObject[item.quality] = item.listenFile;
+          });
+
+          switch (br) {
+            case 128000:
+              url = brObject.l;
+              break;
+
+            case 320000:
+              url = brObject.h;
+              break;
+
+            case 999000:
+              url = brObject.s;
+              break;
+
+            default:
+              throw new Error('br有误');
+          }
+
           return {
             status: true,
             data: {
-              url: _this.parseLocation(data.trackList[0].location)
+              url
             }
           };
         } catch (e) {
@@ -182,7 +175,7 @@ function _default(instance, newApiInstance) {
           let data = yield _this2.getSongDetail(id, true);
 
           if (data.status) {
-            lyric_url = data.data.lyric;
+            lyric_url = data.data.lyricInfo.lyricFile;
           } else {
             return {
               status: false,
@@ -200,10 +193,10 @@ function _default(instance, newApiInstance) {
 
         if (lyric_url) {
           try {
-            let _ref2 = yield instance.get(lyric_url, {}, {
+            let _ref = yield instance.get(lyric_url, {}, {
               pureFly: true
             }),
-                data = _ref2.data;
+                data = _ref.data;
 
             return {
               status: true,
@@ -235,7 +228,7 @@ function _default(instance, newApiInstance) {
     getComment(objectId, page, pageSize) {
       return _asyncToGenerator(function* () {
         try {
-          const data = yield newApiInstance.get('mtop.alimusic.social.commentservice.getcommentlist', {
+          const data = yield instance.get('mtop.alimusic.social.commentservice.getcommentlist', {
             objectId,
             // 会变化
             objectType: 'song',
@@ -298,10 +291,10 @@ function _default(instance, newApiInstance) {
     getArtistDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref3 = yield newApiInstance.get('mtop.alimusic.music.artistservice.getartistdetail', {
+          const _ref2 = yield instance.get('mtop.alimusic.music.artistservice.getartistdetail', {
             artistId: id
           }),
-                artistDetailVO = _ref3.artistDetailVO;
+                artistDetailVO = _ref2.artistDetailVO;
 
           return {
             status: true,
@@ -325,7 +318,7 @@ function _default(instance, newApiInstance) {
         try {
           const detailInfo = yield _this3.getArtistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
-          const data = yield newApiInstance.get('mtop.alimusic.music.songservice.getartistsongs', {
+          const data = yield instance.get('mtop.alimusic.music.songservice.getartistsongs', {
             artistId: id,
             backwardOffSale: true,
             pagingVO: {
@@ -337,7 +330,7 @@ function _default(instance, newApiInstance) {
             status: true,
             data: {
               detail,
-              songs: data.songs.map(item => getMusicInfo2(item))
+              songs: data.songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
@@ -349,11 +342,11 @@ function _default(instance, newApiInstance) {
     getPlaylistDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref4 = yield newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+          const _ref3 = yield instance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
             listId: id,
             isFullTags: false
           }),
-                collectDetail = _ref4.collectDetail;
+                collectDetail = _ref3.collectDetail;
 
           return {
             status: true,
@@ -378,20 +371,20 @@ function _default(instance, newApiInstance) {
           const detailInfo = yield _this4.getPlaylistDetail(id);
           const detail = detailInfo.status ? detailInfo.data : {};
 
-          const _ref5 = yield newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+          const _ref4 = yield instance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
             listId: id,
             pagingVO: {
               page: offset + 1,
               pageSize: limit
             }
           }),
-                songs = _ref5.songs;
+                songs = _ref4.songs;
 
           return {
             status: true,
             data: {
               detail,
-              songs: songs.map(item => getMusicInfo2(item))
+              songs: songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {
@@ -403,10 +396,10 @@ function _default(instance, newApiInstance) {
     getAlbumDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref6 = yield newApiInstance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
+          const _ref5 = yield instance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
             albumId: id
           }),
-                albumDetail = _ref6.albumDetail;
+                albumDetail = _ref5.albumDetail;
 
           return {
             status: true,
@@ -419,7 +412,7 @@ function _default(instance, newApiInstance) {
               },
               desc: albumDetail.description,
               publishTime: albumDetail.gmtPublish,
-              songs: albumDetail.songs.map(item => getMusicInfo2(item))
+              songs: albumDetail.songs.map(item => getMusicInfo(item))
             }
           };
         } catch (e) {

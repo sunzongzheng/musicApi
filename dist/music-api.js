@@ -17,8 +17,6 @@ var _base2 = _interopRequireDefault(require("./qq/instance/base"));
 
 var _base3 = _interopRequireDefault(require("./xiami/instance/base"));
 
-var _base4 = _interopRequireDefault(require("./xiami/instance/base.new"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -28,7 +26,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function _default(instance) {
   const netease = (0, _netease.default)((0, _base.default)(instance));
   const qq = (0, _qq.default)((0, _base2.default)(instance));
-  const xiami = (0, _xiami.default)((0, _base3.default)(instance), (0, _base4.default)(instance));
+  const xiami = (0, _xiami.default)((0, _base3.default)(instance));
   const vendors = ['netease', 'qq', 'xiami'];
 
   const paramsVerify = (vendor, id) => {
@@ -118,12 +116,12 @@ function _default(instance) {
     },
 
     // 获取歌曲url
-    getSongUrl(vendor, id) {
+    getSongUrl(vendor, id, br = 128000) {
       var _this3 = this;
 
       return _asyncToGenerator(function* () {
         yield paramsVerify(vendor, id);
-        return yield _this3[vendor]['getSongUrl'](id);
+        return yield _this3[vendor]['getSongUrl'](id, br);
       })();
     },
 

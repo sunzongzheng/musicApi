@@ -57,7 +57,12 @@ function _default(instance) {
       name: info.name,
       id: info.id,
       cp: !privilege.cp,
-      dl: !privilege.fee
+      dl: !privilege.fee,
+      quality: {
+        192: privilege.fl >= 192000,
+        320: privilege.fl >= 320000,
+        999: privilege.fl >= 999000
+      }
     };
   };
 
@@ -172,23 +177,26 @@ function _default(instance) {
       })();
     },
 
-    getSongUrl(id) {
+    getSongUrl(id, br = 128000) {
       return _asyncToGenerator(function* () {
-        return {
-          status: true,
-          data: {
-            url: `http://music.163.com/song/media/outer/url?id=${id}.mp3`
-          }
-        };
         const params = {
           ids: [id],
-          br: 999000,
+          br,
           csrf_token: ''
         };
 
         try {
           let _ref2 = yield instance.post('/weapi/song/enhance/player/url', params),
               data = _ref2.data;
+
+          return {
+            status: true,
+            data: {
+              url: data[0].url,
+              br: data[0].br,
+              size: data[0].size
+            }
+          };
         } catch (e) {
           return {
             status: false,

@@ -2,6 +2,7 @@ import {lyric_decode, noSongsDetailMsg} from '../util'
 
 export default function (instance) {
     const getMusicInfo = (info) => {
+        const file = info.file
         return {
             album: {
                 id: info.album.id,
@@ -14,10 +15,16 @@ export default function (instance) {
                     name: singer.name
                 }
             }),
-            name: info.name,
+            name: info.title,
             id: info.id,
             cp: !info.action.alert,
-            dl: !info.pay.pay_down
+            dl: !info.pay.pay_down,
+            quality: {
+                // 192: Boolean(file.size_aac || file.size_192aac || file.size_ogg || file.size_192ogg),
+                192: false,
+                320: Boolean(file.size_320 || file.size_320mp3),
+                999: Boolean(info.file.size_flac),
+            }
         }
     }
     const getMusicInfo2 = (info) => {
@@ -36,7 +43,13 @@ export default function (instance) {
             name: info.songname,
             id: info.songid,
             cp: !info.alertid,
-            dl: !info.pay.paydownload
+            dl: !info.pay.paydownload,
+            quality: {
+                // 192: Boolean(info.sizeogg),
+                192: false,
+                320: Boolean(info.size320),
+                999: Boolean(info.sizeflac),
+            }
         }
     }
     return {
@@ -144,7 +157,7 @@ export default function (instance) {
             }
             return detailInfo.data.mid
         },
-        async getSongUrl(songid, level = 'normal') {
+        async getSongUrl(songid, br = 128000) {
             const guid = Math.floor(Math.random() * 1000000000)
             let data
             try {
@@ -153,16 +166,8 @@ export default function (instance) {
                     guid: guid
                 })
                 const mid = await this.getMid(songid)
-                switch (level) {
-                    case 'high':
-                        data = {
-                            status: true,
-                            data: {
-                                url: `http://dl.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
-                            }
-                        }
-                        break
-                    case 'normal':
+                switch (br) {
+                    case 128000:
                         data = {
                             status: true,
                             data: {
@@ -170,14 +175,24 @@ export default function (instance) {
                             }
                         }
                         break
-                    case 'low':
+                    case 320000:
                         data = {
                             status: true,
                             data: {
-                                url: `http://ws.stream.qqmusic.qq.com/C100${mid}.m4a?fromtag=38`
+                                url: `http://dl.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                             }
                         }
                         break
+                    case 999000:
+                        data = {
+                            status: true,
+                            data: {
+                                url: `http://dl.stream.qqmusic.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+                            }
+                        }
+                        break
+                    default:
+                        throw new Error('br有误')
                 }
             } catch (e) {
                 data = {

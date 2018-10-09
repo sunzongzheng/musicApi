@@ -19,7 +19,7 @@ const Cache = {
 
       if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
         this.cache = {
-          token: [`_m_h5_tk=${cookies['_m_h5_tk']}`, `_m_h5_tk_enc${cookies['_m_h5_tk_enc']}`],
+          token: [`_m_h5_tk=${cookies['_m_h5_tk']}`, `_m_h5_tk_enc=${cookies['_m_h5_tk_enc']}`],
           signedToken: cookies['_m_h5_tk'].split('_')[0],
           expire: +new Date() + 10 * 365 * 24 * 60 * 60 * 1000 // 浏览器环境 此字段无效 以cookie有效期为准
 

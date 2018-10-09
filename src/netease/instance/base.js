@@ -1,6 +1,5 @@
-import {randomUserAgent} from '../../util'
+import {randomUserAgent, completeCookie} from '../../util'
 import Encrypt from '../crypto'
-import fetch_visitor_hash from '../fetch-visitor-hash'
 
 export default function (createInstance) {
     const fly = createInstance()
@@ -16,8 +15,9 @@ export default function (createInstance) {
         Referer: 'http://music.163.com',
         Host: 'music.163.com',
         'User-Agent': randomUserAgent(),
-        Cookie: `_ntes_nuid=${fetch_visitor_hash()}`
+        Cookie: completeCookie()
     }
+    fly.config.rejectUnauthorized = false
 
     fly.interceptors.request.use(config => {
         if (config.pureFly) return config

@@ -3,25 +3,13 @@ import {lyric_decode, noSongsDetailMsg} from '../util'
 const replaceImage = (url = '') => {
     return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
 }
-export default function (instance, newApiInstance) {
+export default function (instance) {
     const getMusicInfo = (info) => {
-        return {
-            album: {
-                id: info.album_id,
-                name: info.album_name,
-                cover: replaceImage(info.album_logo || info.logo)
-            },
-            artists: [{
-                id: info.artist_id,
-                name: info.artist_name
-            }],
-            name: info.song_name,
-            id: info.song_id,
-            cp: !info.listen_file,
-            dl: !info.need_pay_flag
-        }
-    }
-    const getMusicInfo2 = (info) => {
+        const purviewRoleVOs = info.purviewRoleVOs
+        const brObject = {}
+        purviewRoleVOs.forEach(item => {
+            brObject[item.quality] = !item.operationVOs[0].needVip
+        })
         return {
             album: {
                 id: info.albumId,
@@ -35,94 +23,99 @@ export default function (instance, newApiInstance) {
             name: info.songName,
             id: info.songId,
             cp: !info.listenFiles.length,
-            dl: !info.needPayFlag
+            dl: !info.needPayFlag,
+            quality: {
+                192: false,
+                320: brObject.h,
+                999: brObject.s,
+            }
         }
     }
     return {
         async searchSong({keyword, limit = 30, offset = 0}) {
-            const params = {
-                v: '2.0',
-                key: keyword,
-                limit: limit,
-                page: offset + 1,
-                r: 'search/songs',
-                app_key: 1
-            }
             try {
-                let data = await instance.post('/web?', params)
-                return {
-                    status: true,
-                    data: {
-                        total: data.total,
-                        songs: data.songs.map(item => getMusicInfo(item))
+                const data = await instance.get('mtop.alimusic.search.searchservice.searchsongs', {
+                    key: keyword,
+                    pagingVO: {
+                        page: offset + 1,
+                        pageSize: limit
                     }
-                }
-            } catch (e) {
-                return Promise.reject(e)
-            }
-        },
-        async getSongDetail(id, getRaw = false) {
-            const params = {
-                v: '2.0',
-                id,
-                r: 'song/detail',
-                app_key: 1
-            }
-            try {
-                const {song} = await instance.post('/web?', params)
-                if (!song.song_id) {
-                    return {
-                        status: false,
-                        msg: noSongsDetailMsg,
-                    }
-                }
-                if (getRaw) {
-                    return {
-                        status: true,
-                        data: song
-                    }
-                }
-                return {
-                    status: true,
-                    data: getMusicInfo(song)
-                }
-            } catch (e) {
-                console.warn(e)
-                if (e.status === 200) {
-                    return {
-                        status: false,
-                        msg: e.ret[0].slice('::')[1],
-                        log: e
-                    }
-                } else {
-                    return {
-                        status: false,
-                        msg: '请求失败',
-                        log: e
-                    }
-                }
-            }
-        },
-        async getBatchSongDetail(ids) {
-            try {
-                const data = await newApiInstance.get('mtop.alimusic.music.songservice.getsongs', {
-                    songIds: ids
                 })
                 return {
                     status: true,
-                    data: data.songs.map(info => getMusicInfo2(info))
+                    data: {
+                        total: data.pagingVO.count,
+                        songs: data.songs.map(item => getMusicInfo(item))
+                    }
                 }
             } catch (e) {
                 return e
             }
         },
-        async getSongUrl(id) {
+        async getSongDetail(id, getRaw = false) {
             try {
-                let data = await instance.get(`http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`)
+                const data = await instance.get('mtop.alimusic.music.songservice.getsongs', {
+                    songIds: [id]
+                })
+                const info = data.songs[0]
+                if (!info) {
+                    return {
+                        status: false,
+                        msg: noSongsDetailMsg
+                    }
+                }
+                if (getRaw) {
+                    return {
+                        status: true,
+                        data: info
+                    }
+                }
+                return {
+                    status: true,
+                    data: getMusicInfo(info)
+                }
+            } catch (e) {
+                return e
+            }
+        },
+        async getBatchSongDetail(ids) {
+            try {
+                const data = await instance.get('mtop.alimusic.music.songservice.getsongs', {
+                    songIds: ids
+                })
+                return {
+                    status: true,
+                    data: data.songs.map(info => getMusicInfo(info))
+                }
+            } catch (e) {
+                return e
+            }
+        },
+        async getSongUrl(id, br = 128000) {
+            try {
+                let url
+                const data = await this.getSongDetail(id, true)
+                const brObject = {}
+                data.data.listenFiles.forEach(item => {
+                    brObject[item.quality] = item.listenFile
+                })
+                switch (br) {
+                    case 128000:
+                        url = brObject.l
+                        break
+                    case 320000:
+                        url = brObject.h
+                        break
+                    case 999000:
+                        url = brObject.s
+                        break
+                    default:
+                        throw new Error('br有误')
+                }
                 return {
                     status: true,
                     data: {
-                        url: this.parseLocation(data.trackList[0].location)
+                        url
                     }
                 }
             } catch (e) {
@@ -138,7 +131,7 @@ export default function (instance, newApiInstance) {
             try {
                 let data = await this.getSongDetail(id, true)
                 if (data.status) {
-                    lyric_url = data.data.lyric
+                    lyric_url = data.data.lyricInfo.lyricFile
                 } else {
                     return {
                         status: false,
@@ -186,7 +179,7 @@ export default function (instance, newApiInstance) {
         },
         async getComment(objectId, page, pageSize) {
             try {
-                const data = await newApiInstance.get('mtop.alimusic.social.commentservice.getcommentlist', {
+                const data = await instance.get('mtop.alimusic.social.commentservice.getcommentlist', {
                     objectId, // 会变化
                     objectType: 'song',
                     pagingVO: {
@@ -236,7 +229,7 @@ export default function (instance, newApiInstance) {
         },
         async getArtistDetail(id) {
             try {
-                const {artistDetailVO} = await newApiInstance.get('mtop.alimusic.music.artistservice.getartistdetail', {
+                const {artistDetailVO} = await instance.get('mtop.alimusic.music.artistservice.getartistdetail', {
                     artistId: id
                 })
                 return {
@@ -256,7 +249,7 @@ export default function (instance, newApiInstance) {
             try {
                 const detailInfo = await this.getArtistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const data = await newApiInstance.get('mtop.alimusic.music.songservice.getartistsongs', {
+                const data = await instance.get('mtop.alimusic.music.songservice.getartistsongs', {
                     artistId: id,
                     backwardOffSale: true,
                     pagingVO: {
@@ -268,7 +261,7 @@ export default function (instance, newApiInstance) {
                     status: true,
                     data: {
                         detail,
-                        songs: data.songs.map(item => getMusicInfo2(item))
+                        songs: data.songs.map(item => getMusicInfo(item))
                     }
                 }
             } catch (e) {
@@ -277,7 +270,7 @@ export default function (instance, newApiInstance) {
         },
         async getPlaylistDetail(id) {
             try {
-                const {collectDetail} = await newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
+                const {collectDetail} = await instance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
                     listId: id,
                     isFullTags: false
                 })
@@ -298,7 +291,7 @@ export default function (instance, newApiInstance) {
             try {
                 const detailInfo = await this.getPlaylistDetail(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
-                const {songs} = await newApiInstance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
+                const {songs} = await instance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
                     listId: id,
                     pagingVO: {
                         page: offset + 1,
@@ -309,7 +302,7 @@ export default function (instance, newApiInstance) {
                     status: true,
                     data: {
                         detail,
-                        songs: songs.map(item => getMusicInfo2(item))
+                        songs: songs.map(item => getMusicInfo(item))
                     }
                 }
             } catch (e) {
@@ -318,7 +311,7 @@ export default function (instance, newApiInstance) {
         },
         async getAlbumDetail(id) {
             try {
-                const {albumDetail} = await newApiInstance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
+                const {albumDetail} = await instance.get('mtop.alimusic.music.albumservice.getalbumdetail', {
                     albumId: id
                 })
                 return {
@@ -332,7 +325,7 @@ export default function (instance, newApiInstance) {
                         },
                         desc: albumDetail.description,
                         publishTime: albumDetail.gmtPublish,
-                        songs: albumDetail.songs.map(item => getMusicInfo2(item))
+                        songs: albumDetail.songs.map(item => getMusicInfo(item))
                     }
                 }
             } catch (e) {

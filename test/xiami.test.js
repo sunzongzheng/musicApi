@@ -16,7 +16,7 @@ describe('虾米音乐', () => {
     })
     it('获取歌曲地址 & 歌曲地址可连通', async () => {
         const data = await xiami.getSongUrl(xiamiMusic.id)
-        const {status} = await fly.get("http:" + data.data.url)
+        const {status} = await fly.get(data.data.url)
         assert.equal(true, status === 200 || status === 201)
     })
     it('获取歌词 & 歌词有内容', async () => {
