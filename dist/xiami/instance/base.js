@@ -92,7 +92,7 @@ function _default(createInstance) {
       try {
         // 只要返了cookie 就更新token
         if (res.headers['set-cookie']) {
-          const token = res.headers['set-cookie'].split('Path=/,').map(i => i.split(';')[0].trim());
+          const token = res.headers['set-cookie'].map(item => item.split(';')[0].trim());
           const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
 
           _cache.default.setCache({
@@ -104,7 +104,7 @@ function _default(createInstance) {
           return fly.get(res.request.urlcopy, res.request.bodycopy).then(data => data).catch(e => e);
         }
       } catch (e) {
-        console.warn('返回cookie格式变化，请检查', res);
+        console.warn('返回cookie格式变化，请检查', res, e);
       }
 
       fly.unlock();
