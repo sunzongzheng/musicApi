@@ -182,4 +182,6 @@ declare module '@suen/music-api' {
     export function getArtistSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getArtistSongsResult | errorResult>
 
     export function getAlbumSongs(vendor: vendor, ids: number | string, offset?: number, limit?: number): Promise<getAlbumSongsResult | errorResult>
+
+    export function getAnyVendorSongDetail(list: Array<{vendor: vendor, id: number}>) : Promise<Array<musicInfo>>
 }

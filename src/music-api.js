@@ -113,6 +113,75 @@ export default function (instance) {
         async getAlbumDetail(vendor, id) {
             await paramsVerify(vendor, id)
             return await this[vendor]['getAlbumDetail'](id)
-        }
+        },
+        // 批量获取任意vendor歌曲详情
+        async getAnyVendorSongDetail(arr, timeout = 0) {
+            // 先分类
+            const songsList = {
+                netease: [],
+                qq: [],
+                xiami: [],
+            }
+            arr.forEach(item => {
+                songsList[item.vendor].push(item.id)
+            })
+            // 分类 批量获取详情 并存入歌曲对象
+            const songsObject = {}
+            for (let vendor of Object.keys(songsList)) {
+                const list = songsList[vendor]
+                if (!list.length) continue
+                const limit = {
+                    qq: 50,
+                    netease: 1000,
+                    xiami: 250,
+                }[vendor]
+                let arr = []
+                for (let index = 0; index < list.length; index++) {
+                    arr.push(list[index])
+                    // 达到限制 或 已是数组最后一个
+                    if (arr.length === limit || index + 1 === list.length) {
+                        // 获取详情
+                        const data = await this.getBatchSongDetail(vendor, arr)
+                        if (data.status) {
+                            data.data.forEach(song => {
+                                songsObject[`${vendor}_${song.id}`] = song
+                            })
+                        } else {
+                            console.warn(`${vendor}获取详情失败`)
+                        }
+                        // 重置待处理的数组
+                        arr = []
+                        if (timeout) {
+                            await new Promise(resolve => {
+                                setTimeout(() => {
+                                    resolve()
+                                }, timeout)
+                            })
+                        }
+                    }
+                }
+            }
+            // 整理结果
+            const rs = []
+            for (let {id, vendor} of arr) {
+                const song = songsObject[`${vendor}_${id}`]
+                if (song) {
+                    rs.push(song)
+                } else {
+                    // 有可能是：歌曲id错误、更改了歌曲id、云平台删歌 此处获取单个歌曲详情 来判断是哪一种
+                    const data = await this.getSongDetail(vendor, id)
+                    if (data.status) {
+                        // 更换了歌曲id
+                        rs.push(data.data)
+                        console.warn(`更换歌曲id：${vendor} ${id}`)
+                    } else {
+                        // 删除了歌曲
+                        rs.push(null)
+                        console.warn(`歌曲ID错误或被删除：${vendor} ${id}`)
+                    }
+                }
+            }
+            return rs
+        },
     }
 }
