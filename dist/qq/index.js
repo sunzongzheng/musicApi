@@ -28,7 +28,7 @@ function _default(instance) {
       }),
       name: info.title,
       id: info.id,
-      cp: !info.action.alert,
+      cp: info.action.msg === 3 || !info.interval,
       dl: !info.pay.pay_down,
       quality: {
         // 192: Boolean(file.size_aac || file.size_192aac || file.size_ogg || file.size_192ogg),
@@ -54,7 +54,7 @@ function _default(instance) {
       }),
       name: info.songname,
       id: info.songid,
-      cp: !info.alertid,
+      cp: info.msgid === 3 || !info.interval,
       dl: !info.pay.paydownload,
       quality: {
         // 192: Boolean(info.sizeogg),
