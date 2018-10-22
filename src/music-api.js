@@ -168,17 +168,12 @@ export default function (instance) {
                 if (song) {
                     rs.push(song)
                 } else {
-                    // 有可能是：歌曲id错误、更改了歌曲id、云平台删歌 此处获取单个歌曲详情 来判断是哪一种
-                    const data = await this.getSongDetail(vendor, id)
-                    if (data.status) {
-                        // 更换了歌曲id
-                        rs.push(data.data)
-                        console.warn(`更换歌曲id：${vendor} ${id}`)
-                    } else {
-                        // 删除了歌曲
-                        rs.push(null)
-                        console.warn(`歌曲ID错误或被删除：${vendor} ${id}`)
-                    }
+                    /*
+                    有可能是：歌曲id错误、更改了歌曲id、云平台删歌、批量获取详情失败 此处无法判断
+                    且有可能这种状态的歌曲数量较多 调单个获取接口有可能会导致被ban ip 此处直接返null
+                    */
+                    console.warn(`歌曲无法获取详情：${vendor} ${id}`)
+                    rs.push(null)
                 }
             }
             return rs
