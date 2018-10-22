@@ -76,36 +76,6 @@ export function lyric_decode(str, needTranslate = false) {
 
 export const noSongsDetailMsg = '无法获取信息，请检查songId'
 
-export function getCookies() {
-    let result = {}
-    if (document.cookie) {
-        const cookies = document.cookie.split('; ')
-        cookies.forEach(item => {
-            const cookie = item.split('=')
-            result[cookie[0]] = cookie[1]
-        })
-    }
-    return result
-}
-
-const expiresTime = (day = 7) => { // 获取过期时间
-    const exp = new Date()
-    exp.setTime(exp.getTime() + day * 24 * 60 * 60 * 1000)
-    return exp.toUTCString()
-}
-
-export function setCookie(key, value, info) {
-    const {path = '/', domain = location.hostname} = info || {}
-    let str = key + '=' + encodeURIComponent(value) + ';'
-    str += 'path=' + path + ';'
-    str += 'expires=' + expiresTime() + ';'
-    if (domain !== 'localhost') {
-        str += 'domain=' + domain + ';'
-    }
-
-    document.cookie = str
-}
-
 function randomString(pattern, length) {
     return Array.apply(null, {length: length}).map(() => (pattern[Math.floor(Math.random() * pattern.length)])).join('')
 }

@@ -19,8 +19,9 @@ const getBody = (api, body) => {
     })
     const appKey = 12574478
     const t = new Date().getTime()
+    const cache = Cache.getCache()
     const sign = Crypto.MD5(
-        `${Cache.cache.signedToken}&${t}&${appKey}&${queryStr}`
+        `${cache ? cache.signedToken : ''}&${t}&${appKey}&${queryStr}`
     )
     return {
         appKey,
@@ -50,11 +51,12 @@ export default function (createInstance) {
             request.baseURL = ''
             return request
         }
-        // 第一次请求 或 token过期 先锁队列 只放行第一个
-        if (first || (Cache.cache.expire && +new Date() > Cache.cache.expire)) {
+        const cache = Cache.getCache()
+        // 第一次请求 或 没有缓存 先锁队列 只放行第一个
+        if (first || !cache) {
             fly.lock()
         }
-        request.headers.Cookie = ['uidXM=1'].concat(Cache.cache.token || []).join('; ')
+        request.headers.Cookie = `uidXM=1; ${cache ? cache.cookie : ''}`
         request.bodycopy = request.body
         request.body = getBody(request.url, request.body)
         request.urlcopy = request.url
@@ -69,12 +71,11 @@ export default function (createInstance) {
         try {
             // 只要返了cookie 就更新token
             if (res.headers['set-cookie']) {
-                const token = res.headers['set-cookie'].map(item => item.split(';')[0].trim())
-                const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0]
-                Cache.setCache({
-                    token,
-                    signedToken: myToken
+                const cache = {}
+                res.headers['set-cookie'].map(item => item.split(';')[0].trim()).map(item => item.split('=')).forEach(item => {
+                    cache[item[0]] = item[1]
                 })
+                Cache.setCache(cache)
                 fly.unlock()
                 return fly.get(res.request.urlcopy, res.request.bodycopy)
                     .then(data => data)

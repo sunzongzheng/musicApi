@@ -35,7 +35,9 @@ const getBody = (api, body) => {
   const appKey = 12574478;
   const t = new Date().getTime();
 
-  const sign = _crypto.default.MD5(`${_cache.default.cache.signedToken}&${t}&${appKey}&${queryStr}`);
+  const cache = _cache.default.getCache();
+
+  const sign = _crypto.default.MD5(`${cache ? cache.signedToken : ''}&${t}&${appKey}&${queryStr}`);
 
   return {
     appKey,
@@ -65,14 +67,16 @@ function _default(createInstance) {
       request.headers = {};
       request.baseURL = '';
       return request;
-    } // 第一次请求 或 token过期 先锁队列 只放行第一个
+    }
+
+    const cache = _cache.default.getCache(); // 第一次请求 或 没有缓存 先锁队列 只放行第一个
 
 
-    if (first || _cache.default.cache.expire && +new Date() > _cache.default.cache.expire) {
+    if (first || !cache) {
       fly.lock();
     }
 
-    request.headers.Cookie = ['uidXM=1'].concat(_cache.default.cache.token || []).join('; ');
+    request.headers.Cookie = `uidXM=1; ${cache ? cache.cookie : ''}`;
     request.bodycopy = request.body;
     request.body = getBody(request.url, request.body);
     request.urlcopy = request.url;
@@ -92,13 +96,12 @@ function _default(createInstance) {
       try {
         // 只要返了cookie 就更新token
         if (res.headers['set-cookie']) {
-          const token = res.headers['set-cookie'].map(item => item.split(';')[0].trim());
-          const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
-
-          _cache.default.setCache({
-            token,
-            signedToken: myToken
+          const cache = {};
+          res.headers['set-cookie'].map(item => item.split(';')[0].trim()).map(item => item.split('=')).forEach(item => {
+            cache[item[0]] = item[1];
           });
+
+          _cache.default.setCache(cache);
 
           fly.unlock();
           return fly.get(res.request.urlcopy, res.request.bodycopy).then(data => data).catch(e => e);

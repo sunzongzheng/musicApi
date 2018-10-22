@@ -1,37 +1,37 @@
-import {getCookies, setCookie} from "../util"
-
+const isBrowser = typeof(window) !== 'undefined'
 const Cache = {
-    cache: {
-        token: null,
-        signedToken: null
-    },
+    cache: null,
+    isBrowser,
     init() {
-        if (typeof(window) !== 'undefined') {
-            const cookies = getCookies()
-            if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
-                this.cache = {
-                    token: [
-                        `_m_h5_tk=${cookies['_m_h5_tk']}`,
-                        `_m_h5_tk_enc=${cookies['_m_h5_tk_enc']}`
-                    ],
-                    signedToken: cookies['_m_h5_tk'].split('_')[0],
-                    expire: +new Date() + 10 * 365 * 24 * 60 * 60 * 1000, // 浏览器环境 此字段无效 以cookie有效期为准
+        if (this.isBrowser) {
+            let cache = localStorage.getItem('music-api-xiami-cookie-cache')
+            if (cache) {
+                cache = JSON.parse(cache)
+                if (cache.expire > +new Date()) {
+                    this.setCache(cache)
                 }
             }
         }
     },
-    setCache({token, signedToken}) {
-        this.cache = {
-            token,
-            signedToken,
-            expire: +new Date() + 24 * 60 * 60 * 1000, // 1天有效 浏览器环境此字段无效
+    getCache() {
+        if (this.cache && this.cache.expire > +new Date()) {
+            const {_m_h5_tk, _m_h5_tk_enc} = this.cache
+            return {
+                cookie: `_m_h5_tk=${_m_h5_tk}; _m_h5_tk_enc=${_m_h5_tk_enc}`,
+                signedToken: _m_h5_tk.split('_')[0]
+            }
         }
-        // 浏览器环境 存cookie
-        if (typeof(window) !== 'undefined') {
-            token.forEach(item => {
-                const arr = item.split('=')
-                setCookie(arr[0], arr[1])
-            })
+        return null
+    },
+    setCache({_m_h5_tk, _m_h5_tk_enc, expire = +new Date() + 7 * 24 * 60 * 60 * 1000}) {
+        this.cache = {
+            _m_h5_tk,
+            _m_h5_tk_enc,
+            expire
+        }
+        // 浏览器环境 存localstorage
+        if (this.isBrowser) {
+            localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache))
         }
     }
 }

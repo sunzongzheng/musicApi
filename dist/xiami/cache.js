@@ -4,47 +4,53 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
-var _util = require("../util");
-
+const isBrowser = typeof window !== 'undefined';
 const Cache = {
-  cache: {
-    token: null,
-    signedToken: null
-  },
+  cache: null,
+  isBrowser,
 
   init() {
-    if (typeof window !== 'undefined') {
-      const cookies = (0, _util.getCookies)();
+    if (this.isBrowser) {
+      let cache = localStorage.getItem('music-api-xiami-cookie-cache');
 
-      if (cookies['_m_h5_tk'] && cookies['_m_h5_tk_enc']) {
-        this.cache = {
-          token: [`_m_h5_tk=${cookies['_m_h5_tk']}`, `_m_h5_tk_enc=${cookies['_m_h5_tk_enc']}`],
-          signedToken: cookies['_m_h5_tk'].split('_')[0],
-          expire: +new Date() + 10 * 365 * 24 * 60 * 60 * 1000 // 浏览器环境 此字段无效 以cookie有效期为准
+      if (cache) {
+        cache = JSON.parse(cache);
 
-        };
+        if (cache.expire > +new Date()) {
+          this.setCache(cache);
+        }
       }
     }
   },
 
+  getCache() {
+    if (this.cache && this.cache.expire > +new Date()) {
+      const _this$cache = this.cache,
+            _m_h5_tk = _this$cache._m_h5_tk,
+            _m_h5_tk_enc = _this$cache._m_h5_tk_enc;
+      return {
+        cookie: `_m_h5_tk=${_m_h5_tk}; _m_h5_tk_enc=${_m_h5_tk_enc}`,
+        signedToken: _m_h5_tk.split('_')[0]
+      };
+    }
+
+    return null;
+  },
+
   setCache({
-    token,
-    signedToken
+    _m_h5_tk,
+    _m_h5_tk_enc,
+    expire = +new Date() + 7 * 24 * 60 * 60 * 1000
   }) {
     this.cache = {
-      token,
-      signedToken,
-      expire: +new Date() + 24 * 60 * 60 * 1000 // 1天有效 浏览器环境此字段无效
-      // 浏览器环境 存cookie
+      _m_h5_tk,
+      _m_h5_tk_enc,
+      expire // 浏览器环境 存localstorage
 
     };
 
-    if (typeof window !== 'undefined') {
-      token.forEach(item => {
-        const arr = item.split('=');
-        (0, _util.setCookie)(arr[0], arr[1]);
-      });
+    if (this.isBrowser) {
+      localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache));
     }
   }
 
