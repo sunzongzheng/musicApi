@@ -31,21 +31,52 @@ export default function (instance) {
             }
         }
     }
+    const getMusicInfo2 = info => {
+        const purviewRoleVOs = info.purview_roles
+        const brObject = {}
+        purviewRoleVOs.forEach(item => {
+            brObject[item.quality] = !item.operation_list[0].upgrade_role
+        })
+        return {
+            album: {
+                id: info.album_id,
+                name: info.album_name,
+                cover: replaceImage(info.album_logo)
+            },
+            artists: [{
+                id: info.artist_id,
+                name: info.artist_name
+            }],
+            name: info.song_name,
+            id: info.song_id,
+            cp: !info.listen_file,
+            dl: !info.need_pay_flag,
+            quality: {
+                192: false,
+                320: brObject.h,
+                999: brObject.s,
+            }
+        }
+    }
     return {
         async searchSong({keyword, limit = 30, offset = 0}) {
             try {
-                const data = await instance.get('mtop.alimusic.search.searchservice.searchsongs', {
+                const params = {
+                    v: '2.0',
                     key: keyword,
-                    pagingVO: {
-                        page: offset + 1,
-                        pageSize: limit
-                    }
+                    limit: limit,
+                    page: offset + 1,
+                    r: 'search/songs',
+                    app_key: 1
+                }
+                const data = await instance.post('/web?', params, {
+                    webApi: true
                 })
                 return {
                     status: true,
                     data: {
-                        total: data.pagingVO.count,
-                        songs: data.songs.map(item => getMusicInfo(item))
+                        total: data.total,
+                        songs: data.songs.map(item => getMusicInfo2(item))
                     }
                 }
             } catch (e) {

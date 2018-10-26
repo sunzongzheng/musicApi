@@ -1,5 +1,6 @@
 import Cache from '../cache'
 import Crypto from "../crypto"
+import querystring from 'querystring'
 
 let first = true
 const getBody = (api, body) => {
@@ -51,6 +52,17 @@ export default function (createInstance) {
             request.baseURL = ''
             return request
         }
+        if (request.webApi) {
+            request.baseURL = 'http://api.xiami.com'
+            request.headers = {
+                Cookie: 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=cb8bfadfe130abdbf5e2282c30f0b39a;',
+                Referer: 'http://h.xiami.com/'
+            }
+            const query = querystring.stringify(request.body)
+            request.body = query
+            request.url += query
+            return request
+        }
         const cache = Cache.getCache()
         // 第一次请求 或 没有缓存 先锁队列 只放行第一个
         if (first || !cache) {
@@ -64,10 +76,26 @@ export default function (createInstance) {
         return request
     })
     fly.interceptors.response.use(async res => {
-        first = false
         if (res.request.pureFly) {
             return res
         }
+        if (res.request.webApi) {
+            if (!res.data) {
+                return Promise.reject({
+                    status: false,
+                    msg: '请求无结果'
+                })
+            }
+            if (res.data.state !== 0 && !res.data.status) {
+                return Promise.reject({
+                    status: false,
+                    msg: '请求失败',
+                    log: res.data
+                })
+            }
+            return res.data.data
+        }
+        first = false
         try {
             // 只要返了cookie 就更新token
             if (res.headers['set-cookie']) {

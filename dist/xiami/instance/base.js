@@ -9,6 +9,8 @@ var _cache = _interopRequireDefault(require("../cache"));
 
 var _crypto = _interopRequireDefault(require("../crypto"));
 
+var _querystring = _interopRequireDefault(require("querystring"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -69,6 +71,20 @@ function _default(createInstance) {
       return request;
     }
 
+    if (request.webApi) {
+      request.baseURL = 'http://api.xiami.com';
+      request.headers = {
+        Cookie: 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=cb8bfadfe130abdbf5e2282c30f0b39a;',
+        Referer: 'http://h.xiami.com/'
+      };
+
+      const query = _querystring.default.stringify(request.body);
+
+      request.body = query;
+      request.url += query;
+      return request;
+    }
+
     const cache = _cache.default.getCache(); // 第一次请求 或 没有缓存 先锁队列 只放行第一个
 
 
@@ -87,11 +103,30 @@ function _default(createInstance) {
   /*#__PURE__*/
   function () {
     var _ref = _asyncToGenerator(function* (res) {
-      first = false;
-
       if (res.request.pureFly) {
         return res;
       }
+
+      if (res.request.webApi) {
+        if (!res.data) {
+          return Promise.reject({
+            status: false,
+            msg: '请求无结果'
+          });
+        }
+
+        if (res.data.state !== 0 && !res.data.status) {
+          return Promise.reject({
+            status: false,
+            msg: '请求失败',
+            log: res.data
+          });
+        }
+
+        return res.data.data;
+      }
+
+      first = false;
 
       try {
         // 只要返了cookie 就更新token

@@ -1,11 +1,12 @@
 {
   "name": "@suen/music-api",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "music api colletion",
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon --inspect controllers/app.js --exec babel-node",
     "test": "mocha -t 30000 --require @babel/register 'test/*.test.js' --exit",
+    "dev-server": "nodemon --inspect src/server.js --exec babel-node",
     "build": "npm run build:node && npm run build:web",
     "build:node": "babel src -d dist",
     "build:web": "webpack"
@@ -16,6 +17,7 @@
     "@babel/runtime": "^7.0.0",
     "big-integer": "^1.6.26",
     "dsbridge": "^3.1.3",
+    "express": "^4.16.4",
     "flyio": "^0.6.2"
   },
   "devDependencies": {

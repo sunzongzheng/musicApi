@@ -13,7 +13,7 @@ export default function (createInstance) {
     fly.config.rejectUnauthorized = false
 
     fly.interceptors.request.use(config => {
-        if(config.headers.newApi) {
+        if (config.headers.newApi) {
             config.baseURL = 'https://u.y.qq.com'
             delete config.headers.newApi
         }
@@ -31,7 +31,9 @@ export default function (createInstance) {
         const callbackArr = ['callback', 'jsonCallback', 'MusicJsonCallback']
         callbackArr.forEach(item => {
             if (res.data.toString().trim().startsWith(item)) {
-                res.data = eval(`function ${item}(val){return val} ${res.data}`)
+                const regex = new RegExp(item + '\\(([\\s\\S]*)\\)')
+                const match = res.data.match(regex)
+                res.data = JSON.parse(match[1])
                 hasCallback = true
             }
         })

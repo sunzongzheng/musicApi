@@ -301,7 +301,7 @@ function _default(instance) {
       })();
     },
 
-    getComment(songid, page, pagesize = 20) {
+    getComment(songid, page = 1, pagesize = 20) {
       return _asyncToGenerator(function* () {
         try {
           const _ref2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {

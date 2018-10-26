@@ -39,7 +39,9 @@ function _default(createInstance) {
     const callbackArr = ['callback', 'jsonCallback', 'MusicJsonCallback'];
     callbackArr.forEach(item => {
       if (res.data.toString().trim().startsWith(item)) {
-        res.data = eval(`function ${item}(val){return val} ${res.data}`);
+        const regex = new RegExp(item + '\\(([\\s\\S]*)\\)');
+        const match = res.data.match(regex);
+        res.data = JSON.parse(match[1]);
         hasCallback = true;
       }
     });
