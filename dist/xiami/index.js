@@ -156,6 +156,8 @@ function _default(instance) {
       var _this = this;
 
       return _asyncToGenerator(function* () {
+        br = parseInt(br);
+
         try {
           let url;
           const data = yield _this.getSongDetail(id, true);

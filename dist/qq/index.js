@@ -197,6 +197,7 @@ function _default(instance) {
       var _this2 = this;
 
       return _asyncToGenerator(function* () {
+        br = parseInt(br);
         const guid = Math.floor(Math.random() * 1000000000);
         let data;
 

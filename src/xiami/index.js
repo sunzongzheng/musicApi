@@ -123,6 +123,7 @@ export default function (instance) {
             }
         },
         async getSongUrl(id, br = 128000) {
+            br = parseInt(br)
             try {
                 let url
                 const data = await this.getSongDetail(id, true)

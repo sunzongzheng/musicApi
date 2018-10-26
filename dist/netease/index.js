@@ -179,6 +179,7 @@ function _default(instance) {
 
     getSongUrl(id, br = 128000) {
       return _asyncToGenerator(function* () {
+        br = parseInt(br);
         const params = {
           ids: [id],
           br,

@@ -158,6 +158,7 @@ export default function (instance) {
             return detailInfo.data.mid
         },
         async getSongUrl(songid, br = 128000) {
+            br = parseInt(br)
             const guid = Math.floor(Math.random() * 1000000000)
             let data
             try {

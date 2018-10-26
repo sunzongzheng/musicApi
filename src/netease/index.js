@@ -139,6 +139,7 @@ export default function (instance) {
             }
         },
         async getSongUrl(id, br = 128000) {
+            br = parseInt(br)
             const params = {
                 ids: [id],
                 br,

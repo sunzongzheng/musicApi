@@ -2,6 +2,8 @@
 
 var _express = _interopRequireDefault(require("express"));
 
+var _apicache = _interopRequireDefault(require("apicache"));
+
 var _app = _interopRequireDefault(require("./app"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -11,12 +13,15 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 const app = (0, _express.default)();
+app.use(_apicache.default.middleware('720 minutes'));
 app.get('/',
 /*#__PURE__*/
 function () {
   var _ref = _asyncToGenerator(function* (req, res) {
     const method = req.query.method;
     const vendor = req.query.vendor;
+    const params = req.query.params;
+    const restParams = req.query.restParams;
 
     if (!method) {
       res.status(400).send({
@@ -25,16 +30,23 @@ function () {
       return;
     }
 
-    const data = yield vendor ? _app.default[vendor][method](req.query.params) : _app.default[method](req.query.params);
+    let data;
 
-    if (data.status) {
-      res.send(data.data);
+    if (vendor) {
+      if (restParams) {
+        data = yield _app.default[vendor][method](...restParams);
+      } else {
+        data = yield _app.default[vendor][method](params);
+      }
     } else {
-      res.status(400).send({
-        error: data.msg,
-        log: data.log
-      });
+      if (restParams) {
+        data = yield _app.default[method](...restParams);
+      } else {
+        data = yield _app.default[method](params);
+      }
     }
+
+    res.send(data);
   });
 
   return function (_x, _x2) {
