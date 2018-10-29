@@ -6,3 +6,4 @@ package-lock.json
 controllers/
 yarn.lock
 .DS_Store
+.leancloud/
