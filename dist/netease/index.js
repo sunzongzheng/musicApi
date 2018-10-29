@@ -515,6 +515,30 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getNewestMvs(limit = 20) {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref9 = yield instance.post('/weapi/mv/first', {
+            total: true,
+            limit,
+            csrf_token: ""
+          }),
+                data = _ref9.data;
+
+          return {
+            status: true,
+            data
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
     }
 
   };

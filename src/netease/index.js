@@ -422,5 +422,24 @@ export default function (instance) {
                 }
             }
         },
+        async getNewestMvs(limit = 20) {
+            try {
+                const {data} = await instance.post('/weapi/mv/first', {
+                    total: true,
+                    limit,
+                    csrf_token: ""
+                })
+                return {
+                    status: true,
+                    data
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        },
     }
 }
