@@ -40,7 +40,8 @@ function _default(instance) {
         192: false,
         320: brObject.h,
         999: brObject.s
-      }
+      },
+      mv: info.mvId
     };
   };
 
@@ -68,7 +69,8 @@ function _default(instance) {
         192: false,
         320: brObject.h,
         999: brObject.s
-      }
+      },
+      mv: false
     };
   };
 

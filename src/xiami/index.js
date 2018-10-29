@@ -28,7 +28,8 @@ export default function (instance) {
                 192: false,
                 320: brObject.h,
                 999: brObject.s,
-            }
+            },
+            mv: info.mvId
         }
     }
     const getMusicInfo2 = info => {
@@ -55,7 +56,8 @@ export default function (instance) {
                 192: false,
                 320: brObject.h,
                 999: brObject.s,
-            }
+            },
+            mv: false
         }
     }
     return {

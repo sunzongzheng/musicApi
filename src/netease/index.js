@@ -50,7 +50,8 @@ export default function (instance) {
                 192: privilege.fl >= 192000,
                 320: privilege.fl >= 320000,
                 999: privilege.fl >= 999000,
-            }
+            },
+            mv: info.mv
         }
     }
     return {

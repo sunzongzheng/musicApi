@@ -35,7 +35,8 @@ function _default(instance) {
         192: false,
         320: Boolean(file.size_320 || file.size_320mp3),
         999: Boolean(info.file.size_flac)
-      }
+      },
+      mv: info.mv.vid
     };
   };
 
@@ -61,7 +62,8 @@ function _default(instance) {
         192: false,
         320: Boolean(info.size320),
         999: Boolean(info.sizeflac)
-      }
+      },
+      mv: info.vid
     };
   };
 
