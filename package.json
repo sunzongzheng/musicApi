@@ -7,6 +7,7 @@
     "start": "node dist/lean-server.js",
     "dev": "nodemon --inspect controllers/app.js --exec babel-node",
     "test": "mocha -t 30000 --require @babel/register 'test/*.test.js' --exit",
+    "test:qq": "mocha -t 30000 --require @babel/register 'test/qq.test.js' --exit",
     "dev-server": "nodemon --inspect src/server.js --exec babel-node",
     "build": "npm run build:node && npm run build:web",
     "build:node": "babel src -d dist",

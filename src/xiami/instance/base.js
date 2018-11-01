@@ -124,6 +124,7 @@ export default function (createInstance) {
             })
         }
     }, e => {
+        console.warn(e)
         return Promise.reject({
             status: false,
             msg: '请求失败',

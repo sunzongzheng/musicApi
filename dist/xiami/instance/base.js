@@ -163,6 +163,7 @@ function _default(createInstance) {
       return _ref.apply(this, arguments);
     };
   }(), e => {
+    console.warn(e);
     return Promise.reject({
       status: false,
       msg: '请求失败',

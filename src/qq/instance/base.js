@@ -1,5 +1,14 @@
 import {randomUserAgent} from '../../util'
 
+const getACSRFToken = function (cookie) {
+    function e(e) {
+        for (var n = 5381, o = 0, t = e.length; t > o; ++o)
+            n += (n << 5) + e.charCodeAt(o);
+        return 2147483647 & n
+    }
+
+    return e(cookie)
+}
 export default function (createInstance) {
     const fly = createInstance()
     // fly.config.proxy = 'http://localhost:8888'
@@ -13,10 +22,43 @@ export default function (createInstance) {
     fly.config.rejectUnauthorized = false
 
     fly.interceptors.request.use(config => {
-        if (config.headers.newApi) {
+        if (config.newApi) {
             config.baseURL = 'https://u.y.qq.com'
-            delete config.headers.newApi
+            delete config.newApi
         }
+        // 浏览器且本地有cookie信息 接口就都带上cookie
+        let loginUin = 0
+        let g_tk = 5381
+        if (typeof(window) !== 'undefined') {
+            const loginCookies = localStorage.getItem('@suen/music-api-qq-login-cookie')
+            if (loginCookies) {
+                try {
+                    config.headers.Cookie = loginCookies
+                    const cookiesObject = {}
+                    loginCookies.replace(/\s*/g, '').split(';').map(item => item.split('=')).forEach(item => {
+                        cookiesObject[item[0]] = item[1]
+                    })
+                    loginUin = cookiesObject['uin'].substring(2)
+                    g_tk = getACSRFToken(cookiesObject["p_skey"] || cookiesObject["skey"] || cookiesObject["p_lskey"] || cookiesObject["lskey"])
+                } catch (e) {
+                    console.warn(e)
+                }
+            }
+        }
+        config.body = Object.assign({}, {
+            g_tk,
+            format: 'jsonp',
+            callback: 'callback',
+            jsonpCallback: 'callback',
+            loginUin,
+            hostUin: 0,
+            inCharset: 'utf8',
+            outCharset: 'utf-8',
+            notice: 0,
+            platform: 'yqq',
+            needNewCode: 0,
+            new_json: 1,
+        }, config.body)
         return config
     }, e => Promise.reject(e))
     fly.interceptors.response.use(res => {
@@ -53,7 +95,14 @@ export default function (createInstance) {
             })
         }
         return res.data
-    }, e => Promise.reject(e))
+    }, e => {
+        console.warn(e)
+        return Promise.reject({
+            status: false,
+            msg: '请求失败',
+            log: e
+        })
+    })
 
     return fly
 }

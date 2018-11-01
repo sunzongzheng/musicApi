@@ -55,22 +55,17 @@ export default function (instance) {
         }
     }
     return {
+        instance,
         async searchSong({keyword, limit = 30, offset = 0}) {
             const params = {
                 p: offset + 1,
                 n: limit,
                 w: keyword,
                 ct: 24,
-                new_json: 1,
                 remoteplace: 'txt.yqq.song',
                 aggr: 1,
                 cr: 1,
                 lossless: 0,
-                format: 'jsonp',
-                inCharset: 'utf8',
-                outCharset: 'utf-8',
-                platform: 'yqq',
-                needNewCode: 0
             }
             try {
                 let data = await instance.get('/soso/fcgi-bin/client_search_cp', params)
@@ -82,11 +77,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getSongDetail(id, raw = false, type = 'songid') {
@@ -94,16 +85,6 @@ export default function (instance) {
                 const data = await instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
                     [type]: id,
                     tpl: 'yqq_song_detail',
-                    format: 'jsonp',
-                    callback: 'callback',
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    inCharset: 'utf8',
-                    outCharset: 'utf-8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0
                 })
                 const info = data.data[0]
                 if (!info) {
@@ -117,11 +98,7 @@ export default function (instance) {
                     data: raw ? info : getMusicInfo(info)
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getBatchSongDetail(songids) {
@@ -129,27 +106,13 @@ export default function (instance) {
                 const data = await instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
                     songid: songids.join(','),
                     tpl: 'yqq_song_detail',
-                    format: 'jsonp',
-                    callback: 'callback',
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    inCharset: 'utf8',
-                    outCharset: 'utf-8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0
                 })
                 return {
                     status: true,
                     data: data.data.map(item => getMusicInfo(item))
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getMid(id) {
@@ -210,19 +173,8 @@ export default function (instance) {
             try {
                 const mid = await this.getMid(songid)
                 let data = await instance.get('/lyric/fcgi-bin/fcg_query_lyric_new.fcg', {
-                    'callback': 'callback',
                     'pcachetime': Date.parse(new Date()),
                     'songmid': mid,
-                    'g_tk': 5381,
-                    'jsonpCallback': 'callback',
-                    'loginUin': 0,
-                    'hostUin': 0,
-                    'format': 'jsonp',
-                    'inCharset': 'utf8',
-                    'outCharset': 'utf-8',
-                    'notice': 0,
-                    'platform': 'yqq',
-                    'needNewCode': 0
                 })
                 if (data.lyric) {
                     return {
@@ -242,26 +194,13 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: e.message || '请求失败',
-                    log: e
-                }
+                return e
             }
 
         },
         async getComment(songid, page = 1, pagesize = 20) {
             try {
                 const {comment, hot_comment} = await instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    format: 'jsonp',
-                    inCharset: 'utf8',
-                    outCharset: 'utf8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0,
                     reqtype: 2,
                     biztype: 1,
                     topid: songid,
@@ -270,7 +209,6 @@ export default function (instance) {
                     pagenum: page - 1,
                     pagesize,
                     lasthotcommentid: '',
-                    callback: 'callback',
                     domain: 'qq.com',
                 })
                 return {
@@ -282,27 +220,13 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getArtistSongs(id, offset, limit) {
             try {
                 const params = {
-                    format: 'jsonp',
-                    callback: 'callback',
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    inCharset: 'utf8',
-                    outCharset: 'utf-8',
-                    notice: 0,
                     platform: 'h5page',
-                    needNewCode: 0,
                     from: 'h5',
                     singerid: id,
                     order: 'listen',
@@ -324,28 +248,13 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
-        async getAlbumSongs(id, offset, limit) {
+        async getPlaylistDetail(id, offset, limit) {
             try {
                 const params = {
                     type: 1,
-                    format: 'jsonp',
-                    callback: 'callback',
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    inCharset: 'utf8',
-                    outCharset: 'utf-8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0,
                     onlysong: 0,
                     disstid: id
                 }
@@ -363,49 +272,35 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
+        },
+        getMusicu(data) {
+            return instance.get('/cgi-bin/musicu.fcg', {
+                data: JSON.stringify(data),
+            }, {
+                newApi: true
+            })
         },
         async getArtists(offset = 0, param) {
             const {area = -100, sex = -100, genre = -100, index = -100} = param || {}
             try {
-                const {singerList} = await instance.get('/cgi-bin/musicu.fcg', {
-                    jsonpCallback: 'callback',
-                    callback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    format: 'jsonp',
-                    inCharset: 'utf8',
-                    outCharset: 'utf8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0,
-                    data: JSON.stringify({
-                        comm: {
-                            ct: 24,
-                            cv: 10000
-                        },
-                        singerList: {
-                            module: 'Music.SingerListServer',
-                            method: 'get_singer_list',
-                            param: {
-                                area,
-                                sex,
-                                genre,
-                                index,
-                                sin: offset * 80,
-                                cur_page: offset + 1,
-                            }
+                const {singerList} = await this.getMusicu({
+                    comm: {
+                        ct: 24,
+                        cv: 10000
+                    },
+                    singerList: {
+                        module: 'Music.SingerListServer',
+                        method: 'get_singer_list',
+                        param: {
+                            area,
+                            sex,
+                            genre,
+                            index,
+                            sin: offset * 80,
+                            cur_page: offset + 1,
                         }
-                    })
-                }, {
-                    headers: {
-                        newApi: true
                     }
                 })
                 return {
@@ -413,12 +308,7 @@ export default function (instance) {
                     data: singerList.data
                 }
             } catch (e) {
-                console.warn(e)
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getAlbumDetail(id) {
@@ -426,16 +316,6 @@ export default function (instance) {
                 const {data} = await instance.get('https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg', {
                     albumid: id,
                     tpl: 'yqq_song_detail',
-                    format: 'jsonp',
-                    callback: 'callback',
-                    jsonpCallback: 'callback',
-                    loginUin: 0,
-                    hostUin: 0,
-                    inCharset: 'utf8',
-                    outCharset: 'utf-8',
-                    notice: 0,
-                    platform: 'yqq',
-                    needNewCode: 0
                 })
                 return {
                     status: true,
@@ -452,11 +332,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getAllTopList() {
@@ -465,7 +341,6 @@ export default function (instance) {
                 format: 'html',
                 tpl: 'macv4',
                 v8debug: 1,
-                jsonCallback: 'jsonCallback'
             }
             try {
                 let data = await instance.get('/v8/fcg-bin/fcg_v8_toplist_opt.fcg', params, {
@@ -492,25 +367,12 @@ export default function (instance) {
                     })
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getTopList(id) {
             const params = {
-                format: 'jsonp',
-                callback: 'callback',
-                jsonpCallback: 'callback',
-                loginUin: 0,
-                hostUin: 0,
-                inCharset: 'utf8',
-                outCharset: 'utf-8',
-                notice: 0,
                 platform: 'h5',
-                needNewCode: 0,
                 topid: id,
                 tpl: 3,
                 page: 'detail',
@@ -529,11 +391,61 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
+                return e
+            }
+        },
+        async getUserInfo() {
+            try {
+                const {data} = await instance.get('/portalcgi/fcgi-bin/music_mini_portal/fcg_getuser_infoEx.fcg')
                 return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
+                    status: true,
+                    data
                 }
+            } catch (e) {
+                return e
+            }
+        },
+        async getRecommendPlaylist() {
+            try {
+                const {recomPlaylist} = await this.getMusicu({
+                    'comm': {
+                        'ct': 24,
+                    },
+                    'recomPlaylist': {
+                        'method': 'get_hot_recommend',
+                        'param': {
+                            'async': 1,
+                            'cmd': 2,
+                        },
+                        'module': 'playlist.HotRecommendServer',
+                    }
+                })
+                return {
+                    status: true,
+                    data: recomPlaylist.data.v_hot
+                }
+            } catch (e) {
+                return e
+            }
+        },
+        async getRecommendSongs(page = 1, limit = 30) {
+            try {
+                const {get_daily_track} = await this.getMusicu({
+                    "comm": {"ct": 6, "cv": 50500},
+                    "get_daily_track": {
+                        "module": "music.ai_track_daily_svr",
+                        "method": "get_daily_track",
+                        "param": {
+                            "id": 99, "cmd": 0, "page": page - 1
+                        }
+                    }
+                })
+                return {
+                    status: true,
+                    data: get_daily_track.data.tracks.map(item => getMusicInfo(item))
+                }
+            } catch (e) {
+                return e
             }
         }
     }

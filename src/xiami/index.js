@@ -61,6 +61,7 @@ export default function (instance) {
         }
     }
     return {
+        instance,
         async searchSong({keyword, limit = 30, offset = 0}) {
             try {
                 const params = {
@@ -302,7 +303,7 @@ export default function (instance) {
                 return e
             }
         },
-        async getPlaylistDetail(id) {
+        async getPlaylistInfo(id) {
             try {
                 const {collectDetail} = await instance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
                     listId: id,
@@ -321,9 +322,9 @@ export default function (instance) {
                 return e
             }
         },
-        async getAlbumSongs(id, offset, limit) {
+        async getPlaylistDetail(id, offset, limit) {
             try {
-                const detailInfo = await this.getPlaylistDetail(id)
+                const detailInfo = await this.getPlaylistInfo(id)
                 const detail = detailInfo.status ? detailInfo.data : {}
                 const {songs} = await instance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {
                     listId: id,

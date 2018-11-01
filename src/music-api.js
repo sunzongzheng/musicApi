@@ -105,9 +105,9 @@ export default function (instance) {
             return await this[vendor]['getArtistSongs'](id, offset, limit)
         },
         // 获取歌单歌曲
-        async getAlbumSongs(vendor, id, offset = 0, limit = 65535) {
+        async getPlaylistDetail(vendor, id, offset = 0, limit = 65535) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getAlbumSongs'](id, offset, limit)
+            return await this[vendor]['getPlaylistDetail'](id, offset, limit)
         },
         // 获取专辑详情
         async getAlbumDetail(vendor, id) {

@@ -309,7 +309,7 @@ export default function (instance) {
                 }
             }
         },
-        async getAlbumSongs(id, offset, limit) {
+        async getPlaylistDetail(id, offset, limit) {
             try {
                 const {playlist, privileges} = await instance.post(`/weapi/v3/playlist/detail`, {
                     id,
@@ -470,16 +470,12 @@ export default function (instance) {
                 }
             }
         },
-        async getRecommendSongs(cookies, page = 1, limit = 30) {
+        async getRecommendSongs(page = 1, limit = 30) {
             try {
                 let data = await instance.post(`/weapi/v1/discovery/recommend/songs`, {
                     limit,
                     offset: page - 1,
                     total: true
-                }, {
-                    headers: {
-                        Cookie: cookies,
-                    }
                 })
                 return {
                     status: true,

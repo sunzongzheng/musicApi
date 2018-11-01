@@ -75,6 +75,8 @@ function _default(instance) {
   };
 
   return {
+    instance,
+
     searchSong({
       keyword,
       limit = 30,
@@ -375,7 +377,7 @@ function _default(instance) {
       })();
     },
 
-    getPlaylistDetail(id) {
+    getPlaylistInfo(id) {
       return _asyncToGenerator(function* () {
         try {
           const _ref3 = yield instance.get('mtop.alimusic.music.list.collectservice.getcollectdetail', {
@@ -399,12 +401,12 @@ function _default(instance) {
       })();
     },
 
-    getAlbumSongs(id, offset, limit) {
+    getPlaylistDetail(id, offset, limit) {
       var _this4 = this;
 
       return _asyncToGenerator(function* () {
         try {
-          const detailInfo = yield _this4.getPlaylistDetail(id);
+          const detailInfo = yield _this4.getPlaylistInfo(id);
           const detail = detailInfo.status ? detailInfo.data : {};
 
           const _ref4 = yield instance.get('mtop.alimusic.music.list.collectservice.getcollectsongs', {

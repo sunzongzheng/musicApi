@@ -379,7 +379,7 @@ function _default(instance) {
       })();
     },
 
-    getAlbumSongs(id, offset, limit) {
+    getPlaylistDetail(id, offset, limit) {
       return _asyncToGenerator(function* () {
         try {
           const _ref5 = yield instance.post(`/weapi/v3/playlist/detail`, {
@@ -572,17 +572,13 @@ function _default(instance) {
       })();
     },
 
-    getRecommendSongs(cookies, page = 1, limit = 30) {
+    getRecommendSongs(page = 1, limit = 30) {
       return _asyncToGenerator(function* () {
         try {
           let data = yield instance.post(`/weapi/v1/discovery/recommend/songs`, {
             limit,
             offset: page - 1,
             total: true
-          }, {
-            headers: {
-              Cookie: cookies
-            }
           });
           return {
             status: true,

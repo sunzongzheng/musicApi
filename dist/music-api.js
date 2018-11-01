@@ -169,12 +169,12 @@ function _default(instance) {
     },
 
     // 获取歌单歌曲
-    getAlbumSongs(vendor, id, offset = 0, limit = 65535) {
+    getPlaylistDetail(vendor, id, offset = 0, limit = 65535) {
       var _this7 = this;
 
       return _asyncToGenerator(function* () {
         yield paramsVerify(vendor, id);
-        return yield _this7[vendor]['getAlbumSongs'](id, offset, limit);
+        return yield _this7[vendor]['getPlaylistDetail'](id, offset, limit);
       })();
     },
 

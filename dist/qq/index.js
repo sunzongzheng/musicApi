@@ -68,6 +68,8 @@ function _default(instance) {
   };
 
   return {
+    instance,
+
     searchSong({
       keyword,
       limit = 30,
@@ -79,16 +81,10 @@ function _default(instance) {
           n: limit,
           w: keyword,
           ct: 24,
-          new_json: 1,
           remoteplace: 'txt.yqq.song',
           aggr: 1,
           cr: 1,
-          lossless: 0,
-          format: 'jsonp',
-          inCharset: 'utf8',
-          outCharset: 'utf-8',
-          platform: 'yqq',
-          needNewCode: 0
+          lossless: 0
         };
 
         try {
@@ -101,11 +97,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -115,17 +107,7 @@ function _default(instance) {
         try {
           const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
             [type]: id,
-            tpl: 'yqq_song_detail',
-            format: 'jsonp',
-            callback: 'callback',
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            inCharset: 'utf8',
-            outCharset: 'utf-8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0
+            tpl: 'yqq_song_detail'
           });
           const info = data.data[0];
 
@@ -141,11 +123,7 @@ function _default(instance) {
             data: raw ? info : getMusicInfo(info)
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -155,28 +133,14 @@ function _default(instance) {
         try {
           const data = yield instance.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
             songid: songids.join(','),
-            tpl: 'yqq_song_detail',
-            format: 'jsonp',
-            callback: 'callback',
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            inCharset: 'utf8',
-            outCharset: 'utf-8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0
+            tpl: 'yqq_song_detail'
           });
           return {
             status: true,
             data: data.data.map(item => getMusicInfo(item))
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -262,19 +226,8 @@ function _default(instance) {
         try {
           const mid = yield _this3.getMid(songid);
           let data = yield instance.get('/lyric/fcgi-bin/fcg_query_lyric_new.fcg', {
-            'callback': 'callback',
             'pcachetime': Date.parse(new Date()),
-            'songmid': mid,
-            'g_tk': 5381,
-            'jsonpCallback': 'callback',
-            'loginUin': 0,
-            'hostUin': 0,
-            'format': 'jsonp',
-            'inCharset': 'utf8',
-            'outCharset': 'utf-8',
-            'notice': 0,
-            'platform': 'yqq',
-            'needNewCode': 0
+            'songmid': mid
           });
 
           if (data.lyric) {
@@ -295,11 +248,7 @@ function _default(instance) {
             };
           }
         } catch (e) {
-          return {
-            status: false,
-            msg: e.message || '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -308,15 +257,6 @@ function _default(instance) {
       return _asyncToGenerator(function* () {
         try {
           const _ref2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            format: 'jsonp',
-            inCharset: 'utf8',
-            outCharset: 'utf8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0,
             reqtype: 2,
             biztype: 1,
             topid: songid,
@@ -325,7 +265,6 @@ function _default(instance) {
             pagenum: page - 1,
             pagesize,
             lasthotcommentid: '',
-            callback: 'callback',
             domain: 'qq.com'
           }),
                 comment = _ref2.comment,
@@ -340,12 +279,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -354,16 +288,7 @@ function _default(instance) {
       return _asyncToGenerator(function* () {
         try {
           const params = {
-            format: 'jsonp',
-            callback: 'callback',
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            inCharset: 'utf8',
-            outCharset: 'utf-8',
-            notice: 0,
             platform: 'h5page',
-            needNewCode: 0,
             from: 'h5',
             singerid: id,
             order: 'listen',
@@ -388,31 +313,16 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
-    getAlbumSongs(id, offset, limit) {
+    getPlaylistDetail(id, offset, limit) {
       return _asyncToGenerator(function* () {
         try {
           const params = {
             type: 1,
-            format: 'jsonp',
-            callback: 'callback',
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            inCharset: 'utf8',
-            outCharset: 'utf-8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0,
             onlysong: 0,
             disstid: id
           };
@@ -433,17 +343,22 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
 
+    getMusicu(data) {
+      return instance.get('/cgi-bin/musicu.fcg', {
+        data: JSON.stringify(data)
+      }, {
+        newApi: true
+      });
+    },
+
     getArtists(offset = 0, param) {
+      var _this4 = this;
+
       return _asyncToGenerator(function* () {
         const _ref5 = param || {},
               _ref5$area = _ref5.area,
@@ -456,38 +371,22 @@ function _default(instance) {
               index = _ref5$index === void 0 ? -100 : _ref5$index;
 
         try {
-          const _ref6 = yield instance.get('/cgi-bin/musicu.fcg', {
-            jsonpCallback: 'callback',
-            callback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            format: 'jsonp',
-            inCharset: 'utf8',
-            outCharset: 'utf8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0,
-            data: JSON.stringify({
-              comm: {
-                ct: 24,
-                cv: 10000
-              },
-              singerList: {
-                module: 'Music.SingerListServer',
-                method: 'get_singer_list',
-                param: {
-                  area,
-                  sex,
-                  genre,
-                  index,
-                  sin: offset * 80,
-                  cur_page: offset + 1
-                }
+          const _ref6 = yield _this4.getMusicu({
+            comm: {
+              ct: 24,
+              cv: 10000
+            },
+            singerList: {
+              module: 'Music.SingerListServer',
+              method: 'get_singer_list',
+              param: {
+                area,
+                sex,
+                genre,
+                index,
+                sin: offset * 80,
+                cur_page: offset + 1
               }
-            })
-          }, {
-            headers: {
-              newApi: true
             }
           }),
                 singerList = _ref6.singerList;
@@ -497,12 +396,7 @@ function _default(instance) {
             data: singerList.data
           };
         } catch (e) {
-          console.warn(e);
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -512,17 +406,7 @@ function _default(instance) {
         try {
           const _ref7 = yield instance.get('https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg', {
             albumid: id,
-            tpl: 'yqq_song_detail',
-            format: 'jsonp',
-            callback: 'callback',
-            jsonpCallback: 'callback',
-            loginUin: 0,
-            hostUin: 0,
-            inCharset: 'utf8',
-            outCharset: 'utf-8',
-            notice: 0,
-            platform: 'yqq',
-            needNewCode: 0
+            tpl: 'yqq_song_detail'
           }),
                 data = _ref7.data;
 
@@ -541,11 +425,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -556,8 +436,7 @@ function _default(instance) {
           page: 'index',
           format: 'html',
           tpl: 'macv4',
-          v8debug: 1,
-          jsonCallback: 'jsonCallback'
+          v8debug: 1
         };
 
         try {
@@ -585,11 +464,7 @@ function _default(instance) {
             })
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -597,16 +472,7 @@ function _default(instance) {
     getTopList(id) {
       return _asyncToGenerator(function* () {
         const params = {
-          format: 'jsonp',
-          callback: 'callback',
-          jsonpCallback: 'callback',
-          loginUin: 0,
-          hostUin: 0,
-          inCharset: 'utf8',
-          outCharset: 'utf-8',
-          notice: 0,
           platform: 'h5',
-          needNewCode: 0,
           topid: id,
           tpl: 3,
           page: 'detail',
@@ -626,11 +492,85 @@ function _default(instance) {
             }
           };
         } catch (e) {
+          return e;
+        }
+      })();
+    },
+
+    getUserInfo() {
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref8 = yield instance.get('/portalcgi/fcgi-bin/music_mini_portal/fcg_getuser_infoEx.fcg'),
+                data = _ref8.data;
+
           return {
-            status: false,
-            msg: '获取失败',
-            log: e
+            status: true,
+            data
           };
+        } catch (e) {
+          return e;
+        }
+      })();
+    },
+
+    getRecommendPlaylist() {
+      var _this5 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref9 = yield _this5.getMusicu({
+            'comm': {
+              'ct': 24
+            },
+            'recomPlaylist': {
+              'method': 'get_hot_recommend',
+              'param': {
+                'async': 1,
+                'cmd': 2
+              },
+              'module': 'playlist.HotRecommendServer'
+            }
+          }),
+                recomPlaylist = _ref9.recomPlaylist;
+
+          return {
+            status: true,
+            data: recomPlaylist.data.v_hot
+          };
+        } catch (e) {
+          return e;
+        }
+      })();
+    },
+
+    getRecommendSongs(page = 1, limit = 30) {
+      var _this6 = this;
+
+      return _asyncToGenerator(function* () {
+        try {
+          const _ref10 = yield _this6.getMusicu({
+            "comm": {
+              "ct": 6,
+              "cv": 50500
+            },
+            "get_daily_track": {
+              "module": "music.ai_track_daily_svr",
+              "method": "get_daily_track",
+              "param": {
+                "id": 99,
+                "cmd": 0,
+                "page": page - 1
+              }
+            }
+          }),
+                get_daily_track = _ref10.get_daily_track;
+
+          return {
+            status: true,
+            data: get_daily_track.data.tracks.map(item => getMusicInfo(item))
+          };
+        } catch (e) {
+          return e;
         }
       })();
     }
