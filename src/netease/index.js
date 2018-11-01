@@ -54,6 +54,34 @@ export default function (instance) {
             mv: info.mv
         }
     }
+    const getMusicInfo2 = (info, privilege) => {
+        if (!privilege) {
+            privilege = info.privilege
+        }
+        return {
+            album: {
+                id: info.album.id,
+                name: info.album.name,
+                cover: info.album.picUrl
+            },
+            artists: info.artists.map(ar => {
+                return {
+                    id: ar.id,
+                    name: ar.name
+                }
+            }),
+            name: info.name,
+            id: info.id,
+            cp: !privilege.cp,
+            dl: !privilege.fee,
+            quality: {
+                192: privilege.fl >= 192000,
+                320: privilege.fl >= 320000,
+                999: privilege.fl >= 999000,
+            },
+            mv: info.mvid
+        }
+    }
     return {
         instance,
         async searchSong({keyword, limit = 30, offset = 0, type = 1}) {
@@ -442,5 +470,28 @@ export default function (instance) {
                 }
             }
         },
+        async getRecommendSongs(cookies, page = 1, limit = 30) {
+            try {
+                let data = await instance.post(`/weapi/v1/discovery/recommend/songs`, {
+                    limit,
+                    offset: page - 1,
+                    total: true
+                }, {
+                    headers: {
+                        Cookie: cookies,
+                    }
+                })
+                return {
+                    status: true,
+                    data: data.recommend.map(item => getMusicInfo2(item))
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
+        }
     }
 }

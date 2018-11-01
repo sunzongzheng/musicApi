@@ -67,6 +67,36 @@ function _default(instance) {
     };
   };
 
+  const getMusicInfo2 = (info, privilege) => {
+    if (!privilege) {
+      privilege = info.privilege;
+    }
+
+    return {
+      album: {
+        id: info.album.id,
+        name: info.album.name,
+        cover: info.album.picUrl
+      },
+      artists: info.artists.map(ar => {
+        return {
+          id: ar.id,
+          name: ar.name
+        };
+      }),
+      name: info.name,
+      id: info.id,
+      cp: !privilege.cp,
+      dl: !privilege.fee,
+      quality: {
+        192: privilege.fl >= 192000,
+        320: privilege.fl >= 320000,
+        999: privilege.fl >= 999000
+      },
+      mv: info.mvid
+    };
+  };
+
   return {
     instance,
 
@@ -531,6 +561,32 @@ function _default(instance) {
           return {
             status: true,
             data
+          };
+        } catch (e) {
+          return {
+            status: false,
+            msg: '请求失败',
+            log: e
+          };
+        }
+      })();
+    },
+
+    getRecommendSongs(cookies, page = 1, limit = 30) {
+      return _asyncToGenerator(function* () {
+        try {
+          let data = yield instance.post(`/weapi/v1/discovery/recommend/songs`, {
+            limit,
+            offset: page - 1,
+            total: true
+          }, {
+            headers: {
+              Cookie: cookies
+            }
+          });
+          return {
+            status: true,
+            data: data.recommend.map(item => getMusicInfo2(item))
           };
         } catch (e) {
           return {
