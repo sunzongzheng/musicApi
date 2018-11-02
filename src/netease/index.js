@@ -488,6 +488,26 @@ export default function (instance) {
                     log: e
                 }
             }
+        },
+        async getPersonalizedPlaylist(page = 1, limit = 30) {
+            try {
+                let data = await instance.post(`/weapi/personalized/playlist`, {
+                    limit: 30,
+                    offset: page - 1,
+                    total: true,
+                    n: 1000
+                })
+                return {
+                    status: true,
+                    data: data.result
+                }
+            } catch (e) {
+                return {
+                    status: false,
+                    msg: '请求失败',
+                    log: e
+                }
+            }
         }
     }
 }

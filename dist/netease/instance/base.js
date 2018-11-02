@@ -32,10 +32,12 @@ function _default(createInstance) {
     if (config.pureFly) return config;
     const cryptoreq = (0, _crypto.default)(config.body); // 浏览器且本地有cookie信息 接口就都带上cookie
 
-    const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie');
+    if (typeof window !== 'undefined') {
+      const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie');
 
-    if (typeof window !== 'undefined' && loginCookies) {
-      config.headers.Cookie = loginCookies;
+      if (!loginCookies) {
+        config.headers.Cookie = loginCookies;
+      }
     }
 
     config.body = {
