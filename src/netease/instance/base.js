@@ -25,7 +25,7 @@ export default function (createInstance) {
         // 浏览器且本地有cookie信息 接口就都带上cookie
         if(typeof(window) !== 'undefined') {
             const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie')
-            if(!loginCookies) {
+            if(loginCookies) {
                 config.headers.Cookie = loginCookies
             }
         }

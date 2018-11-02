@@ -35,7 +35,7 @@ function _default(createInstance) {
     if (typeof window !== 'undefined') {
       const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie');
 
-      if (!loginCookies) {
+      if (loginCookies) {
         config.headers.Cookie = loginCookies;
       }
     }
