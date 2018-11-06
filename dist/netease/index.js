@@ -380,6 +380,8 @@ function _default(instance) {
     },
 
     getPlaylistDetail(id, offset, limit) {
+      var _this = this;
+
       return _asyncToGenerator(function* () {
         try {
           const _ref5 = yield instance.post(`/weapi/v3/playlist/detail`, {
@@ -391,10 +393,35 @@ function _default(instance) {
                 playlist = _ref5.playlist,
                 privileges = _ref5.privileges;
 
+          let songs = [];
           const privilegesObjects = {};
-          privileges.forEach(item => {
-            privilegesObjects[item.id] = item;
-          });
+
+          if (playlist.tracks.length > 1000) {
+            let arr = [];
+            const limit = 1000;
+
+            for (let i = 0; i < playlist.tracks.length; i++) {
+              arr.push(playlist.tracks[i].id); // 达到限制 或 已是数组最后一个
+
+              if (arr.length === limit || i + 1 === playlist.tracks.length) {
+                // 获取详情
+                const data = yield _this.getBatchSongDetail(arr);
+
+                if (data.status) {
+                  songs = songs.concat(data.data);
+                } // 重置待处理的数组
+
+
+                arr = [];
+              }
+            }
+          } else {
+            privileges.forEach(item => {
+              privilegesObjects[item.id] = item;
+            });
+            songs = playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]));
+          }
+
           return {
             status: true,
             data: {
@@ -404,7 +431,7 @@ function _default(instance) {
                 cover: playlist.coverImgUrl,
                 desc: playlist.description
               },
-              songs: playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]))
+              songs
             }
           };
         } catch (e) {

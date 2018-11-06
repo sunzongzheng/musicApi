@@ -317,10 +317,30 @@ export default function (instance) {
                     s: 8,
                     csrf_token: ""
                 })
+                let songs = []
                 const privilegesObjects = {}
-                privileges.forEach(item => {
-                    privilegesObjects[item.id] = item
-                })
+                if (playlist.tracks.length > 1000) {
+                    let arr = []
+                    const limit = 1000
+                    for (let i = 0; i < playlist.tracks.length; i++) {
+                        arr.push(playlist.tracks[i].id)
+                        // 达到限制 或 已是数组最后一个
+                        if (arr.length === limit || i + 1 === playlist.tracks.length) {
+                            // 获取详情
+                            const data = await this.getBatchSongDetail(arr)
+                            if (data.status) {
+                                songs = songs.concat(data.data)
+                            }
+                            // 重置待处理的数组
+                            arr = []
+                        }
+                    }
+                } else {
+                    privileges.forEach(item => {
+                        privilegesObjects[item.id] = item
+                    })
+                    songs = playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]))
+                }
                 return {
                     status: true,
                     data: {
@@ -330,7 +350,7 @@ export default function (instance) {
                             cover: playlist.coverImgUrl,
                             desc: playlist.description
                         },
-                        songs: playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]))
+                        songs
                     }
                 }
             } catch (e) {
