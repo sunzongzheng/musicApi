@@ -14,7 +14,7 @@
     "build:web": "webpack"
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=8.x"
   },
   "author": "i@zzsun.cc",
   "license": "ISC",
