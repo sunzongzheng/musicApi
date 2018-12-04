@@ -22,8 +22,10 @@ export default function (instance) {
             quality: {
                 // 192: Boolean(file.size_aac || file.size_192aac || file.size_ogg || file.size_192ogg),
                 192: false,
-                320: Boolean(file.size_320 || file.size_320mp3),
-                999: Boolean(info.file.size_flac),
+                // 320: Boolean(file.size_320 || file.size_320mp3),
+                320: false,
+                // 999: Boolean(info.file.size_flac),
+                999: false,
             },
             mv: info.mv.vid
         }
@@ -48,8 +50,10 @@ export default function (instance) {
             quality: {
                 // 192: Boolean(info.sizeogg),
                 192: false,
-                320: Boolean(info.size320),
-                999: Boolean(info.sizeflac),
+                // 320: Boolean(info.size320),
+                320: false,
+                // 999: Boolean(info.sizeflac),
+                999: false,
             },
             mv: info.vid
         }
