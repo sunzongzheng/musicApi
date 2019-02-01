@@ -26,6 +26,35 @@ const top_list_all = {
 }
 
 export default function (instance) {
+    // getRestrictLevel方法 来源于网易云音乐web端代码
+    const getRestrictLevel = function (bm5r, fC7v) {
+        if (!bm5r)
+            return 0;
+        if (bm5r.program)
+            return 0;
+        if (fC7v) {
+            if (fC7v.st != null && fC7v.st < 0) {
+                return 100
+            }
+            if (fC7v.fee > 0 && fC7v.fee != 8 && fC7v.payed == 0 && fC7v.pl <= 0)
+                return 10;
+            if (fC7v.fee == 16 || fC7v.fee == 4 && fC7v.flag & 2048)
+                return 11;
+            if ((fC7v.fee == 0 || fC7v.payed) && fC7v.pl > 0 && fC7v.dl == 0)
+                return 1e3;
+            if (fC7v.pl == 0 && fC7v.dl == 0)
+                return 100;
+            return 0
+        } else {
+            var eA7t = bm5r.status != null ? bm5r.status : bm5r.st != null ? bm5r.st : 0;
+            if (bm5r.status >= 0)
+                return 0;
+            if (bm5r.fee > 0)
+                return 10;
+            return 100
+        }
+    }
+    const disable = (song, privilege) => getRestrictLevel(song, privilege) === 100
     const getMusicInfo = (info, privilege) => {
         if (!privilege) {
             privilege = info.privilege
@@ -43,15 +72,16 @@ export default function (instance) {
                 }
             }),
             name: info.name,
-            id: info.id,
-            cp: !privilege.cp,
+            songId: info.id,
+            cp: disable(info, privilege),
             dl: !privilege.fee,
             quality: {
                 192: privilege.maxbr >= 192000,
                 320: privilege.maxbr >= 320000,
                 999: privilege.maxbr >= 999000,
             },
-            mv: info.mv
+            mv: info.mv || null,
+            vendor: 'netease'
         }
     }
     const getMusicInfo2 = (info, privilege) => {
@@ -71,15 +101,16 @@ export default function (instance) {
                 }
             }),
             name: info.name,
-            id: info.id,
-            cp: !privilege.cp,
+            songId: info.id,
+            cp: disable(info, privilege),
             dl: !privilege.fee,
             quality: {
                 192: privilege.maxbr >= 192000,
                 320: privilege.maxbr >= 320000,
                 999: privilege.maxbr >= 999000,
             },
-            mv: info.mvid
+            mv: info.mvid || null,
+            vendor: 'netease'
         }
     }
     return {

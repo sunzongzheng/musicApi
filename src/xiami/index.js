@@ -21,7 +21,7 @@ export default function (instance) {
                 name: info.artistName
             }],
             name: info.songName,
-            id: info.songId,
+            songId: info.songId,
             cp: !info.listenFiles.length,
             dl: !info.needPayFlag,
             quality: {
@@ -29,7 +29,8 @@ export default function (instance) {
                 320: brObject.h,
                 999: brObject.s,
             },
-            mv: info.mvId
+            mv: info.mvId || null,
+            vendor: 'xiami'
         }
     }
     const getMusicInfo2 = info => {
@@ -49,7 +50,7 @@ export default function (instance) {
                 name: info.artist_name
             }],
             name: info.song_name,
-            id: info.song_id,
+            songId: info.song_id,
             cp: !info.listen_file,
             dl: !info.need_pay_flag,
             quality: {
@@ -57,7 +58,8 @@ export default function (instance) {
                 320: brObject.h,
                 999: brObject.s,
             },
-            mv: false
+            mv: null,
+            vendor: 'xiami'
         }
     }
     return {

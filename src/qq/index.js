@@ -16,7 +16,7 @@ export default function (instance) {
                 }
             }),
             name: info.title,
-            id: info.id,
+            songId: info.id,
             cp: info.action.msg === 3 || !info.interval,
             dl: !info.pay.pay_down,
             quality: {
@@ -24,7 +24,8 @@ export default function (instance) {
                 320: Boolean(file.size_320 || file.size_320mp3),
                 999: Boolean(info.file.size_flac),
             },
-            mv: info.mv.vid
+            mv: info.mv.vid || null,
+            vendor: 'qq'
         }
     }
     const getMusicInfo2 = (info) => {
@@ -41,7 +42,7 @@ export default function (instance) {
                 }
             }),
             name: info.songname,
-            id: info.songid,
+            songId: info.songid,
             cp: info.msgid === 3 || !info.interval,
             dl: !info.pay.paydownload,
             quality: {
@@ -49,7 +50,8 @@ export default function (instance) {
                 320: Boolean(info.size320),
                 999: Boolean(info.sizeflac),
             },
-            mv: info.vid
+            mv: info.vid || null,
+            vendor: 'qq'
         }
     }
     return {

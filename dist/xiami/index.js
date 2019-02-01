@@ -33,7 +33,7 @@ function _default(instance) {
         name: info.artistName
       }],
       name: info.songName,
-      id: info.songId,
+      songId: info.songId,
       cp: !info.listenFiles.length,
       dl: !info.needPayFlag,
       quality: {
@@ -41,7 +41,8 @@ function _default(instance) {
         320: brObject.h,
         999: brObject.s
       },
-      mv: info.mvId
+      mv: info.mvId || null,
+      vendor: 'xiami'
     };
   };
 
@@ -62,7 +63,7 @@ function _default(instance) {
         name: info.artist_name
       }],
       name: info.song_name,
-      id: info.song_id,
+      songId: info.song_id,
       cp: !info.listen_file,
       dl: !info.need_pay_flag,
       quality: {
@@ -70,7 +71,8 @@ function _default(instance) {
         320: brObject.h,
         999: brObject.s
       },
-      mv: false
+      mv: null,
+      vendor: 'xiami'
     };
   };
 
