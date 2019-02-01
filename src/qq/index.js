@@ -20,12 +20,9 @@ export default function (instance) {
             cp: info.action.msg === 3 || !info.interval,
             dl: !info.pay.pay_down,
             quality: {
-                // 192: Boolean(file.size_aac || file.size_192aac || file.size_ogg || file.size_192ogg),
-                192: false,
-                // 320: Boolean(file.size_320 || file.size_320mp3),
-                320: false,
-                // 999: Boolean(info.file.size_flac),
-                999: false,
+                192: Boolean(file.size_aac || file.size_192aac || file.size_ogg || file.size_192ogg),
+                320: Boolean(file.size_320 || file.size_320mp3),
+                999: Boolean(info.file.size_flac),
             },
             mv: info.mv.vid
         }
@@ -48,12 +45,9 @@ export default function (instance) {
             cp: info.msgid === 3 || !info.interval,
             dl: !info.pay.paydownload,
             quality: {
-                // 192: Boolean(info.sizeogg),
-                192: false,
-                // 320: Boolean(info.size320),
-                320: false,
-                // 999: Boolean(info.sizeflac),
-                999: false,
+                192: Boolean(info.sizeogg),
+                320: Boolean(info.size320),
+                999: Boolean(info.sizeflac),
             },
             mv: info.vid
         }
@@ -141,7 +135,7 @@ export default function (instance) {
                         data = {
                             status: true,
                             data: {
-                                url: `http://dl.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                                url: `http://streamoc.music.tc.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                             }
                         }
                         break
@@ -149,7 +143,7 @@ export default function (instance) {
                         data = {
                             status: true,
                             data: {
-                                url: `http://dl.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                                url: `http://streamoc.music.tc.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                             }
                         }
                         break
@@ -157,7 +151,7 @@ export default function (instance) {
                         data = {
                             status: true,
                             data: {
-                                url: `http://dl.stream.qqmusic.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+                                url: `http://streamoc.music.tc.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
                             }
                         }
                         break

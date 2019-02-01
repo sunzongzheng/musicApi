@@ -59,9 +59,9 @@ function _default(instance) {
       cp: !privilege.cp,
       dl: !privilege.fee,
       quality: {
-        192: privilege.fl >= 192000,
-        320: privilege.fl >= 320000,
-        999: privilege.fl >= 999000
+        192: privilege.maxbr >= 192000,
+        320: privilege.maxbr >= 320000,
+        999: privilege.maxbr >= 999000
       },
       mv: info.mv
     };
@@ -89,9 +89,9 @@ function _default(instance) {
       cp: !privilege.cp,
       dl: !privilege.fee,
       quality: {
-        192: privilege.fl >= 192000,
-        320: privilege.fl >= 320000,
-        999: privilege.fl >= 999000
+        192: privilege.maxbr >= 192000,
+        320: privilege.maxbr >= 320000,
+        999: privilege.maxbr >= 999000
       },
       mv: info.mvid
     };

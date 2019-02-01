@@ -8,7 +8,7 @@ export default function (instance) {
         const purviewRoleVOs = info.purviewRoleVOs
         const brObject = {}
         purviewRoleVOs.forEach(item => {
-            brObject[item.quality] = !item.operationVOs[0].needVip
+            brObject[item.quality] = item.isExist
         })
         return {
             album: {
