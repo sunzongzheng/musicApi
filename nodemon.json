@@ -1,0 +1,14 @@
+{
+    "verbose": true,
+    "watch": [
+        "src/",
+        "controllers"
+    ],
+    "ext": "ts",
+    "execMap": {
+        "ts": "node --inspect -r ts-node/register"
+    },
+    "env": {
+        "NODE_ENV": "development"
+    }
+}

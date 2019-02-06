@@ -7,3 +7,4 @@ controllers/
 yarn.lock
 .DS_Store
 .leancloud/
+.docs/.vuepress/dist/
