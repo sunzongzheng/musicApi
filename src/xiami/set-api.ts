@@ -96,7 +96,7 @@ export default function setMobileApi(Api: Fly) {
         }
         const retry_codes = res.request.webApi ?
             ['SG_TOKEN_EMPTY', 'SG_TOKEN_EXPIRED', 'SG_EMPTY'] :
-            ['FAIL_SYS_TOKEN_EMPTY', 'FAIL_SYS_TOKEN_EXPIRED', 'FAIL_SYS_EMPTY']
+            ['FAIL_SYS_TOKEN_EMPTY', 'FAIL_SYS_TOKEN_EXOIRED', 'FAIL_SYS_EMPTY']
         if (code === 'SUCCESS') {
             return res.request.webApi ? res.data.result.data : res.data.data.data
         } else if (retry_codes.includes(code)) { // token有问题 重试
