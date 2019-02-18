@@ -14,3 +14,4 @@ deploy:
   github_token: $GITHUB_TOKEN
   local_dir: docs/.vuepress/dist
   target_branch: gh-pages
+  branch: travis-ci-test
