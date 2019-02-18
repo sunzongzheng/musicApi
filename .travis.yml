@@ -6,4 +6,11 @@ cache:
   - node_modules
 
 script:
-  - ./deploy-docs.sh
+  - npm run docs:build
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: docs/.vuepress/dist
+  target_branch: gh-pages
