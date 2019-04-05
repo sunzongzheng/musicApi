@@ -1,9 +1,17 @@
 language: node_js
-node_js: "8"
+node_js: "lts/*"
 
 cache:
   directories:
   - node_modules
 
 script:
-  - ./build/deploy-docs.sh
+  - npm run docs:build
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: docs/.vuepress/dist
+  on:
+    branch: v2
