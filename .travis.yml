@@ -6,4 +6,4 @@ cache:
   - node_modules
 
 script:
-  - ./deploy-docs.sh
+  - ./build/deploy-docs.sh

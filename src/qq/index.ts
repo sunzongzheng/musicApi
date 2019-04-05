@@ -58,12 +58,37 @@ export default class QQ extends MusicApi {
         }
     }
 
-    async getSongDetail(ids: Array<number>) {
+    async getSongDetail(ids: Array<number>, raw = false) {
         this.checkId(ids)
-        const {data} = await this.Api.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
+        const { data } = await this.Api.get('/v8/fcg-bin/fcg_play_single_song.fcg', {
             songid: ids.join(','),
             tpl: 'yqq_song_detail',
         })
-        return data.map((item: any) => this.getMusicInfo(item))
+        return raw ? data : data.map((item: any) => this.getMusicInfo(item))
+    }
+
+    async getMid(id: number) {
+        const detailInfo = await this.getSongDetail([id], true)
+        return detailInfo[0].mid
+    }
+
+    async getSongUrl(id: number, br = 128) {
+        this.checkBr(br)
+        const guid = Math.floor(Math.random() * 1000000000)
+        const {key} = await this.Api.get('/base/fcgi-bin/fcg_musicexpress.fcg', {
+            json: 3,
+            guid: guid
+        })
+        const mid = await this.getMid(id)
+        switch (br) {
+            case 128:
+                return `http://183.131.60.16/amobile.music.tc.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+            case 320:
+                return `http://183.131.60.16/amobile.music.tc.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+            case 999:
+                return `http://183.131.60.16/amobile.music.tc.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+            default:
+                return ''
+        }
     }
 }

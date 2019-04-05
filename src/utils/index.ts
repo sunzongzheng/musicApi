@@ -48,16 +48,16 @@ class Cache {
             'xiami-h5-api-cookie': {
                 expire: +new Date() + 24 * 60 * 60 * 1000,
                 value: {
-                    '_m_h5_tk': '6d3d4c0d39274396c04452e9754f12c6_1549451368745',
-                    '_m_h5_tk_enc': '3465cb727169d25773c7a69b99237b80'
+                    '_m_h5_tk': 'fb34a4a1845e757a403abe206e7b758a_1554460923259',
+                    '_m_h5_tk_enc': '7084aa9951f8983f46b3091386a3c028'
                 }
             },
             'xiami-web-api-cookie': {
                 expire: +new Date() + 24 * 60 * 60 * 1000,
                 value: {
-                    xmgid: '5fb7bde1-453c-415b-99da-a08f1fe221c9',
-                    xm_sg_tk: '39c9cfc6ffb6486e6a981d31b80bdbd0_1549442802672',
-                    'xm_sg_tk.sig': 'KkKkX0o9O-oRcSN5O5_-cu5wgiFykPju-JXIEav128w',
+                    xmgid: '14bfb7ac-471a-437b-92ab-f310e893cebb',
+                    xm_sg_tk: 'ad9f4f88c838a875e9bb93f77e5613aa_1554450479743',
+                    'xm_sg_tk.sig': '8UNEygleCdlrJK0JSfdOoLnpBvUEDrk5QnvcrDPCKfc',
                 }
             }
         }

@@ -78,4 +78,16 @@ export default class Netease extends MusicApi {
         })
         return data.songs.map((info: any) => this.getMusicInfo(info, privilegeObject[info.id]))
     }
+
+    async getSongUrl(id: number, br = 128) {
+        this.checkBr(br)
+        br = br * 1000
+        const params = {
+            ids: [id],
+            br,
+            csrf_token: ''
+        }
+        const {data} = await this.Api.post('/weapi/song/enhance/player/url', params)
+        return data[0].url
+    }
 }

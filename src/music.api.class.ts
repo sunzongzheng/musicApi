@@ -3,16 +3,16 @@
 import EngineWrapper from "flyio/dist/npm/engine-wrapper"
 import { Err } from './utils'
 
-enum maxbr {
+export enum br {
     normal = 128,
     high = 320,
     max = 999
 }
 
-enum vendor {
-    netease,
-    qq,
-    xiami
+export enum vendor {
+    netease = 'netease',
+    qq = 'qq',
+    xiami = 'xiami'
 }
 
 export enum searchType {
@@ -36,7 +36,7 @@ interface songInfo {
         name: string
     }>,
     cp: boolean // 是否有版权限制
-    maxbr: maxbr // 最大音质
+    maxbr: br // 最大音质
     mv: number | string | null
     vendor: vendor
 }
@@ -54,15 +54,26 @@ export default abstract class MusicApi {
         }
     }
 
+    protected checkBr(br: number) {
+        if(![128, 320, 999].includes(br)) {
+            throw new Err({
+                msg: 'br错误',
+                log: br
+            })
+        }
+    }
+
     abstract search({ keyword, limit, page, type }: {
         keyword: string, // 搜索关键词
-        limit: number, // 页大小
-        page: number, // 页数 > 0
-        type: searchType
+        limit?: number, // 页大小
+        page?: number, // 页数 > 0
+        type?: searchType
     }): Promise<{
         total: number,
         songs: Array<songInfo>
     }>
 
-    abstract getSongDetail(ids: Array<number>): Promise<songInfo>
+    abstract getSongDetail(ids: Array<number>): Promise<Array<songInfo>>
+
+    abstract getSongUrl(id: number, br?: br): Promise<string>
 }

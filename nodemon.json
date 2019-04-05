@@ -6,7 +6,7 @@
     ],
     "ext": "ts",
     "execMap": {
-        "ts": "node --inspect -r ts-node/register"
+        "ts": "node -r ts-node/register"
     },
     "env": {
         "NODE_ENV": "development"

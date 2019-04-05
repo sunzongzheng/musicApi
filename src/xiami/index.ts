@@ -56,11 +56,30 @@ export default class Xiami extends MusicApi {
             songs: songs.map((item: any) => this.getMusicInfo(item))
         }
     }
-    async getSongDetail(ids: Array<number>) {
+    async getSongDetail(ids: Array<number>, raw = false) {
         this.checkId(ids)
         const data: any = await this.Api.get('mtop.alimusic.music.songservice.getsongs', {
             songIds: ids
         })
-        return data.songs.map((song: any) => this.getMusicInfo(song))
+        return raw ? data : data.songs.map((song: any) => this.getMusicInfo(song))
+    }
+
+    async getSongUrl(id: number, br = 128) {
+        this.checkBr(br)
+        const data = await this.getSongDetail([id], true)
+        const brObject: { [key: string]: any } = {}
+        data.songs[0].listenFiles.forEach((item: any) => {
+            brObject[item.quality] = item.listenFile
+        })
+        switch (br) {
+            case 128:
+                return brObject.l
+            case 320:
+                return brObject.h
+            case 999:
+                return brObject.s
+            default:
+                return ''
+        }
     }
 }

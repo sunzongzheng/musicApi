@@ -30,7 +30,7 @@ declare module 'flyio/dist/npm/fly' {
     export default class {
         constructor(engine: any)
         post: Fly['post']
-        get<T = any>(url: string, data?:any, config?: config): FlyPromise<T>;
+        get<T = any>(url: string, data?:any, config?: config): Promise<any>;
         config: config
         interceptors: interceptors
         lock: Fly['lock']

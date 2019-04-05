@@ -1,8 +1,10 @@
-import Netease from './netease'
+import factory from './custom-adapter'
 import adapter from 'flyio/src/adapter/dsbridge'
 
-const netease = new Netease(adapter)
+const musicApi = factory(adapter)
 
-export {
-    netease
-}
+export const netease = musicApi.netease
+export const qq = musicApi.qq
+export const xiami = musicApi.xiami
+
+export default musicApi

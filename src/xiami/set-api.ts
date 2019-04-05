@@ -10,7 +10,7 @@ const keys = {
 }
 
 export default function setMobileApi(Api: Fly) {
-    Api.config.proxy = 'http://localhost:8888'
+    // Api.config.proxy = 'http://localhost:8888'
     Api.config.timeout = 5000
     Api.config.headers = {
         'User-Agent': randomUserAgent(),
@@ -84,6 +84,7 @@ export default function setMobileApi(Api: Fly) {
                 cacheCookie[item[0]] = item[1]
             })
             cache.set(res.request.webApi ? keys.web : keys.h5, cacheCookie)
+            console.log(cacheCookie)
         }
         let code, msg
         if (res.request.webApi) {
@@ -96,7 +97,7 @@ export default function setMobileApi(Api: Fly) {
         }
         const retry_codes = res.request.webApi ?
             ['SG_TOKEN_EMPTY', 'SG_TOKEN_EXPIRED', 'SG_EMPTY'] :
-            ['FAIL_SYS_TOKEN_EMPTY', 'FAIL_SYS_TOKEN_EXPIRED', 'FAIL_SYS_EMPTY']
+            ['FAIL_SYS_TOKEN_EMPTY', 'FAIL_SYS_TOKEN_EXOIRED', 'FAIL_SYS_EMPTY']
         if (code === 'SUCCESS') {
             return res.request.webApi ? res.data.result.data : res.data.data.data
         } else if (retry_codes.includes(code)) { // token有问题 重试
