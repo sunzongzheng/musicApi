@@ -21,7 +21,7 @@ export default function (instance) {
                 name: info.artistName
             }],
             name: info.songName,
-            songId: info.songId,
+            id: info.songId,
             cp: !info.listenFiles.length,
             dl: !info.needPayFlag,
             quality: {
@@ -50,7 +50,7 @@ export default function (instance) {
                 name: info.artist_name
             }],
             name: info.song_name,
-            songId: info.song_id,
+            id: info.song_id,
             cp: !info.listen_file,
             dl: !info.need_pay_flag,
             quality: {

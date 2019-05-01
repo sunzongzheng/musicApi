@@ -58,9 +58,22 @@ function _default(instance) {
       if (bm5r.fee > 0) return 10;
       return 100;
     }
-  };
+  }; // 来自网易云前端 l2x.qA8s
 
-  const disable = (song, privilege) => getRestrictLevel(song, privilege) === 100;
+
+  function qA8s(fB4F) {
+    if (fB4F.st != null && fB4F.st < 0) {
+      return 100;
+    }
+
+    if (fB4F.fee > 0 && fB4F.fee != 8 && fB4F.payed == 0 && fB4F.pl <= 0) return 10;
+    if (fB4F.fee == 16 || fB4F.fee == 4 && fB4F.flag & 2048) return 11;
+    if ((fB4F.fee == 0 || fB4F.payed) && fB4F.pl > 0 && fB4F.dl == 0) return 1e3;
+    if (fB4F.pl == 0 && fB4F.dl == 0) return 100;
+    return 0;
+  }
+
+  const disable = (song, privilege) => getRestrictLevel(song, privilege) === 100 || qA8s(privilege) === 10;
 
   const getMusicInfo = (info, privilege) => {
     if (!privilege) {
@@ -80,7 +93,7 @@ function _default(instance) {
         };
       }),
       name: info.name,
-      songId: info.id,
+      id: info.id,
       cp: disable(info, privilege),
       dl: !privilege.fee,
       quality: {
@@ -111,7 +124,7 @@ function _default(instance) {
         };
       }),
       name: info.name,
-      songId: info.id,
+      id: info.id,
       cp: disable(info, privilege),
       dl: !privilege.fee,
       quality: {
@@ -269,7 +282,11 @@ function _default(instance) {
     getLyric(id) {
       return _asyncToGenerator(function* () {
         try {
-          let data = yield instance.post('/weapi/song/lyric?os=osx&id=' + id + '&lv=-1&kv=-1&tv=-1', {});
+          let data = yield instance.post('/weapi/song/lyric?lv=-1&kv=-1&tv=-1', {
+            id
+          }, {
+            crypto: 'linuxapi'
+          });
 
           if (data.lrc && data.lrc.lyric) {
             const translateDecodeData = (0, _util.lyric_decode)(data.tlyric.lyric) || [];

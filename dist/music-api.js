@@ -205,10 +205,8 @@ function _default(instance) {
 
         const songsObject = {};
 
-        var _arr = Object.keys(songsList);
-
-        for (var _i = 0; _i < _arr.length; _i++) {
-          let vendor = _arr[_i];
+        for (var _i = 0, _Object$keys = Object.keys(songsList); _i < _Object$keys.length; _i++) {
+          let vendor = _Object$keys[_i];
           const list = songsList[vendor];
           if (!list.length) continue;
           const limit = {

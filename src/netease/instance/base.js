@@ -1,10 +1,11 @@
 import {randomUserAgent, completeCookie} from '../../util'
 import Encrypt from '../crypto'
+import querystring from 'querystring'
 
 export default function (createInstance) {
     const fly = createInstance()
     // fly.config.proxy = 'http://localhost:8888'
-    fly.config.baseURL = 'http://music.163.com'
+    fly.config.baseURL = 'https://music.163.com'
     fly.config.timeout = 5000
     fly.config.headers = {
         Accept: '*/*',
@@ -21,7 +22,6 @@ export default function (createInstance) {
 
     fly.interceptors.request.use(config => {
         if (config.pureFly) return config
-        const cryptoreq = Encrypt(config.body)
         // 浏览器且本地有cookie信息 接口就都带上cookie
         if(typeof(window) !== 'undefined') {
             const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie')
@@ -29,10 +29,23 @@ export default function (createInstance) {
                 config.headers.Cookie = loginCookies
             }
         }
-        config.body = {
-            params: cryptoreq.params,
-            encSecKey: cryptoreq.encSecKey
+        let data
+        if(config.crypto === 'linuxapi') {
+            data = Encrypt.linuxapi({
+                method: config.method,
+                url: config.baseURL + config.url.replace(/\w*api/, 'api'),
+                params: config.body
+            })
+            config.headers['User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'
+            config.url = '/api/linux/forward'
+        } else {
+            const cryptoreq = Encrypt.weapi(config.body)
+            data = {
+                params: cryptoreq.params,
+                encSecKey: cryptoreq.encSecKey
+            }
         }
+        config.body = querystring.stringify(data)
         return config
     }, e => Promise.reject(e))
     fly.interceptors.response.use(res => {

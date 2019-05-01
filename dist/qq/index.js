@@ -27,7 +27,7 @@ function _default(instance) {
         };
       }),
       name: info.title,
-      songId: info.id,
+      id: info.id,
       cp: info.action.msg === 3 || !info.interval,
       dl: !info.pay.pay_down,
       quality: {
@@ -54,7 +54,7 @@ function _default(instance) {
         };
       }),
       name: info.songname,
-      songId: info.songid,
+      id: info.songid,
       cp: info.msgid === 3 || !info.interval,
       dl: !info.pay.paydownload,
       quality: {

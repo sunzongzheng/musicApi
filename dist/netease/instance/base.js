@@ -9,12 +9,14 @@ var _util = require("../../util");
 
 var _crypto = _interopRequireDefault(require("../crypto"));
 
+var _querystring = _interopRequireDefault(require("querystring"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default(createInstance) {
   const fly = createInstance(); // fly.config.proxy = 'http://localhost:8888'
 
-  fly.config.baseURL = 'http://music.163.com';
+  fly.config.baseURL = 'https://music.163.com';
   fly.config.timeout = 5000;
   fly.config.headers = {
     Accept: '*/*',
@@ -29,8 +31,7 @@ function _default(createInstance) {
   };
   fly.config.rejectUnauthorized = false;
   fly.interceptors.request.use(config => {
-    if (config.pureFly) return config;
-    const cryptoreq = (0, _crypto.default)(config.body); // 浏览器且本地有cookie信息 接口就都带上cookie
+    if (config.pureFly) return config; // 浏览器且本地有cookie信息 接口就都带上cookie
 
     if (typeof window !== 'undefined') {
       const loginCookies = localStorage.getItem('@suen/music-api-netease-login-cookie');
@@ -40,10 +41,26 @@ function _default(createInstance) {
       }
     }
 
-    config.body = {
-      params: cryptoreq.params,
-      encSecKey: cryptoreq.encSecKey
-    };
+    let data;
+
+    if (config.crypto === 'linuxapi') {
+      data = _crypto.default.linuxapi({
+        method: config.method,
+        url: config.baseURL + config.url.replace(/\w*api/, 'api'),
+        params: config.body
+      });
+      config.headers['User-Agent'] = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36';
+      config.url = '/api/linux/forward';
+    } else {
+      const cryptoreq = _crypto.default.weapi(config.body);
+
+      data = {
+        params: cryptoreq.params,
+        encSecKey: cryptoreq.encSecKey
+      };
+    }
+
+    config.body = _querystring.default.stringify(data);
     return config;
   }, e => Promise.reject(e));
   fly.interceptors.response.use(res => {
