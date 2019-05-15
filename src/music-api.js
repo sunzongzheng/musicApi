@@ -29,11 +29,11 @@ export default function (instance) {
         }
     }
     const getData = async (api, params, errorResponse) => {
-        let netease_rs = await netease[api](params)
+        let netease_rs = await provider.netease[api](params)
         netease_rs = netease_rs.status ? netease_rs.data : errorResponse
-        let qq_rs = await qq[api](params)
+        let qq_rs = await provider.qq[api](params)
         qq_rs = qq_rs.status ? qq_rs.data : errorResponse
-        let xiami_rs = await xiami[api](params)
+        let xiami_rs = await provider.xiami[api](params)
         xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse
         return {
             status: true,

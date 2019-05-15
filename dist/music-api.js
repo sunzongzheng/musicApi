@@ -56,11 +56,11 @@ function _default(instance) {
   /*#__PURE__*/
   function () {
     var _ref = _asyncToGenerator(function* (api, params, errorResponse) {
-      let netease_rs = yield netease[api](params);
+      let netease_rs = yield provider.netease[api](params);
       netease_rs = netease_rs.status ? netease_rs.data : errorResponse;
-      let qq_rs = yield qq[api](params);
+      let qq_rs = yield provider.qq[api](params);
       qq_rs = qq_rs.status ? qq_rs.data : errorResponse;
-      let xiami_rs = yield xiami[api](params);
+      let xiami_rs = yield provider.xiami[api](params);
       xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse;
       return {
         status: true,
