@@ -1,5 +1,10 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
 const crypto = require('crypto');
 
 const bigInt = require('big-integer');
@@ -66,4 +71,5 @@ var Crypto = {
     };
   }
 };
-module.exports = Crypto;
+var _default = Crypto;
+exports.default = _default;

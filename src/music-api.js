@@ -6,9 +6,11 @@ import qqBase from './qq/instance/base'
 import xiamiBase from './xiami/instance/base'
 
 export default function (instance) {
-    const netease = Netease(neteaseBase(instance))
-    const qq = QQ(qqBase(instance))
-    const xiami = Xiami(xiamiBase(instance))
+    const provider = {
+        netease: Netease(neteaseBase(instance)),
+        qq: QQ(qqBase(instance)),
+        xiami: Xiami(xiamiBase(instance))
+    }
 
     const vendors = ['netease', 'qq', 'xiami']
     const paramsVerify = (vendor, id) => {
@@ -43,9 +45,7 @@ export default function (instance) {
         }
     }
     return {
-        netease,
-        qq,
-        xiami,
+        ...provider,
         // 搜索歌曲
         searchSong(keyword, offset = 0) {
             // 关键字不能为空
@@ -66,22 +66,22 @@ export default function (instance) {
         // 获取歌曲详情
         async getSongDetail(vendor, id) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getSongDetail'](id)
+            return await provider[vendor]['getSongDetail'](id)
         },
         // 批量获取歌曲详情
         async getBatchSongDetail(vendor, ids) {
             await paramsVerify(vendor, ids)
-            return await this[vendor]['getBatchSongDetail'](ids)
+            return await provider[vendor]['getBatchSongDetail'](ids)
         },
         // 获取歌曲url
         async getSongUrl(vendor, id, br = 128000) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getSongUrl'](id, br)
+            return await provider[vendor]['getSongUrl'](id, br)
         },
         // 获取歌词
         async getLyric(vendor, id) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getLyric'](id)
+            return await provider[vendor]['getLyric'](id)
         },
         // 获取排行榜
         getTopList(id) {
@@ -92,27 +92,27 @@ export default function (instance) {
                     msg: 'id不能为空'
                 }
             }
-            return netease.getTopList(id)
+            return provider.netease.getTopList(id)
         },
         // 获取歌曲评论
         async getComment(vendor, id, page = 1, limit = 20) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getComment'](id, page, limit)
+            return await provider[vendor]['getComment'](id, page, limit)
         },
         // 获取歌手单曲
         async getArtistSongs(vendor, id, offset = 0, limit = 50) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getArtistSongs'](id, offset, limit)
+            return await provider[vendor]['getArtistSongs'](id, offset, limit)
         },
         // 获取歌单歌曲
         async getPlaylistDetail(vendor, id, offset = 0, limit = 65535) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getPlaylistDetail'](id, offset, limit)
+            return await provider[vendor]['getPlaylistDetail'](id, offset, limit)
         },
         // 获取专辑详情
         async getAlbumDetail(vendor, id) {
             await paramsVerify(vendor, id)
-            return await this[vendor]['getAlbumDetail'](id)
+            return await provider[vendor]['getAlbumDetail'](id)
         },
         // 批量获取任意vendor歌曲详情
         async getAnyVendorSongDetail(arr, timeout = 0) {

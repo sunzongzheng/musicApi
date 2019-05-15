@@ -181,7 +181,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://streamoc.music.tc.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `http://isure.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -190,7 +190,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://streamoc.music.tc.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `http://isure.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -199,7 +199,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://streamoc.music.tc.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+                  url: `http://isure.stream.qqmusic.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
                 }
               };
               break;
