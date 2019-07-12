@@ -1,11 +1,11 @@
 {
   "name": "@suen/music-api",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "music api colletion",
   "main": "dist/app.js",
   "scripts": {
     "start": "node dist/lean-server.js",
-    "dev": "nodemon --inspect controllers/app.js --exec babel-node",
+    "dev": "nodemon --inspect-brk controllers/app.js --exec babel-node",
     "test": "mocha -t 30000 --require @babel/register 'test/*.test.js' --exit",
     "test:qq": "mocha -t 30000 --require @babel/register 'test/qq.test.js' --exit",
     "dev-server": "nodemon --inspect src/server.js --exec babel-node",

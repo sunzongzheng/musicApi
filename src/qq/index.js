@@ -124,14 +124,31 @@ export default function (instance) {
         },
         async getSongUrl(songid, br = 128000) {
             br = parseInt(br)
-            const guid = Math.floor(Math.random() * 1000000000)
+            const mid = await this.getMid(songid)
+            const guid = `${Math.floor(Math.random() * 1000000000)}`
+            const uin = '0'
             let data
             try {
-                const {key} = await instance.get('/base/fcgi-bin/fcg_musicexpress.fcg', {
-                    json: 3,
-                    guid: guid
+                const {req: {data: {midurlinfo}}} = await instance.get('/cgi-bin/musicu.fcg', {
+                    data: JSON.stringify({
+                        "req": {
+                            "module": "vkey.GetVkeyServer",
+                            "method": "CgiGetVkey",
+                            "param": {
+                                guid,
+                                "songmid": [mid],
+                                "songtype": [0],
+                                uin,
+                                "loginflag": 1,
+                                "platform": "20"
+                            }
+                        },
+                        "comm": {uin, "format": "json", "ct": 24, "cv": 0}
+                    })
+                }, {
+                    newApi: true
                 })
-                const mid = await this.getMid(songid)
+                const key = midurlinfo[0].vkey
                 switch (br) {
                     case 128000:
                         data = {
