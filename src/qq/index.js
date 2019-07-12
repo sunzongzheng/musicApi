@@ -129,7 +129,7 @@ export default function (instance) {
             const uin = '0'
             let data
             try {
-                const {req: {data: {midurlinfo}}} = await instance.get('/cgi-bin/musicu.fcg', {
+                const {req: {data: {midurlinfo, testfile2g}}} = await instance.get('/cgi-bin/musicu.fcg', {
                     data: JSON.stringify({
                         "req": {
                             "module": "vkey.GetVkeyServer",
@@ -148,7 +148,7 @@ export default function (instance) {
                 }, {
                     newApi: true
                 })
-                const key = midurlinfo[0].vkey
+                const key = midurlinfo[0].vkey || (testfile2g.match(/vkey=(\w+)/) || [])[1]
                 switch (br) {
                     case 128000:
                         data = {

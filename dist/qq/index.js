@@ -194,9 +194,11 @@ function _default(instance) {
           }, {
             newApi: true
           }),
-                midurlinfo = _ref.req.data.midurlinfo;
+                _ref$req$data = _ref.req.data,
+                midurlinfo = _ref$req$data.midurlinfo,
+                testfile2g = _ref$req$data.testfile2g;
 
-          const key = midurlinfo[0].vkey;
+          const key = midurlinfo[0].vkey || (testfile2g.match(/vkey=(\w+)/) || [])[1];
 
           switch (br) {
             case 128000:
