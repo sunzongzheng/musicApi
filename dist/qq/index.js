@@ -199,13 +199,14 @@ function _default(instance) {
                 testfile2g = _ref$req$data.testfile2g;
 
           const key = midurlinfo[0].vkey || (testfile2g.match(/vkey=(\w+)/) || [])[1];
+          const host = 'http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com';
 
           switch (br) {
             case 128000:
               data = {
                 status: true,
                 data: {
-                  url: `http://isure.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `${host}/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -214,7 +215,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://isure.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                  url: `${host}/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
                 }
               };
               break;
@@ -223,7 +224,7 @@ function _default(instance) {
               data = {
                 status: true,
                 data: {
-                  url: `http://isure.stream.qqmusic.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+                  url: `${host}/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
                 }
               };
               break;
