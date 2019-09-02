@@ -50,10 +50,10 @@ export default function (instance) {
         searchSong(keyword, offset = 0) {
             // 关键字不能为空
             if (!keyword) {
-                return {
+                return Promise.reject({
                     status: false,
                     msg: '查询参数不能为空'
-                }
+                })
             }
             return getData('searchSong', {
                 keyword,
