@@ -1,48 +1,93 @@
 # music-api
 - 对网易云、虾米音乐、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
-- Node >= 6
-- 支持安卓/ios/electron
+- Node >= 8
+- 支持android、ios、react native、electron
 
 # 注意事项
 - 项目仍在开发阶段，即使是小版本之间也会出现不兼容，如用在`生产环境`，请写死版本号使用
 
-# Usage
+# 安装
+````js
+npm install @suen/music-api
+````
+
+# 引入
 - node
     ````js
-    npm install @suen/music-api
-    
     import musicApi from '@suen/music-api'
     ````
-- native
+- android、ios
   - 引入[js](https://github.com/sunzongzheng/musicApi/blob/master/dist/app.native.js)
-  - 通过Fly调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
-  - 已在window下注册，可直接通过window.musicApi调用
-  
+  - 通过Fly注册并调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
+  - 已在window下注册，webview内可直接使用window.musicApi
+- react native
+    ````js
+    import musicApi from '@suen/music-api/dist/app.react-native'
+    ````
+- electron-render
+    ````js
+    // 主进程 引入nodeAdapter，避免被打包进渲染进程 如无这个需求 可直接在渲染进程中进入
+    import nodeAdapter from 'flyio/src/adapter/node'
+    global.nodeAdapter = nodeAdapter
+    
+    // 渲染进程
+    import musicApiContructor from '@suen/music-api/dist/app.electron'
+    const musicApi = musicApiContructor(require('electron').remote.getGlobal('nodeAdapter'))
+    ````
+- api server
+    ````js
+    // express
+    import app from '@suen/music-api/src/express-app'
+    
+    // lean cloud
+    import app from '@suen/music-api/src/lean-cloud-server'
+    
+    app.listen(8080) // 监听端口
+    ````
+    
+# 使用
+- 函数调用
+  ````js
+  musicApi.searchSong('周杰伦')
+    .then(data => {
+        console.log(data)
+    })
+  musicApi.qq.searchSong({
+    keyword: '周杰伦'
+  })
+    .then(data => {
+        console.log(data)
+    })
+  ````
+- api server调用
+  - method: `GET`
+  - query: `JSON.stringfy([param1, param2])`
+
 # Api
 - ## Common
     - 歌曲搜索
         ````js
         function searchSong( keyword:关键字, offset:偏移页数 ) {
-        return {
-            status:Boolean, // 请求是否成功
-            data:{
-                netease: Object,
-                qq: Object,
-                xiami: Object
+            return {
+                status:Boolean, // 请求是否成功
+                data:{
+                    netease: Object,
+                    qq: Object,
+                    xiami: Object
+                }
             }
-        }
         }
         ````
     - 歌曲url
         ````js
         function getSongUrl( vendor:歌曲来源, id:歌曲id ) {
-        return {
-            status: Boolean, // 请求是否成功
-            data: {
-                url:'歌曲地址'
+            return {
+                status: Boolean, // 请求是否成功
+                data: {
+                    url:'歌曲地址'
+                }
             }
-        }
         }
         ````
     - 歌曲歌词
@@ -153,7 +198,7 @@
         - 默认第一页，65535条数据
         
         ````js
-        function getAlbumSongs( vendor:歌曲来源, id:歌手id, offset:偏移页数, limit:页大小 ) {
+        function getPlaylistDetail( vendor:歌曲来源, id:歌手id, offset:偏移页数, limit:页大小 ) {
             return {
                 status: Boolean, // 请求是否成功
                 data: {
