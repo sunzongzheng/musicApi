@@ -1,10 +1,11 @@
-const isBrowser = typeof(window) !== 'undefined'
+import {isBrowser} from '../util/index.js'
+
 const Cache = {
     cache: null,
     isBrowser,
     init() {
         if (this.isBrowser) {
-            let cache = localStorage.getItem('music-api-xiami-cookie-cache')
+            let cache = window.localStorage.getItem('music-api-xiami-cookie-cache')
             if (cache) {
                 cache = JSON.parse(cache)
                 if (cache.expire > +new Date()) {
@@ -31,7 +32,7 @@ const Cache = {
         }
         // 浏览器环境 存localstorage
         if (this.isBrowser) {
-            localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache))
+            window.localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache))
         }
     }
 }

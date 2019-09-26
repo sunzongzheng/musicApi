@@ -38,8 +38,8 @@ function _default(createInstance) {
     let loginUin = 0;
     let g_tk = 5381;
 
-    if (typeof window !== 'undefined') {
-      const loginCookies = localStorage.getItem('@suen/music-api-qq-login-cookie');
+    if (_util.isBrowser) {
+      const loginCookies = window.localStorage.getItem('@suen/music-api-qq-login-cookie');
 
       if (loginCookies) {
         try {

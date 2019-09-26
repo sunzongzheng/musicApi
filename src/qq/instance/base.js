@@ -1,4 +1,4 @@
-import {randomUserAgent} from '../../util'
+import {randomUserAgent, isBrowser} from '../../util'
 
 const getACSRFToken = function (cookie) {
     function e(e) {
@@ -29,8 +29,8 @@ export default function (createInstance) {
         // 浏览器且本地有cookie信息 接口就都带上cookie
         let loginUin = 0
         let g_tk = 5381
-        if (typeof(window) !== 'undefined') {
-            const loginCookies = localStorage.getItem('@suen/music-api-qq-login-cookie')
+        if (isBrowser) {
+            const loginCookies = window.localStorage.getItem('@suen/music-api-qq-login-cookie')
             if (loginCookies) {
                 try {
                     config.headers.Cookie = loginCookies

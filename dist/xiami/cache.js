@@ -4,14 +4,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-const isBrowser = typeof window !== 'undefined';
+
+var _index = require("../util/index.js");
+
 const Cache = {
   cache: null,
-  isBrowser,
+  isBrowser: _index.isBrowser,
 
   init() {
     if (this.isBrowser) {
-      let cache = localStorage.getItem('music-api-xiami-cookie-cache');
+      let cache = window.localStorage.getItem('music-api-xiami-cookie-cache');
 
       if (cache) {
         cache = JSON.parse(cache);
@@ -50,7 +52,7 @@ const Cache = {
     };
 
     if (this.isBrowser) {
-      localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache));
+      window.localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache));
     }
   }
 
