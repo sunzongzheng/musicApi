@@ -11,8 +11,9 @@ const aesEncrypt = (buffer, mode, key, iv) => {
 }
 
 const rsaEncrypt = (buffer, key) => {
+    const RSA_NO_PADDING = crypto.constants ? crypto.constants.RSA_NO_PADDING : 3
     buffer = Buffer.concat([Buffer.alloc(128 - buffer.length), Buffer.from(buffer)])
-    return crypto.publicEncrypt({key: key, padding: crypto.constants.RSA_NO_PADDING}, buffer)
+    return crypto.publicEncrypt({key: key, padding: RSA_NO_PADDING}, buffer)
 }
 
 const weapi = (object) => {

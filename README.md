@@ -22,7 +22,10 @@ npm install @suen/music-api
   - 通过Fly注册并调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
   - 已在window下注册，webview内可直接使用window.musicApi
 - react native
+  - 请先按照[https://github.com/tradle/react-native-crypto#install](https://github.com/tradle/react-native-crypto#install)第一步安装依赖
+  - 然后通过以下代码引入
     ````js
+    import './shim.js' // shim.js会生成在根目录下
     import musicApi from '@suen/music-api/dist/app.react-native'
     ````
 - electron-render
@@ -41,6 +44,9 @@ npm install @suen/music-api
     import app from '@suen/music-api/src/express-app'
     
     // lean cloud
+    process.env.LEANCLOUD_APP_ID = 'your LEANCLOUD_APP_ID'
+    process.env.LEANCLOUD_APP_KEY = 'your LEANCLOUD_APP_KEY'
+    process.env.LEANCLOUD_APP_MASTER_KEY = 'your LEANCLOUD_APP_MASTER_KEY'
     import app from '@suen/music-api/src/lean-cloud-server'
     
     app.listen(8080) // 监听端口

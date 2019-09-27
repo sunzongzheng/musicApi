@@ -54,7 +54,10 @@ module.exports = [
         output: {
             path: path.resolve(__dirname, 'dist'),
             libraryTarget: "umd",
-        }
+        },
+        externals: [
+            'crypto'
+        ]
     },
     {
         mode: 'production',
