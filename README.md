@@ -1,15 +1,14 @@
 # music-api
 - 对网易云、虾米音乐、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
-- Node >= 8
-- 支持android、ios、react native、electron
+- 支持node、android、ios、react native、electron
 
 # 注意事项
 - 项目仍在开发阶段，即使是小版本之间也会出现不兼容，如用在`生产环境`，请写死版本号使用
 
 # 安装
 ````js
-npm install @suen/music-api
+yarn add @suen/music-api
 ````
 
 # 引入
@@ -22,8 +21,15 @@ npm install @suen/music-api
   - 通过Fly注册并调用，详见[Fly文档](https://wendux.github.io/dist/#/doc/flyio/native)
   - 已在window下注册，webview内可直接使用window.musicApi
 - react native
-  - 请先按照[https://github.com/tradle/react-native-crypto#install](https://github.com/tradle/react-native-crypto#install)第一步安装依赖
-  - 然后通过以下代码引入
+  - 安装依赖
+    ````shell
+    // 请使用yarn 经测试 使用npm可能会在装依赖时卡死
+    yarn add react-native-crypto react-native-randombytes
+    react-native link react-native-randombytes
+    yarn add -D rn-nodeify@latest
+    ./node_modules/.bin/rn-nodeify --hack --install --yarn // 执行到这一步时 请确定已安装 @suen/music-api
+    ````
+  - 通过以下代码引入
     ````js
     import './shim.js' // shim.js会生成在根目录下
     import musicApi from '@suen/music-api/dist/app.react-native'
