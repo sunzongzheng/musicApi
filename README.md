@@ -36,7 +36,7 @@ yarn add @suen/music-api
     ````
 - electron-render
     ````js
-    // 主进程 引入nodeAdapter，避免被打包进渲染进程 如无这个需求 可直接在渲染进程中进入
+    // 主进程 引入nodeAdapter，避免被打包进渲染进程 如无这个需求 可直接在渲染进程中引入
     import nodeAdapter from 'flyio/src/adapter/node'
     global.nodeAdapter = nodeAdapter
     
@@ -48,14 +48,11 @@ yarn add @suen/music-api
     ````js
     // express
     import app from '@suen/music-api/src/express-app'
+    app.listen(8080)
     
     // lean cloud
-    process.env.LEANCLOUD_APP_ID = 'your LEANCLOUD_APP_ID'
-    process.env.LEANCLOUD_APP_KEY = 'your LEANCLOUD_APP_KEY'
-    process.env.LEANCLOUD_APP_MASTER_KEY = 'your LEANCLOUD_APP_MASTER_KEY'
     import app from '@suen/music-api/src/lean-cloud-server'
-    
-    app.listen(8080) // 监听端口
+    app.listen(process.env.LEANCLOUD_APP_PORT)
     ````
     
 # 使用
@@ -74,7 +71,12 @@ yarn add @suen/music-api
   ````
 - api server调用
   - method: `GET`
-  - query: `JSON.stringfy([param1, param2])`
+  - query: 
+    - vendor: enum('qq', 'netease', 'xiami')
+    - method: 函数名
+    - params: 参数 `JSON.stringfy([param1, param2])`
+  - 通过这种方式调用请查看源代码，了解各个vendor的函数列表及参数
+  - 示例：[https://suen-music-api.leanapp.cn/?vendor=qq&method=searchSong&params=\[{"keyword":"周杰伦"}\]](https://suen-music-api.leanapp.cn/?vendor=qq&method=searchSong&params=[{"keyword":"周杰伦"}])
 
 # Api
 - ## Common
