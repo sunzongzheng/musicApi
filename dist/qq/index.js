@@ -173,6 +173,15 @@ function _default(instance) {
           const _ref = yield instance.get('/cgi-bin/musicu.fcg', {
             data: JSON.stringify({
               "req": {
+                "module": "CDN.SrfCdnDispatchServer",
+                "method": "GetCdnDispatch",
+                "param": {
+                  guid,
+                  "calltype": 0,
+                  "userip": ""
+                }
+              },
+              "req_0": {
                 "module": "vkey.GetVkeyServer",
                 "method": "CgiGetVkey",
                 "param": {
@@ -194,44 +203,16 @@ function _default(instance) {
           }, {
             newApi: true
           }),
-                _ref$req$data = _ref.req.data,
-                midurlinfo = _ref$req$data.midurlinfo,
-                testfile2g = _ref$req$data.testfile2g;
+                freeflowsip = _ref.req.data.freeflowsip,
+                midurlinfo = _ref.req_0.data.midurlinfo;
 
-          const key = midurlinfo[0].vkey || (testfile2g.match(/vkey=(\w+)/) || [])[1];
-          const host = 'http://aqqmusic.tc.qq.com/amobile.music.tc.qq.com';
-
-          switch (br) {
-            case 128000:
-              data = {
-                status: true,
-                data: {
-                  url: `${host}/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
-                }
-              };
-              break;
-
-            case 320000:
-              data = {
-                status: true,
-                data: {
-                  url: `${host}/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
-                }
-              };
-              break;
-
-            case 999000:
-              data = {
-                status: true,
-                data: {
-                  url: `${host}/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
-                }
-              };
-              break;
-
-            default:
-              throw new Error('br有误');
-          }
+          const host = freeflowsip[0];
+          data = {
+            status: true,
+            data: {
+              url: host + midurlinfo[0].purl
+            }
+          };
         } catch (e) {
           data = {
             status: false,
