@@ -33,6 +33,7 @@ function _default(instance) {
         name: info.artistName
       }],
       name: info.songName,
+      link: `https://www.xiami.com/song/${info.song_id}`,
       id: info.songId,
       cp: !info.listenFiles.length,
       dl: !info.needPayFlag,
@@ -63,6 +64,7 @@ function _default(instance) {
         name: info.artist_name
       }],
       name: info.song_name,
+      link: `https://www.xiami.com/song/${info.song_id}`,
       id: info.song_id,
       cp: !info.listen_file,
       dl: !info.need_pay_flag,

@@ -16,6 +16,7 @@ export default function (instance) {
                 }
             }),
             name: info.title,
+            link: `https://y.qq.com/n/yqq/song/${info.mid}.html`,
             id: info.id,
             cp: info.action.msg === 3 || !info.interval,
             dl: !info.pay.pay_down,
@@ -42,6 +43,7 @@ export default function (instance) {
                 }
             }),
             name: info.songname,
+            link: `https://y.qq.com/n/yqq/song/${info.mid}.html`,
             id: info.songid,
             cp: info.msgid === 3 || !info.interval,
             dl: !info.pay.paydownload,
