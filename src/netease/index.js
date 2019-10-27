@@ -87,6 +87,7 @@ export default function (instance) {
                 }
             }),
             name: info.name,
+            link: `https://music.163.com/#/song?id=${info.id}`,
             id: info.id,
             cp: disable(info, privilege),
             dl: !privilege.fee,
@@ -116,6 +117,7 @@ export default function (instance) {
                 }
             }),
             name: info.name,
+            link: `https://music.163.com/#/song?id=${info.id}`,
             id: info.id,
             cp: disable(info, privilege),
             dl: !privilege.fee,
