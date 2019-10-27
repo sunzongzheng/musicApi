@@ -93,6 +93,7 @@ function _default(instance) {
         };
       }),
       name: info.name,
+      link: `https://music.163.com/#/song?id=${info.id}`,
       id: info.id,
       cp: disable(info, privilege),
       dl: !privilege.fee,
@@ -124,6 +125,7 @@ function _default(instance) {
         };
       }),
       name: info.name,
+      link: `https://music.163.com/#/song?id=${info.id}`,
       id: info.id,
       cp: disable(info, privilege),
       dl: !privilege.fee,
