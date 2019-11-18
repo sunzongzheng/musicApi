@@ -47,8 +47,9 @@ const Cache = {
     this.cache = {
       _m_h5_tk,
       _m_h5_tk_enc,
-      expire
-    }; // 浏览器环境 存localstorage
+      expire // 浏览器环境 存localstorage
+
+    };
 
     if (this.isBrowser) {
       window.localStorage.setItem('music-api-xiami-cookie-cache', JSON.stringify(this.cache));
