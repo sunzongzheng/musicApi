@@ -8,7 +8,7 @@
     "test": "mocha -t 30000 --require @babel/register 'test/*.test.js' --exit",
     "test:qq": "mocha -t 30000 --require @babel/register 'test/qq.test.js' --exit",
     "dev-server": "nodemon --inspect src/server.js --exec babel-node",
-    "build:node": "babel src -d dist",
+    "build:node": "babel src -d dist"
   },
   "engines": {
     "node": ">=8.x"
@@ -18,12 +18,10 @@
   "dependencies": {
     "@babel/runtime": "^7.0.0",
     "apicache": "^1.2.3",
-    "babel-node": "^0.0.1-security",
     "big-integer": "^1.6.26",
     "dsbridge": "^3.1.3",
     "express": "^4.16.4",
     "flyio": "0.6.2",
-    "global": "^4.4.0",
     "leancloud-storage": "^3.10.0",
     "leanengine": "^3.3.2"
   },
