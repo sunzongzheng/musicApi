@@ -1,18 +1,21 @@
 import Netease from './netease'
 import QQ from './qq'
 import Xiami from './xiami'
+import Migu from './migu'
 import neteaseBase from './netease/instance/base'
 import qqBase from './qq/instance/base'
 import xiamiBase from './xiami/instance/base'
+import miguBase from './migu/instance/base'
 
 export default function (instance) {
     const provider = {
         netease: Netease(neteaseBase(instance)),
         qq: QQ(qqBase(instance)),
-        xiami: Xiami(xiamiBase(instance))
+        xiami: Xiami(xiamiBase(instance)),
+        migu: Migu(miguBase(instance))
     }
 
-    const vendors = ['netease', 'qq', 'xiami']
+    const vendors = ['netease', 'qq', 'xiami','migu']
     const paramsVerify = (vendor, id) => {
         // 参数校验
         if (!vendors.includes(vendor)) {
@@ -35,12 +38,15 @@ export default function (instance) {
         qq_rs = qq_rs.status ? qq_rs.data : errorResponse
         let xiami_rs = await provider.xiami[api](params)
         xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse
+        let migu_rs = await provider.migu[api](params)
+        migu_rs = migu_rs.status ? migu_rs.data : errorResponse
         return {
             status: true,
             data: {
                 netease: netease_rs,
                 qq: qq_rs,
-                xiami: xiami_rs
+                xiami: xiami_rs,
+                migu: migu_rs
             }
         }
     }
