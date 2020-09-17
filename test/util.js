@@ -13,7 +13,7 @@ export const qqMusic = {
     translateLyricId: 432263
 }
 export const xiamiMusic = {
-    id: 74204,
+    id: 1770567772,
     artistId: 2629,
     playlistId: 412499071,
     albumId: 2100350206,

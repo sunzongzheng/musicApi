@@ -463,7 +463,7 @@ export default function (instance) {
                     },
                     pureFly: true
                 })
-                const pattern = /<script[^>]*>\s*window\.Gbanners\s*=\s*([^;]+?);\s*<\/script>/g;
+                const pattern = /window.Gbanners[\s\S]+?(\[[\s\S]+?\])/;
                 const banners = pattern.exec(data)[1]
                 return {
                     status: true,

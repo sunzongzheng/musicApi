@@ -1,7 +1,7 @@
 import {lyric_decode, noSongsDetailMsg} from '../util'
 
 const replaceImage = (url = '') => {
-    return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
+    return url.replace('http:', 'https:').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
 }
 export default function (instance) {
     const getMusicInfo = (info) => {
