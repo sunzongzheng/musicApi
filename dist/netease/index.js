@@ -703,6 +703,34 @@ function _default(instance) {
           };
         }
       })();
+    },
+
+    getAllTopList() {
+      return _asyncToGenerator(function* () {
+        try {
+          const data = yield instance.post('/weapi/toplist/detail', {});
+          return {
+            status: true,
+            data: data.list.map(item => {
+              return {
+                id: item.id,
+                name: item.name,
+                cover: item.coverImgUrl,
+                list: item.tracks.map(track => {
+                  return {
+                    artists: [{
+                      name: track.second
+                    }],
+                    name: track.first
+                  };
+                })
+              };
+            })
+          };
+        } catch (e) {
+          return e;
+        }
+      })();
     }
 
   };

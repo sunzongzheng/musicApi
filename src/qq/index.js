@@ -358,13 +358,13 @@ export default function (instance) {
                         return {
                             id: item.topID,
                             name: item.ListName,
-                            cover: item.MacListPicUrl,
+                            cover: item.pic_v12,
                             list: item.songlist.map((item, i) => {
                                 return {
-                                    artists: {
+                                    artists: [{
                                         id: item.singerid,
                                         name: item.singername
-                                    },
+                                    }],
                                     name: item.songname,
                                     id: item.songid
                                 }
