@@ -391,7 +391,7 @@ export default function (instance) {
                     data: {
                         name: data.topinfo.ListName,
                         description: data.topinfo.info,
-                        cover: data.topinfo.MacDetailPicUrl,
+                        cover: data.topinfo.pic_v12,
                         playCount: data.topinfo.listennum,
                         list: data.songlist.map(item => getMusicInfo2(item.data))
                     }
