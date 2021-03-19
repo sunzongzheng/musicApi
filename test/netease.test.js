@@ -25,21 +25,9 @@ describe('网易云', () => {
         assert.equal(true, data.data.lyric.length > 0)
         assert.equal(true, data.data.translate.length > 0)
     })
-    it('获取新歌榜', async () => {
-        const {data} = await netease.getTopList("0")
-        assert.equal(true, data.list.length >= 30)
-    })
-    it('获取热歌榜', async () => {
-        const {data} = await netease.getTopList("1")
-        assert.equal(true, data.list.length >= 30)
-    })
-    it('获取网易原创歌曲榜', async () => {
-        const {data} = await netease.getTopList("2")
-        assert.equal(true, data.list.length >= 30)
-    })
-    it('获取飙升榜', async () => {
-        const {data} = await netease.getTopList("3")
-        assert.equal(true, data.list.length >= 30)
+    it('获取排行榜', async () => {
+        const {data} = await netease.getAllTopList()
+        assert.equal(true, data.length > 0)
     })
     it('获取歌曲评论', async () => {
         const data = await netease.getComment(neteaseMusic.id, 1, 1)

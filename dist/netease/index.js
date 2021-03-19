@@ -305,15 +305,14 @@ function _default(instance) {
       })();
     },
 
-    getTopList(id) {
+    getTopList(id, limit = 1000) {
       return _asyncToGenerator(function* () {
         try {
           const _ref3 = yield instance.post('/weapi/v3/playlist/detail', {
             id,
-            limit: 30,
             offset: 0,
             total: true,
-            n: 1000,
+            n: limit,
             csrf_token: ""
           }),
                 playlist = _ref3.playlist,
@@ -411,36 +410,26 @@ function _default(instance) {
             s: 8,
             csrf_token: ""
           }),
-                playlist = _ref5.playlist,
-                privileges = _ref5.privileges;
+                playlist = _ref5.playlist;
 
-          let songs = [];
-          const privilegesObjects = {};
+          const songs = [];
+          let bufferSongIds = [];
 
-          if (playlist.tracks.length > 1000) {
-            let arr = [];
-            const limit = 1000;
+          for (let i = 0; i < playlist.trackIds.length; i++) {
+            const track = playlist.trackIds[i];
+            bufferSongIds.push(track.id); // 到阈值或到最后一个
 
-            for (let i = 0; i < playlist.tracks.length; i++) {
-              arr.push(playlist.tracks[i].id); // 达到限制 或 已是数组最后一个
+            if (bufferSongIds.length === 1000 || i === playlist.trackIds.length - 1) {
+              const _ref6 = yield _this.getBatchSongDetail(bufferSongIds),
+                    status = _ref6.status,
+                    data = _ref6.data;
 
-              if (arr.length === limit || i + 1 === playlist.tracks.length) {
-                // 获取详情
-                const data = yield _this.getBatchSongDetail(arr);
-
-                if (data.status) {
-                  songs = songs.concat(data.data);
-                } // 重置待处理的数组
-
-
-                arr = [];
+              if (status) {
+                songs.push(...data);
               }
+
+              bufferSongIds = [];
             }
-          } else {
-            privileges.forEach(item => {
-              privilegesObjects[item.id] = item;
-            });
-            songs = playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]));
           }
 
           return {
@@ -468,9 +457,9 @@ function _default(instance) {
     getAlbumDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref6 = yield instance.post(`/weapi/v1/album/${id}`, {}),
-                album = _ref6.album,
-                songs = _ref6.songs;
+          const _ref7 = yield instance.post(`/weapi/v1/album/${id}`, {}),
+                album = _ref7.album,
+                songs = _ref7.songs;
 
           return {
             status: true,
@@ -499,14 +488,14 @@ function _default(instance) {
     getBanner() {
       return _asyncToGenerator(function* () {
         try {
-          const _ref7 = yield instance.get('http://music.163.com/discover', {}, {
+          const _ref8 = yield instance.get('http://music.163.com/discover', {}, {
             headers: {
               Referer: "http://music.163.com",
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3380.0 Safari/537.36"
             },
             pureFly: true
           }),
-                data = _ref7.data;
+                data = _ref8.data;
 
           const pattern = /window.Gbanners[\s\S]+?(\[[\s\S]+?\])/;
           const banners = pattern.exec(data)[1];
@@ -527,10 +516,10 @@ function _default(instance) {
     getMvDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref8 = yield instance.post(`/weapi/mv/detail`, {
+          const _ref9 = yield instance.post(`/weapi/mv/detail`, {
             id
           }),
-                data = _ref8.data;
+                data = _ref9.data;
 
           return {
             status: true,
@@ -599,12 +588,12 @@ function _default(instance) {
     getNewestMvs(limit = 20) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref9 = yield instance.post('/weapi/mv/first', {
+          const _ref10 = yield instance.post('/weapi/mv/first', {
             total: true,
             limit,
             csrf_token: ""
           }),
-                data = _ref9.data;
+                data = _ref10.data;
 
           return {
             status: true,

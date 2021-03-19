@@ -337,35 +337,25 @@ export default function (instance) {
         },
         async getPlaylistDetail(id, offset, limit) {
             try {
-                const {playlist, privileges} = await instance.post(`/weapi/v3/playlist/detail`, {
+                const {playlist} = await instance.post(`/weapi/v3/playlist/detail`, {
                     id,
                     n: limit,
                     s: 8,
                     csrf_token: ""
                 })
-                let songs = []
-                const privilegesObjects = {}
-                if (playlist.tracks.length > 1000) {
-                    let arr = []
-                    const limit = 1000
-                    for (let i = 0; i < playlist.tracks.length; i++) {
-                        arr.push(playlist.tracks[i].id)
-                        // 达到限制 或 已是数组最后一个
-                        if (arr.length === limit || i + 1 === playlist.tracks.length) {
-                            // 获取详情
-                            const data = await this.getBatchSongDetail(arr)
-                            if (data.status) {
-                                songs = songs.concat(data.data)
-                            }
-                            // 重置待处理的数组
-                            arr = []
+                const songs = []
+                let bufferSongIds = []
+                for(let i = 0; i < playlist.trackIds.length; i++) {
+                    const track = playlist.trackIds[i]
+                    bufferSongIds.push(track.id)
+                    // 到阈值或到最后一个
+                    if (bufferSongIds.length === 1000 || i === playlist.trackIds.length - 1) {
+                        const {status, data} = await this.getBatchSongDetail(bufferSongIds)
+                        if (status) {
+                            songs.push(...data)
                         }
+                        bufferSongIds = []
                     }
-                } else {
-                    privileges.forEach(item => {
-                        privilegesObjects[item.id] = item
-                    })
-                    songs = playlist.tracks.map(item => getMusicInfo(item, privilegesObjects[item.id]))
                 }
                 return {
                     status: true,
