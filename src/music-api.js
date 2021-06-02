@@ -1,18 +1,15 @@
 import Netease from './netease'
 import QQ from './qq'
-import Xiami from './xiami'
 import neteaseBase from './netease/instance/base'
 import qqBase from './qq/instance/base'
-import xiamiBase from './xiami/instance/base'
 
 export default function (instance) {
     const provider = {
         netease: Netease(neteaseBase(instance)),
-        qq: QQ(qqBase(instance)),
-        xiami: Xiami(xiamiBase(instance))
+        qq: QQ(qqBase(instance))
     }
 
-    const vendors = ['netease', 'qq', 'xiami']
+    const vendors = ['netease', 'qq']
     const paramsVerify = (vendor, id) => {
         // 参数校验
         if (!vendors.includes(vendor)) {
@@ -33,14 +30,11 @@ export default function (instance) {
         netease_rs = netease_rs.status ? netease_rs.data : errorResponse
         let qq_rs = await provider.qq[api](params)
         qq_rs = qq_rs.status ? qq_rs.data : errorResponse
-        let xiami_rs = await provider.xiami[api](params)
-        xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse
         return {
             status: true,
             data: {
                 netease: netease_rs,
-                qq: qq_rs,
-                xiami: xiami_rs
+                qq: qq_rs
             }
         }
     }
@@ -119,8 +113,7 @@ export default function (instance) {
             // 先分类
             const songsList = {
                 netease: [],
-                qq: [],
-                xiami: [],
+                qq: []
             }
             arr.forEach(item => {
                 songsList[item.vendor].push(item.id)
@@ -132,8 +125,7 @@ export default function (instance) {
                 if (!list.length) continue
                 const limit = {
                     qq: 50,
-                    netease: 1000,
-                    xiami: 250,
+                    netease: 1000
                 }[vendor]
                 let arr = []
                 for (let index = 0; index < list.length; index++) {

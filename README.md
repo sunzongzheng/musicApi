@@ -1,5 +1,5 @@
 # music-api
-- 对网易云、虾米音乐、QQ音乐统一封装
+- 对网易云、QQ音乐统一封装
 - 绝大部分来源于[Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)和[LIU9293/musicAPI](https://github.com/LIU9293/musicAPI)等
 - 支持node、android、ios、react native、electron
 
@@ -72,7 +72,7 @@ yarn add @suen/music-api
 - api server调用
   - method: `GET`
   - query: 
-    - vendor: enum('qq', 'netease', 'xiami')
+    - vendor: enum('qq', 'netease')
     - method: 函数名
     - params: 参数 `JSON.stringfy([param1, param2])`
   - 通过这种方式调用请查看源代码，了解各个vendor的函数列表及参数
@@ -87,8 +87,7 @@ yarn add @suen/music-api
                 status:Boolean, // 请求是否成功
                 data:{
                     netease: Object,
-                    qq: Object,
-                    xiami: Object
+                    qq: Object
                 }
             }
         }
@@ -153,7 +152,6 @@ yarn add @suen/music-api
         注意事项： 
         - QQ音乐一次只能获取50条数据，不会去重
         - 网易云音乐未发现单次数量限制，会去重
-        - 虾米音乐未发现单次数量限制，不会去重
         - `去重`的意思是 `重复的歌曲id，只会返回一次歌曲信息`
         ````js
         function getBatchSongDetail( vendor:歌曲来源, ids:歌曲id数组 ) {
@@ -208,7 +206,7 @@ yarn add @suen/music-api
     - 歌单信息
     
         注意事项：
-        - QQ音乐没有分页，传页参数无效;网易云可传limit;虾米可传全部页参数
+        - QQ音乐没有分页，传页参数无效;网易云可传limit
         - 默认第一页，65535条数据
         
         ````js

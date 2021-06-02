@@ -128,12 +128,6 @@ declare module '@suen/music-api' {
     export interface qq extends musicApiBase {
     }
 
-    export interface xiami extends musicApiBase {
-        getXiamiToken(api: string): Promise<{ token: string, signedToken: string }>
-
-        parseLocation(location: string): string
-    }
-
     interface getTopListResult {
         status: true
         data: {
@@ -154,8 +148,7 @@ declare module '@suen/music-api' {
         status: true,
         data: {
             netease: searchSongResult,
-            qq: searchSongResult,
-            xiami: searchSongResult
+            qq: searchSongResult
         }
     }
 
@@ -163,8 +156,7 @@ declare module '@suen/music-api' {
 
     enum vendor {
         netease = 'netease',
-        qq = 'qq',
-        xiami = 'xiami'
+        qq = 'qq'
     }
 
     export function getSongDetail(vendor: vendor, id: number | string): Promise<getSongDetailResult | errorResult>
