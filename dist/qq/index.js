@@ -172,7 +172,7 @@ function _default(instance) {
         let data;
 
         try {
-          const _ref = yield instance.get('/cgi-bin/musicu.fcg', {
+          const _yield$instance$get = yield instance.get('/cgi-bin/musicu.fcg', {
             data: JSON.stringify({
               "req": {
                 "module": "CDN.SrfCdnDispatchServer",
@@ -205,8 +205,8 @@ function _default(instance) {
           }, {
             newApi: true
           }),
-                freeflowsip = _ref.req.data.freeflowsip,
-                midurlinfo = _ref.req_0.data.midurlinfo;
+                freeflowsip = _yield$instance$get.req.data.freeflowsip,
+                midurlinfo = _yield$instance$get.req_0.data.midurlinfo;
 
           const host = freeflowsip[0];
           data = {
@@ -264,7 +264,7 @@ function _default(instance) {
     getComment(songid, page = 1, pagesize = 20) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
+          const _yield$instance$get2 = yield instance.get('/base/fcgi-bin/fcg_global_comment_h5.fcg', {
             reqtype: 2,
             biztype: 1,
             topid: songid,
@@ -275,8 +275,8 @@ function _default(instance) {
             lasthotcommentid: '',
             domain: 'qq.com'
           }),
-                comment = _ref2.comment,
-                hot_comment = _ref2.hot_comment;
+                comment = _yield$instance$get2.comment,
+                hot_comment = _yield$instance$get2.hot_comment;
 
           return {
             status: true,
@@ -305,8 +305,8 @@ function _default(instance) {
             songstatus: 1
           };
 
-          const _ref3 = yield instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params),
-                data = _ref3.data;
+          const _yield$instance$get3 = yield instance.get('/v8/fcg-bin/fcg_v8_singer_track_cp.fcg', params),
+                data = _yield$instance$get3.data;
 
           return {
             status: true,
@@ -335,8 +335,8 @@ function _default(instance) {
             disstid: id
           };
 
-          const _ref4 = yield instance.get('/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg', params),
-                cdlist = _ref4.cdlist;
+          const _yield$instance$get4 = yield instance.get('/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg', params),
+                cdlist = _yield$instance$get4.cdlist;
 
           return {
             status: true,
@@ -368,18 +368,18 @@ function _default(instance) {
       var _this4 = this;
 
       return _asyncToGenerator(function* () {
-        const _ref5 = param || {},
-              _ref5$area = _ref5.area,
-              area = _ref5$area === void 0 ? -100 : _ref5$area,
-              _ref5$sex = _ref5.sex,
-              sex = _ref5$sex === void 0 ? -100 : _ref5$sex,
-              _ref5$genre = _ref5.genre,
-              genre = _ref5$genre === void 0 ? -100 : _ref5$genre,
-              _ref5$index = _ref5.index,
-              index = _ref5$index === void 0 ? -100 : _ref5$index;
+        const _ref = param || {},
+              _ref$area = _ref.area,
+              area = _ref$area === void 0 ? -100 : _ref$area,
+              _ref$sex = _ref.sex,
+              sex = _ref$sex === void 0 ? -100 : _ref$sex,
+              _ref$genre = _ref.genre,
+              genre = _ref$genre === void 0 ? -100 : _ref$genre,
+              _ref$index = _ref.index,
+              index = _ref$index === void 0 ? -100 : _ref$index;
 
         try {
-          const _ref6 = yield _this4.getMusicu({
+          const _yield$_this4$getMusi = yield _this4.getMusicu({
             comm: {
               ct: 24,
               cv: 10000
@@ -397,7 +397,7 @@ function _default(instance) {
               }
             }
           }),
-                singerList = _ref6.singerList;
+                singerList = _yield$_this4$getMusi.singerList;
 
           return {
             status: true,
@@ -412,11 +412,11 @@ function _default(instance) {
     getAlbumDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref7 = yield instance.get('https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg', {
+          const _yield$instance$get5 = yield instance.get('https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg', {
             albumid: id,
             tpl: 'yqq_song_detail'
           }),
-                data = _ref7.data;
+                data = _yield$instance$get5.data;
 
           return {
             status: true,
@@ -508,8 +508,8 @@ function _default(instance) {
     getUserInfo() {
       return _asyncToGenerator(function* () {
         try {
-          const _ref8 = yield instance.get('/portalcgi/fcgi-bin/music_mini_portal/fcg_getuser_infoEx.fcg'),
-                data = _ref8.data;
+          const _yield$instance$get6 = yield instance.get('/portalcgi/fcgi-bin/music_mini_portal/fcg_getuser_infoEx.fcg'),
+                data = _yield$instance$get6.data;
 
           return {
             status: true,
@@ -526,7 +526,7 @@ function _default(instance) {
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref9 = yield _this5.getMusicu({
+          const _yield$_this5$getMusi = yield _this5.getMusicu({
             'comm': {
               'ct': 24
             },
@@ -539,7 +539,7 @@ function _default(instance) {
               'module': 'playlist.HotRecommendServer'
             }
           }),
-                recomPlaylist = _ref9.recomPlaylist;
+                recomPlaylist = _yield$_this5$getMusi.recomPlaylist;
 
           return {
             status: true,
@@ -556,7 +556,7 @@ function _default(instance) {
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref10 = yield _this6.getMusicu({
+          const _yield$_this6$getMusi = yield _this6.getMusicu({
             "comm": {
               "ct": 6,
               "cv": 50500
@@ -571,7 +571,7 @@ function _default(instance) {
               }
             }
           }),
-                get_daily_track = _ref10.get_daily_track;
+                get_daily_track = _yield$_this6$getMusi.get_daily_track;
 
           return {
             status: true,
