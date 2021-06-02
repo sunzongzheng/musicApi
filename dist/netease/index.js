@@ -134,8 +134,8 @@ function _default(instance) {
         };
 
         try {
-          let _ref = yield instance.post('/weapi/cloudsearch/get/web', params),
-              result = _ref.result;
+          let _yield$instance$post = yield instance.post('/weapi/cloudsearch/get/web', params),
+              result = _yield$instance$post.result;
 
           if (!result) {
             result = {
@@ -235,8 +235,8 @@ function _default(instance) {
         };
 
         try {
-          let _ref2 = yield instance.post('/weapi/song/enhance/player/url', params),
-              data = _ref2.data;
+          let _yield$instance$post2 = yield instance.post('/weapi/song/enhance/player/url', params),
+              data = _yield$instance$post2.data;
 
           return {
             status: true,
@@ -308,15 +308,15 @@ function _default(instance) {
     getTopList(id, limit = 1000) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref3 = yield instance.post('/weapi/v3/playlist/detail', {
+          const _yield$instance$post3 = yield instance.post('/weapi/v3/playlist/detail', {
             id,
             offset: 0,
             total: true,
             n: limit,
             csrf_token: ""
           }),
-                playlist = _ref3.playlist,
-                privileges = _ref3.privileges;
+                playlist = _yield$instance$post3.playlist,
+                privileges = _yield$instance$post3.privileges;
 
           return {
             status: true,
@@ -341,15 +341,15 @@ function _default(instance) {
     getComment(rid, page, limit = 20) {
       return _asyncToGenerator(function* () {
         try {
-          let _ref4 = yield instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
+          let _yield$instance$post4 = yield instance.post('/weapi/v1/resource/comments/R_SO_4_' + rid + '/?csrf_token=', {
             offset: (page - 1) * limit,
             rid,
             limit,
             csrf_token: ""
           }),
-              hotComments = _ref4.hotComments,
-              comments = _ref4.comments,
-              total = _ref4.total;
+              hotComments = _yield$instance$post4.hotComments,
+              comments = _yield$instance$post4.comments,
+              total = _yield$instance$post4.total;
 
           return {
             status: true,
@@ -404,13 +404,13 @@ function _default(instance) {
 
       return _asyncToGenerator(function* () {
         try {
-          const _ref5 = yield instance.post(`/weapi/v3/playlist/detail`, {
+          const _yield$instance$post5 = yield instance.post(`/weapi/v3/playlist/detail`, {
             id,
             n: limit,
             s: 8,
             csrf_token: ""
           }),
-                playlist = _ref5.playlist;
+                playlist = _yield$instance$post5.playlist;
 
           const songs = [];
           let bufferSongIds = [];
@@ -420,9 +420,9 @@ function _default(instance) {
             bufferSongIds.push(track.id); // 到阈值或到最后一个
 
             if (bufferSongIds.length === 1000 || i === playlist.trackIds.length - 1) {
-              const _ref6 = yield _this.getBatchSongDetail(bufferSongIds),
-                    status = _ref6.status,
-                    data = _ref6.data;
+              const _yield$_this$getBatch = yield _this.getBatchSongDetail(bufferSongIds),
+                    status = _yield$_this$getBatch.status,
+                    data = _yield$_this$getBatch.data;
 
               if (status) {
                 songs.push(...data);
@@ -457,9 +457,9 @@ function _default(instance) {
     getAlbumDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref7 = yield instance.post(`/weapi/v1/album/${id}`, {}),
-                album = _ref7.album,
-                songs = _ref7.songs;
+          const _yield$instance$post6 = yield instance.post(`/weapi/v1/album/${id}`, {}),
+                album = _yield$instance$post6.album,
+                songs = _yield$instance$post6.songs;
 
           return {
             status: true,
@@ -488,14 +488,14 @@ function _default(instance) {
     getBanner() {
       return _asyncToGenerator(function* () {
         try {
-          const _ref8 = yield instance.get('http://music.163.com/discover', {}, {
+          const _yield$instance$get = yield instance.get('http://music.163.com/discover', {}, {
             headers: {
               Referer: "http://music.163.com",
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3380.0 Safari/537.36"
             },
             pureFly: true
           }),
-                data = _ref8.data;
+                data = _yield$instance$get.data;
 
           const pattern = /window.Gbanners[\s\S]+?(\[[\s\S]+?\])/;
           const banners = pattern.exec(data)[1];
@@ -516,10 +516,10 @@ function _default(instance) {
     getMvDetail(id) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref9 = yield instance.post(`/weapi/mv/detail`, {
+          const _yield$instance$post7 = yield instance.post(`/weapi/mv/detail`, {
             id
           }),
-                data = _ref9.data;
+                data = _yield$instance$post7.data;
 
           return {
             status: true,
@@ -588,12 +588,12 @@ function _default(instance) {
     getNewestMvs(limit = 20) {
       return _asyncToGenerator(function* () {
         try {
-          const _ref10 = yield instance.post('/weapi/mv/first', {
+          const _yield$instance$post8 = yield instance.post('/weapi/mv/first', {
             total: true,
             limit,
             csrf_token: ""
           }),
-                data = _ref10.data;
+                data = _yield$instance$post8.data;
 
           return {
             status: true,

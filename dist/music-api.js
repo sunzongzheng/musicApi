@@ -9,17 +9,19 @@ var _netease = _interopRequireDefault(require("./netease"));
 
 var _qq = _interopRequireDefault(require("./qq"));
 
-var _xiami = _interopRequireDefault(require("./xiami"));
-
 var _base = _interopRequireDefault(require("./netease/instance/base"));
 
 var _base2 = _interopRequireDefault(require("./qq/instance/base"));
 
-var _base3 = _interopRequireDefault(require("./xiami/instance/base"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? Object(arguments[i]) : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -30,10 +32,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function _default(instance) {
   const provider = {
     netease: (0, _netease.default)((0, _base.default)(instance)),
-    qq: (0, _qq.default)((0, _base2.default)(instance)),
-    xiami: (0, _xiami.default)((0, _base3.default)(instance))
+    qq: (0, _qq.default)((0, _base2.default)(instance))
   };
-  const vendors = ['netease', 'qq', 'xiami'];
+  const vendors = ['netease', 'qq'];
 
   const paramsVerify = (vendor, id) => {
     // 参数校验
@@ -52,22 +53,17 @@ function _default(instance) {
     }
   };
 
-  const getData =
-  /*#__PURE__*/
-  function () {
+  const getData = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator(function* (api, params, errorResponse) {
       let netease_rs = yield provider.netease[api](params);
       netease_rs = netease_rs.status ? netease_rs.data : errorResponse;
       let qq_rs = yield provider.qq[api](params);
       qq_rs = qq_rs.status ? qq_rs.data : errorResponse;
-      let xiami_rs = yield provider.xiami[api](params);
-      xiami_rs = xiami_rs.status ? xiami_rs.data : errorResponse;
       return {
         status: true,
         data: {
           netease: netease_rs,
-          qq: qq_rs,
-          xiami: xiami_rs
+          qq: qq_rs
         }
       };
     });
@@ -182,8 +178,7 @@ function _default(instance) {
         // 先分类
         const songsList = {
           netease: [],
-          qq: [],
-          xiami: []
+          qq: []
         };
         arr.forEach(item => {
           songsList[item.vendor].push(item.id);
@@ -197,8 +192,7 @@ function _default(instance) {
           if (!list.length) continue;
           const limit = {
             qq: 50,
-            netease: 1000,
-            xiami: 250
+            netease: 1000
           }[vendor];
           let arr = [];
 
@@ -233,12 +227,12 @@ function _default(instance) {
 
 
         const rs = [];
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
+
+        var _iterator = _createForOfIteratorHelper(arr),
+            _step;
 
         try {
-          for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
             let _ref2 = _step.value;
             let id = _ref2.id,
                 vendor = _ref2.vendor;
@@ -256,18 +250,9 @@ function _default(instance) {
             }
           }
         } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
+          _iterator.e(err);
         } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return != null) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
+          _iterator.f();
         }
 
         return rs;

@@ -19,9 +19,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 const app = (0, _express.default)();
 app.use(_apicache.default.middleware('720 minutes'));
-app.get('/',
-/*#__PURE__*/
-function () {
+app.get('/', /*#__PURE__*/function () {
   var _ref = _asyncToGenerator(function* (req, res) {
     const method = req.query.method;
     const vendor = req.query.vendor;

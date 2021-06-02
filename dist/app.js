@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.xiami = exports.netease = exports.qq = void 0;
+exports.default = exports.netease = exports.qq = void 0;
 
 var _musicApi = _interopRequireDefault(require("./music-api"));
 
@@ -16,7 +16,5 @@ const qq = app.qq;
 exports.qq = qq;
 const netease = app.netease;
 exports.netease = netease;
-const xiami = app.xiami;
-exports.xiami = xiami;
 var _default = app;
 exports.default = _default;
