@@ -7,5 +7,4 @@ const app = musicApi(function () {
 
 export const qq = app.qq
 export const netease = app.netease
-export const xiami = app.xiami
 export default app

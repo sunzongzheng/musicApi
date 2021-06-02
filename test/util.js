@@ -12,10 +12,3 @@ export const qqMusic = {
     albumId: 1458791,
     translateLyricId: 432263
 }
-export const xiamiMusic = {
-    id: 1770567772,
-    artistId: 2629,
-    playlistId: 412499071,
-    albumId: 2100350206,
-    translateLyricId: 2093450
-}
