@@ -4,6 +4,7 @@ import EngineWrapper from "flyio/dist/npm/engine-wrapper"
 import { Err } from './utils'
 
 export enum br {
+    none = 0,
     normal = 128,
     high = 320,
     max = 999
@@ -24,7 +25,7 @@ export enum searchType {
 }
 
 interface songInfo {
-    songId: number
+    id: number
     name: string
     album: {
         id: number,
@@ -35,10 +36,13 @@ interface songInfo {
         id: number,
         name: string
     }>,
-    cp: boolean // 是否有版权限制
-    maxbr: br // 最大音质
+    maxbr: br // 最大音质 0代表无音频资源
     mv: number | string | null
     vendor: vendor
+}
+
+interface lyric_item {
+    
 }
 
 export default abstract class MusicApi {
@@ -76,4 +80,8 @@ export default abstract class MusicApi {
     abstract getSongDetail(ids: Array<number>): Promise<Array<songInfo>>
 
     abstract getSongUrl(id: number, br?: br): Promise<string>
+
+    // abstract getLyric(id: number): Promise<{
+    //     lyric: Array<lyric_item>
+    // }>
 }

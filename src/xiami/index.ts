@@ -20,7 +20,7 @@ export default class Xiami extends MusicApi {
         purviewRoleVOs.forEach((item: any) => {
             brObject[item.quality] = item.isExist
         })
-        const maxbr = brObject.s ? 999000 : (brObject.h ? 320000 : 128000)
+        const maxbr = brObject.s ? 999 : (brObject.h ? 320 : 128)
         return {
             album: {
                 id: info.albumId,

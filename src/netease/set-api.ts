@@ -22,15 +22,16 @@ export default function setApi(Api: Fly) {
     }
 
     Api.interceptors.request.use(config => {
-        const cryptoreq = Encrypt(config.body)
         // 浏览器且本地有cookie信息 接口就都带上cookie
         if (isBrowser && cache.get(loginCacheKey)) {
             config.headers.Cookie = loginCacheKey
         }
-        config.body = {
-            params: cryptoreq.params,
-            encSecKey: cryptoreq.encSecKey
-        }
+        config.body = config.crypto === 'linuxapi' ?
+            Encrypt.linuxapi({
+                method: config.method,
+                url: config.url ? config.url.replace(/\w*api/, 'api') : '',
+                params: config.body
+            }) : Encrypt.weapi(config.body)
         return config
     })
     Api.interceptors.response.use(res => {

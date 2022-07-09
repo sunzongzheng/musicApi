@@ -13,11 +13,11 @@ export default class QQ extends MusicApi {
 
     private getMusicInfo(song: any) {
         const file = song.file
-        let maxbr = 128000
+        let maxbr = 128
         if (song.file.size_flac) {
-            maxbr = 999000
+            maxbr = 999
         } else if (file.size_320 || file.size_320mp3) {
-            maxbr = 320000
+            maxbr = 320
         }
         return {
             album: {
@@ -33,7 +33,7 @@ export default class QQ extends MusicApi {
             }),
             name: song.title,
             songId: song.id,
-            cp: song.action.msg === 3 || !song.interval,
+            cp: !song.id || song.action.msg === 3 || !song.interval,
             maxbr,
             mv: song.mv.vid || null,
             vendor: 'qq'
@@ -82,11 +82,11 @@ export default class QQ extends MusicApi {
         const mid = await this.getMid(id)
         switch (br) {
             case 128:
-                return `http://183.131.60.16/amobile.music.tc.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                return `http://isure.stream.qqmusic.qq.com/M500${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
             case 320:
-                return `http://183.131.60.16/amobile.music.tc.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
+                return `http://isure.stream.qqmusic.qq.com/M800${mid}.mp3?vkey=${key}&guid=${guid}&fromtag=30`
             case 999:
-                return `http://183.131.60.16/amobile.music.tc.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
+                return `http://isure.stream.qqmusic.qq.com/F000${mid}.flac?vkey=${key}&guid=${guid}&fromtag=54`
             default:
                 return ''
         }

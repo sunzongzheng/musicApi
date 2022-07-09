@@ -1,0 +1,41 @@
+{
+  "name": "@suen/music-api",
+  "version": "2.0.0",
+  "description": "music api colletion",
+  "main": "dist/node/node.js",
+  "scripts": {
+    "dev": "mocha ts-node/register 'test/node.ts' --exit --grep $grep",
+    "test": "mocha -t 30000 -r ts-node/register 'test/**/*.test.ts' --exit",
+    "build": "rimraf ./dist && npm run build:node && npm run build:web",
+    "build:node": "tsc",
+    "build:web": "webpack --config ./build/webpack.config.js",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "engines": {
+    "node": ">=8.x"
+  },
+  "author": "i@zzsun.cc",
+  "license": "MIT",
+  "dependencies": {
+    "big-integer": "^1.6.41",
+    "dsbridge": "^3.1.3",
+    "md5": "^2.2.1",
+    "axios": "0.19.2",
+    "@suen/music-api-core": "1.0.0"
+  },
+  "devDependencies": {
+    "@types/md5": "^2.1.33",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "8.0.0",
+    "mocha": "8.0.1",
+    "nodemon": "^1.12.1",
+    "rimraf": "^2.6.3",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.1",
+    "vuepress": "^0.14.8",
+    "webpack": "^4.11.1",
+    "webpack-cli": "^3.0.3"
+  }
+}

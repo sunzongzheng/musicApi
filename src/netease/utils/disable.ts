@@ -26,7 +26,23 @@ function getRestrictLevel(bm5r: any, fC7v: any) {
         return 100
     }
 }
+
+// 来自网易云前端 l2x.qA8s
+function qA8s(fB4F: any) {
+    if (fB4F.st != null && fB4F.st < 0) {
+        return 100
+    }
+    if (fB4F.fee > 0 && fB4F.fee != 8 && fB4F.payed == 0 && fB4F.pl <= 0)
+        return 10;
+    if (fB4F.fee == 16 || fB4F.fee == 4 && fB4F.flag & 2048)
+        return 11;
+    if ((fB4F.fee == 0 || fB4F.payed) && fB4F.pl > 0 && fB4F.dl == 0)
+        return 1e3;
+    if (fB4F.pl == 0 && fB4F.dl == 0)
+        return 100;
+    return 0
+}
 // 判断是否被版权限制
 export default function disable(song: any, privilege: any) {
-    return getRestrictLevel(song, privilege) === 100
+    return getRestrictLevel(song, privilege) === 100 || qA8s(privilege) === 10
 }

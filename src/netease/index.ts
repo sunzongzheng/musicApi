@@ -31,7 +31,7 @@ export default class Netease extends MusicApi {
             name: info.name,
             songId: info.id,
             cp: disable(info, privilege),
-            maxbr: privilege.maxbr,
+            maxbr: privilege.pl / 1000,
             mv: info.mv || null,
             vendor: 'netease'
         }
@@ -89,5 +89,21 @@ export default class Netease extends MusicApi {
         }
         const {data} = await this.Api.post('/weapi/song/enhance/player/url', params)
         return data[0].url
+    }
+
+    async getLyric(id: number) {
+        const data = await this.Api.request('/weapi/song/lyric', null, {
+            method: 'POST',
+            params: {
+                lv: -1,
+                kv: -1,
+                tv: -1
+            },
+            body: {
+                id: 536570450,
+            },
+            crypto: 'linuxapi'
+        })
+        return data
     }
 }
